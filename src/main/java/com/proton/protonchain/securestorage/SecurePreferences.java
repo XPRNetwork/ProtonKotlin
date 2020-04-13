@@ -16,6 +16,7 @@
 
 package com.proton.protonchain.securestorage;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,7 +26,6 @@ import com.proton.protonchain.R;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.CRYPTO_EXCEPTION;
-import static com.proton.protonchain.securestorage.SecureStorageProvider.context;
 
 // Edited by joey-harward on 9/19/18
 
@@ -44,73 +44,85 @@ public final class SecurePreferences {
 		SharedPreferencesName = sharedPreferencesName;
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								@NonNull String value,
 								@Nullable String password) throws SecureStorageException {
+		Context applicationContext = context.getApplicationContext();
+
 		String transformedValue = "";
 		if (password != null) {
 			transformedValue = SecretKeyTool.encryptMessage(key, value, password);
 		} else {
 			if (!KeystoreTool.keyPairExists()) {
-				KeystoreTool.generateKeyPair();
+				KeystoreTool.generateKeyPair(context);
 			}
 
-			transformedValue = KeystoreTool.encryptMessage(value);
+			transformedValue = KeystoreTool.encryptMessage(applicationContext, value);
 		}
 		if (TextUtils.isEmpty(transformedValue)) {
-			throw new SecureStorageException(context.get().getString(R.string.secure_storage_problem_encryption), null, CRYPTO_EXCEPTION);
+			throw new SecureStorageException(context.getString(R.string.secure_storage_problem_encryption), null, CRYPTO_EXCEPTION);
 		} else {
-			setSecureValue(key, transformedValue);
+			setSecureValue(context, key, transformedValue);
 		}
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								@NonNull String value) throws SecureStorageException {
-		setValue(key, value, null);
+		setValue(context, key, value, null);
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								boolean value,
 								@Nullable String password) throws SecureStorageException {
-		setValue(key, String.valueOf(value), password);
+		setValue(context, key, String.valueOf(value), password);
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								boolean value) throws SecureStorageException {
-		setValue(key, value, null);
+		setValue(context, key, value, null);
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								float value,
 								@Nullable String password) throws SecureStorageException {
-		setValue(key, String.valueOf(value), password);
+		setValue(context, key, String.valueOf(value), password);
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								float value) throws SecureStorageException {
-		setValue(key, value, null);
+		setValue(context, key, value, null);
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								long value,
 								@Nullable String password) throws SecureStorageException {
-		setValue(key, String.valueOf(value), password);
+		setValue(context, key, String.valueOf(value), password);
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								long value) throws SecureStorageException {
-		setValue(key, value, null);
+		setValue(context, key, value, null);
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								int value,
 								@Nullable String password) throws SecureStorageException {
-		setValue(key, String.valueOf(value), password);
+		setValue(context, key, String.valueOf(value), password);
 	}
 
-	public static void setValue(@NonNull String key,
+	public static void setValue(@NonNull Context context,
+								@NonNull String key,
 								int value) throws SecureStorageException {
-		setValue(key, value, null);
+		setValue(context, key, value, null);
 	}
 
 	/*public static void setValue(@NonNull String key,
@@ -124,16 +136,17 @@ public final class SecurePreferences {
     }*/
 
 	@Nullable
-	public static String getStringValue(@NonNull String key,
+	public static String getStringValue(@NonNull Context context,
+										@NonNull String key,
 										@Nullable String password,
 										@Nullable String defValue) {
-		String secureValue = getSecureValue(key);
+		String secureValue = getSecureValue(context, key);
 		try {
 			if (!TextUtils.isEmpty(secureValue)) {
 				if (password != null) {
 					return SecretKeyTool.decryptMessage(key, secureValue, password);
 				} else {
-					return KeystoreTool.decryptMessage(secureValue);
+					return KeystoreTool.decryptMessage(context, secureValue);
 				}
 			} else {
 				return defValue;
@@ -144,23 +157,29 @@ public final class SecurePreferences {
 	}
 
 	@Nullable
-	public static String getStringValue(@NonNull String key,
+	public static String getStringValue(@NonNull Context context,
+										@NonNull String key,
 										@Nullable String defValue) {
-		return getStringValue(key, null, defValue);
+		return getStringValue(context, key, null, defValue);
 	}
 
-	public static boolean getBooleanValue(@NonNull String key,
+	public static boolean getBooleanValue(@NonNull Context context,
+										  @NonNull String key,
 										  @Nullable String password,
 										  boolean defValue) {
-		return Boolean.parseBoolean(getStringValue(key, password, String.valueOf(defValue)));
+		return Boolean.parseBoolean(getStringValue(context, key, password, String.valueOf(defValue)));
 	}
 
-	public static boolean getBooleanValue(@NonNull String key, boolean defValue) {
-		return getBooleanValue(key, null, defValue);
+	public static boolean getBooleanValue(@NonNull Context context,
+										  @NonNull String key,
+										  boolean defValue) {
+		return getBooleanValue(context, key, null, defValue);
 	}
 
-	public static float getFloatValue(@NonNull String key, @Nullable String password, float defValue) {
-		String stringVal = getStringValue(key, password, String.valueOf(defValue));
+	public static float getFloatValue(@NonNull Context context,
+									  @NonNull String key,
+									  @Nullable String password, float defValue) {
+		String stringVal = getStringValue(context, key, password, String.valueOf(defValue));
 		if (stringVal != null) {
 			return Float.parseFloat(stringVal);
 		} else {
@@ -168,12 +187,16 @@ public final class SecurePreferences {
 		}
 	}
 
-	public static float getFloatValue(@NonNull String key, float defValue) {
-		return getFloatValue(key, null, defValue);
+	public static float getFloatValue(@NonNull Context context,
+									  @NonNull String key,
+									  float defValue) {
+		return getFloatValue(context, key, null, defValue);
 	}
 
-	public static long getLongValue(@NonNull String key, @Nullable String password, long defValue) {
-		String stringVal = getStringValue(key, password, String.valueOf(defValue));
+	public static long getLongValue(@NonNull Context context,
+									@NonNull String key,
+									@Nullable String password, long defValue) {
+		String stringVal = getStringValue(context, key, password, String.valueOf(defValue));
 		if (stringVal != null) {
 			return Long.parseLong(stringVal);
 		} else {
@@ -181,12 +204,16 @@ public final class SecurePreferences {
 		}
 	}
 
-	public static long getLongValue(@NonNull String key, long defValue) {
-		return getLongValue(key, null, defValue);
+	public static long getLongValue(@NonNull Context context,
+									@NonNull String key,
+									long defValue) {
+		return getLongValue(context, key, null, defValue);
 	}
 
-	public static int getIntValue(@NonNull String key, @Nullable String password, int defValue) {
-		String stringVal = getStringValue(key, password, String.valueOf(defValue));
+	public static int getIntValue(@NonNull Context context,
+								  @NonNull String key,
+								  @Nullable String password, int defValue) {
+		String stringVal = getStringValue(context, key, password, String.valueOf(defValue));
 		if (stringVal != null) {
 			return Integer.parseInt(stringVal);
 		} else {
@@ -194,8 +221,10 @@ public final class SecurePreferences {
 		}
 	}
 
-	public static int getIntValue(@NonNull String key, int defValue) {
-		return getIntValue(key, null, defValue);
+	public static int getIntValue(@NonNull Context context,
+								  @NonNull String key,
+								  int defValue) {
+		return getIntValue(context, key, null, defValue);
 	}
 
 	@NonNull
@@ -215,50 +244,56 @@ public final class SecurePreferences {
         return res;
     }*/
 
-    public static SharedPreferences getSharedPreferences() {
-		return context.get()
-			.getSharedPreferences(getSharedPreferencesName(), MODE_PRIVATE);
+    public static SharedPreferences getSharedPreferences(@NonNull Context context) {
+		return context.getSharedPreferences(getSharedPreferencesName(), MODE_PRIVATE);
 	}
 
-	public static boolean contains(@NonNull String key) {
-		return getSharedPreferences().contains(key);
+	public static boolean contains(@NonNull Context context,
+								   @NonNull String key) {
+		return getSharedPreferences(context).contains(key);
 	}
 
-	public static void removeValue(@NonNull String key) {
-		removeSecureValue(key);
+	public static void removeValue(@NonNull Context context,
+								   @NonNull String key) {
+		removeSecureValue(context, key);
 	}
 
-	public static void clearAllValues() throws SecureStorageException {
-		clearAllSecureValues();
+	public static void clearAllValues(@NonNull Context context) throws SecureStorageException {
+		clearAllSecureValues(context);
 
 //		if (KeystoreTool.keyPairExists()) {
 			KeystoreTool.deleteKeyPair();
 //		}
 	}
 
-	public static void registerOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
-		getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
+	public static void registerOnSharedPreferenceChangeListener(@NonNull Context context,
+																@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
+		getSharedPreferences(context).registerOnSharedPreferenceChangeListener(listener);
 	}
 
-	public static void unregisterOnSharedPreferenceChangeListener(@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
-		getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
+	public static void unregisterOnSharedPreferenceChangeListener(@NonNull Context context,
+																  @NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
+		getSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(listener);
 	}
 
-	private static void setSecureValue(@NonNull String key,
+	private static void setSecureValue(@NonNull Context context,
+									   @NonNull String key,
 									   @NonNull String value) {
-		getSharedPreferences().edit().putString(key, value).apply();
+		getSharedPreferences(context).edit().putString(key, value).apply();
 	}
 
 	@Nullable
-	private static String getSecureValue(@NonNull String key) {
-		return getSharedPreferences().getString(key, null);
+	private static String getSecureValue(@NonNull Context context,
+										 @NonNull String key) {
+		return getSharedPreferences(context).getString(key, null);
 	}
 
-	private static void removeSecureValue(@NonNull String key) {
-		getSharedPreferences().edit().remove(key).apply();
+	private static void removeSecureValue(@NonNull Context context,
+										  @NonNull String key) {
+		getSharedPreferences(context).edit().remove(key).apply();
 	}
 
-	private static void clearAllSecureValues() {
-		getSharedPreferences().edit().clear().apply();
+	private static void clearAllSecureValues(@NonNull Context context) {
+		getSharedPreferences(context).edit().clear().apply();
 	}
 }

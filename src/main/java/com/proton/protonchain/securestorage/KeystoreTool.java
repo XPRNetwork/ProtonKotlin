@@ -16,6 +16,7 @@
 
 package com.proton.protonchain.securestorage;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,7 +56,6 @@ import static android.os.Build.VERSION_CODES.P;
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.KEYSTORE_EXCEPTION;
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.CRYPTO_EXCEPTION;
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.INTERNAL_LIBRARY_EXCEPTION;
-import static com.proton.protonchain.securestorage.SecureStorageProvider.context;
 
 // Edited by joey-harward on 8/30/19
 
@@ -73,7 +73,7 @@ final class KeystoreTool {
     }
 
     @Nullable
-    static String encryptMessage(@NonNull String plainMessage) throws SecureStorageException {
+    static String encryptMessage(@NonNull Context context, @NonNull String plainMessage) throws SecureStorageException {
         try {
             Cipher input;
             if (VERSION.SDK_INT >= M) {
@@ -81,7 +81,7 @@ final class KeystoreTool {
             } else {
                 input = Cipher.getInstance(KEY_TRANSFORMATION_ALGORITHM, KEY_CIPHER_JELLYBEAN_PROVIDER);
             }
-            input.init(Cipher.ENCRYPT_MODE, getPublicKey());
+            input.init(Cipher.ENCRYPT_MODE, getPublicKey(context));
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             CipherOutputStream cipherOutputStream = new CipherOutputStream(
@@ -98,7 +98,7 @@ final class KeystoreTool {
     }
 
     @NonNull
-    static String decryptMessage(@NonNull String encryptedMessage) throws SecureStorageException {
+    static String decryptMessage(@NonNull Context context, @NonNull String encryptedMessage) throws SecureStorageException {
         try {
             Cipher output;
             if (VERSION.SDK_INT >= M) {
@@ -106,7 +106,7 @@ final class KeystoreTool {
             } else {
                 output = Cipher.getInstance(KEY_TRANSFORMATION_ALGORITHM, KEY_CIPHER_JELLYBEAN_PROVIDER);
             }
-            output.init(Cipher.DECRYPT_MODE, getPrivateKey());
+            output.init(Cipher.DECRYPT_MODE, getPrivateKey(context));
 
             CipherInputStream cipherInputStream = new CipherInputStream(
                     new ByteArrayInputStream(Base64.decode(encryptedMessage, Base64.DEFAULT)), output);
@@ -140,8 +140,8 @@ final class KeystoreTool {
         return keyExists;
     }
 
-    static void generateKeyPair() throws SecureStorageException {
-        if (isRTL()) {
+    static void generateKeyPair(@NonNull Context context) throws SecureStorageException {
+        if (isRTL(context)) {
             Locale.setDefault(Locale.US);
         }
 
@@ -149,7 +149,7 @@ final class KeystoreTool {
             generateMarshmallowKeyPair();
         } else {
             PRNGFixes.apply();
-            generateDeprecatedKeyPair();
+            generateDeprecatedKeyPair(context);
         }
     }
 
@@ -171,13 +171,13 @@ final class KeystoreTool {
     }
 
     @SuppressWarnings("deprecation")
-    private static void generateDeprecatedKeyPair() throws SecureStorageException {
+    private static void generateDeprecatedKeyPair(@NonNull Context context) throws SecureStorageException {
         try {
             Calendar start = Calendar.getInstance();
             Calendar end = Calendar.getInstance();
             end.add(Calendar.YEAR, 99);
 
-            android.security.KeyPairGeneratorSpec spec = new android.security.KeyPairGeneratorSpec.Builder(context.get())
+            android.security.KeyPairGeneratorSpec spec = new android.security.KeyPairGeneratorSpec.Builder(context)
                 .setAlias(KEY_ALIAS)
                 .setSubject(new X500Principal("CN="+KEY_ALIAS))
                 .setSerialNumber(BigInteger.TEN)
@@ -209,7 +209,7 @@ final class KeystoreTool {
     }
 
     @Nullable
-    private static PublicKey getPublicKey() throws SecureStorageException {
+    private static PublicKey getPublicKey(@NonNull Context context) throws SecureStorageException {
         PublicKey publicKey;
         try {
             if (keyPairExists()) {
@@ -222,9 +222,9 @@ final class KeystoreTool {
                 }
             } else {
                 if (BuildConfig.DEBUG) {
-                    Log.e(KeystoreTool.class.getName(), context.get().getString(R.string.secure_storage_keypair_does_not_exist));
+                    Log.e(KeystoreTool.class.getName(), context.getString(R.string.secure_storage_keypair_does_not_exist));
                 }
-                throw new SecureStorageException(context.get().getString(R.string.secure_storage_keypair_does_not_exist), null, INTERNAL_LIBRARY_EXCEPTION);
+                throw new SecureStorageException(context.getString(R.string.secure_storage_keypair_does_not_exist), null, INTERNAL_LIBRARY_EXCEPTION);
             }
         } catch (Exception e) {
             throw new SecureStorageException(e.getMessage(), e, KEYSTORE_EXCEPTION);
@@ -234,7 +234,7 @@ final class KeystoreTool {
     }
 
     @Nullable
-    private static PrivateKey getPrivateKey() throws SecureStorageException {
+    private static PrivateKey getPrivateKey(@NonNull Context context) throws SecureStorageException {
         PrivateKey privateKey;
         try {
             if (keyPairExists()) {
@@ -247,9 +247,9 @@ final class KeystoreTool {
                 }
             } else {
                 if (BuildConfig.DEBUG) {
-                    Log.e(KeystoreTool.class.getName(), context.get().getString(R.string.secure_storage_keypair_does_not_exist));
+                    Log.e(KeystoreTool.class.getName(), context.getString(R.string.secure_storage_keypair_does_not_exist));
                 }
-                throw new SecureStorageException(context.get().getString(R.string.secure_storage_keypair_does_not_exist), null, INTERNAL_LIBRARY_EXCEPTION);
+                throw new SecureStorageException(context.getString(R.string.secure_storage_keypair_does_not_exist), null, INTERNAL_LIBRARY_EXCEPTION);
             }
         } catch (Exception e) {
             throw new SecureStorageException(e.getMessage(), e, KEYSTORE_EXCEPTION);
@@ -257,8 +257,8 @@ final class KeystoreTool {
         return privateKey;
     }
 
-    private static boolean isRTL() {
-        Configuration config = context.get().getResources().getConfiguration();
+    private static boolean isRTL(@NonNull Context context) {
+        Configuration config = context.getResources().getConfiguration();
         return config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
     }
 
