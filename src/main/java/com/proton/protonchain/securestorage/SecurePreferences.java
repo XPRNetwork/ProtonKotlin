@@ -18,8 +18,10 @@ package com.proton.protonchain.securestorage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
 
 import com.proton.protonchain.R;
@@ -244,7 +246,7 @@ public final class SecurePreferences {
         return res;
     }*/
 
-    public static SharedPreferences getSharedPreferences(@NonNull Context context) {
+	public static SharedPreferences getSharedPreferences(@NonNull Context context) {
 		return context.getSharedPreferences(getSharedPreferencesName(), MODE_PRIVATE);
 	}
 
@@ -262,7 +264,7 @@ public final class SecurePreferences {
 		clearAllSecureValues(context);
 
 //		if (KeystoreTool.keyPairExists()) {
-			KeystoreTool.deleteKeyPair();
+		KeystoreTool.deleteKeyPair();
 //		}
 	}
 
