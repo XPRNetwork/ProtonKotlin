@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import timber.log.Timber
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.proton.protonchain.model.AccountContact
 
 object DefaultTypeConverters {
 	@TypeConverter
@@ -55,17 +56,17 @@ object DefaultTypeConverters {
 		return Gson().toJson(map, type)
 	}
 
-//	@TypeConverter
-//	@JvmStatic
-//	fun stringToAccountContact(value: String?): AccountContact? {
-//		val type = object : TypeToken<AccountContact>() {}.type
-//		return Gson().fromJson(value, type)
-//	}
-//
-//	@TypeConverter
-//	@JvmStatic
-//	fun accountContactToString(accountContact: AccountContact): String {
-//		val type = object : TypeToken<AccountContact>() {}.type
-//		return Gson().toJson(accountContact, type)
-//	}
+	@TypeConverter
+	@JvmStatic
+	fun stringToAccountContact(value: String?): AccountContact? {
+		val type = object : TypeToken<AccountContact>() {}.type
+		return Gson().fromJson(value, type)
+	}
+
+	@TypeConverter
+	@JvmStatic
+	fun accountContactToString(accountContact: AccountContact): String {
+		val type = object : TypeToken<AccountContact>() {}.type
+		return Gson().toJson(accountContact, type)
+	}
 }

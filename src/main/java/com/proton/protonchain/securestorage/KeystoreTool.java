@@ -61,7 +61,7 @@ import static com.proton.protonchain.securestorage.SecureStorageException.Except
 // Edited by joey-harward on 8/30/19
 
 final class KeystoreTool {
-	private static final String KEY_ALIAS = "LynxWalletKeyPair";
+	private static final String KEY_ALIAS = "ProtonKeyPair";
 	private static final String KEY_ENCRYPTION_ALGORITHM = "RSA";
 	private static final String KEY_CHARSET = "UTF-8";
 	private static final String KEY_KEYSTORE_NAME = "AndroidKeyStore";
@@ -223,9 +223,9 @@ final class KeystoreTool {
 				}
 			} else {
 				if (BuildConfig.DEBUG) {
-					Log.e(KeystoreTool.class.getName(), context.getString(R.string.secure_storage_keypair_does_not_exist));
+					Log.e(KeystoreTool.class.getName(), context.getString(R.string.secureStorageKeyPairDoesNotExist));
 				}
-				throw new SecureStorageException(context.getString(R.string.secure_storage_keypair_does_not_exist), null, INTERNAL_LIBRARY_EXCEPTION);
+				throw new SecureStorageException(context.getString(R.string.secureStorageKeyPairDoesNotExist), null, INTERNAL_LIBRARY_EXCEPTION);
 			}
 		} catch (Exception e) {
 			throw new SecureStorageException(e.getMessage(), e, KEYSTORE_EXCEPTION);
@@ -248,9 +248,9 @@ final class KeystoreTool {
 				}
 			} else {
 				if (BuildConfig.DEBUG) {
-					Log.e(KeystoreTool.class.getName(), context.getString(R.string.secure_storage_keypair_does_not_exist));
+					Log.e(KeystoreTool.class.getName(), context.getString(R.string.secureStorageKeyPairDoesNotExist));
 				}
-				throw new SecureStorageException(context.getString(R.string.secure_storage_keypair_does_not_exist), null, INTERNAL_LIBRARY_EXCEPTION);
+				throw new SecureStorageException(context.getString(R.string.secureStorageKeyPairDoesNotExist), null, INTERNAL_LIBRARY_EXCEPTION);
 			}
 		} catch (Exception e) {
 			throw new SecureStorageException(e.getMessage(), e, KEYSTORE_EXCEPTION);

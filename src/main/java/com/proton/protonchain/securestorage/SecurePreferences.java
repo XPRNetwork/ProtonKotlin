@@ -63,7 +63,7 @@ public final class SecurePreferences {
 			transformedValue = KeystoreTool.encryptMessage(applicationContext, value);
 		}
 		if (TextUtils.isEmpty(transformedValue)) {
-			throw new SecureStorageException(context.getString(R.string.secure_storage_problem_encryption), null, CRYPTO_EXCEPTION);
+			throw new SecureStorageException(context.getString(R.string.secureStorageEncryptionError), null, CRYPTO_EXCEPTION);
 		} else {
 			setSecureValue(context, key, transformedValue);
 		}

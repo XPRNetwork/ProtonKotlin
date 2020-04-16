@@ -1,5 +1,13 @@
 <resources>
-	<string name="secure_storage_keypair_already_exists">KeyPair already exists!</string>
-	<string name="secure_storage_keypair_does_not_exist">KeyPair does not exist in Keystore</string>
-	<string name="secure_storage_problem_encryption">Problem during encryption</string>
+	<string name="defaultEOSChainId" translatable="false">aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906</string>
+	<string name="defaultEOSChainName" translatable="false">EOS</string>
+	<string name="defaultEOSChainUrl" translatable="false">https://eos.greymass.com</string>
+
+	<string name="defaultProtonChainId" translatable="false">0fea517bbfb5b51c564b5c59bcf7f02cf934cfff895f59d0d5cd7079c06fd978</string>
+	<string name="defaultProtonChainName" translatable="false">Proton Chain</string>
+	<string name="defaultProtonChainUrl" translatable="false">https://testnet.lynxchain.io:499/api/</string>
+
+	<string name="secureStorageKeyPairAlreadyExists">KeyPair already exists!</string>
+	<string name="secureStorageKeyPairDoesNotExist">KeyPair does not exist in Keystore</string>
+	<string name="secureStorageEncryptionError">Problem during encryption</string>
 </resources>

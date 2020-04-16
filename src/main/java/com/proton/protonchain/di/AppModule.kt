@@ -4,11 +4,19 @@ import android.app.Application
 import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.proton.protonchain.R
+import com.proton.protonchain.api.EOSChainService
+import com.proton.protonchain.api.LiveDataCallAdapterFactory
+import com.proton.protonchain.api.ProtonChainService
 import com.proton.protonchain.db.ChainProviderDao
 import com.proton.protonchain.db.ProtonChainDb
 import com.proton.protonchain.eosio.commander.GsonEosTypeAdapterFactory
 import dagger.Module
 import dagger.Provides
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module(includes = [ViewModelModule::class])
@@ -39,53 +47,53 @@ class AppModule {
 		return db.chainProviderDao()
 	}
 
+	@Singleton
+	@Provides
+	fun provideChainService(app: Application, gson: Gson): EOSChainService {
+//		val logging = HttpLoggingInterceptor()
+//		logging.level = HttpLoggingInterceptor.Level.BODY
+//		val httpClient = OkHttpClient.Builder()
+//		httpClient.addInterceptor(logging)
+
+		val httpClient = OkHttpClient.Builder()
+			.callTimeout(30, TimeUnit.SECONDS)
+			.connectTimeout(30, TimeUnit.SECONDS)
+			.readTimeout(30, TimeUnit.SECONDS)
+			.writeTimeout(30, TimeUnit.SECONDS)
+
+		return Retrofit.Builder()
+			.baseUrl(app.getString(R.string.defaultEOSChainUrl))
+			.addConverterFactory(GsonConverterFactory.create(gson))
+			.addCallAdapterFactory(LiveDataCallAdapterFactory())
+			.client(httpClient.build())
+			.build()
+			.create(EOSChainService::class.java)
+	}
+
+	@Singleton
+	@Provides
+	fun provideProtonChainService(app: Application, gson: Gson): ProtonChainService {
+//		val logging = HttpLoggingInterceptor()
+//		logging.level = HttpLoggingInterceptor.Level.BODY
+//		val httpClient = OkHttpClient.Builder()
+//		httpClient.addInterceptor(logging)
+
+		val httpClient = OkHttpClient.Builder()
+			.callTimeout(30, TimeUnit.SECONDS)
+			.connectTimeout(30, TimeUnit.SECONDS)
+			.readTimeout(30, TimeUnit.SECONDS)
+			.writeTimeout(30, TimeUnit.SECONDS)
+
+		return Retrofit.Builder()
+			.baseUrl(app.getString(R.string.defaultProtonChainUrl))
+			.addConverterFactory(GsonConverterFactory.create(gson))
+			.addCallAdapterFactory(LiveDataCallAdapterFactory())
+			.client(httpClient.build())
+			.build()
+			.create(ProtonChainService::class.java)
+	}
+
 /*	@Singleton
-	@Provides
-	fun provideChainService(app: Application, gson: Gson): ChainService {
-//		val logging = HttpLoggingInterceptor()
-//		logging.level = HttpLoggingInterceptor.Level.BODY
-//		val httpClient = OkHttpClient.Builder()
-//		httpClient.addInterceptor(logging)
-
-		val httpClient = OkHttpClient.Builder()
-			.callTimeout(30, TimeUnit.SECONDS)
-			.connectTimeout(30, TimeUnit.SECONDS)
-			.readTimeout(30, TimeUnit.SECONDS)
-			.writeTimeout(30, TimeUnit.SECONDS)
-
-		return Retrofit.Builder()
-			.baseUrl(app.getString(R.string.defaultChainUrl))
-			.addConverterFactory(GsonConverterFactory.create(gson))
-			.addCallAdapterFactory(LiveDataCallAdapterFactory())
-			.client(httpClient.build())
-			.build()
-			.create(ChainService::class.java)
-	}
-
-	@Singleton
-	@Provides
-	fun provideLynxChainService(app: Application, gson: Gson): LynxChainService {
-//		val logging = HttpLoggingInterceptor()
-//		logging.level = HttpLoggingInterceptor.Level.BODY
-//		val httpClient = OkHttpClient.Builder()
-//		httpClient.addInterceptor(logging)
-
-		val httpClient = OkHttpClient.Builder()
-			.callTimeout(30, TimeUnit.SECONDS)
-			.connectTimeout(30, TimeUnit.SECONDS)
-			.readTimeout(30, TimeUnit.SECONDS)
-			.writeTimeout(30, TimeUnit.SECONDS)
-
-		return Retrofit.Builder()
-			.baseUrl(app.getString(R.string.defaultLynxChainUrl))
-			.addConverterFactory(GsonConverterFactory.create(gson))
-			.addCallAdapterFactory(LiveDataCallAdapterFactory())
-			.client(httpClient.build())
-			.build()
-			.create(LynxChainService::class.java)
-	}
-
-	@Singleton
 	@Provides
 	fun provideFirebaseFunctionsService(app: Application): FirebaseFunctionsService {
 		val userAgent =
