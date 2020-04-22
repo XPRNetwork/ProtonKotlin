@@ -8,7 +8,8 @@ import com.proton.protonchain.db.DefaultTypeConverters
 
 @Entity(
 	indices = [(Index("chainId", "publicKey"))],
-	primaryKeys = ["chainId", "publicKey"])
+	primaryKeys = ["chainId", "publicKey"]
+)
 @TypeConverters(DefaultTypeConverters::class)
 data class KeyAccount(
 	@SerializedName("account_names") val accountNames: List<String>

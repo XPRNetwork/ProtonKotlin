@@ -1,13 +1,17 @@
 package com.proton.protonchain.model
 
-import androidx.room.*
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
 import com.proton.protonchain.db.DefaultTypeConverters
 import com.proton.protonchain.db.EOSTypeConverters
 
 @Entity(
 	indices = [(Index("chainId", "accountName"))],
-	primaryKeys = ["chainId", "accountName"])
+	primaryKeys = ["chainId", "accountName"]
+)
 @TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class)
 data class Account(
 	@SerializedName("account_name") val accountName: String,
@@ -51,7 +55,8 @@ data class Account(
 	fun getDelegatedCPU(): Double {
 		var delegatedCPU = 0.00
 		if (selfDelegatedBandwidth != null) {
-			delegatedCPU = totalResources.cpuWeightToDouble() - selfDelegatedBandwidth.cpuWeightToDouble()
+			delegatedCPU =
+				totalResources.cpuWeightToDouble() - selfDelegatedBandwidth.cpuWeightToDouble()
 		}
 		return delegatedCPU
 	}
@@ -59,7 +64,8 @@ data class Account(
 	fun getDelegatedNet(): Double {
 		var delegatedNet = 0.00
 		if (selfDelegatedBandwidth != null) {
-			delegatedNet = totalResources.netWeightToDouble() - selfDelegatedBandwidth.netWeightToDouble()
+			delegatedNet =
+				totalResources.netWeightToDouble() - selfDelegatedBandwidth.netWeightToDouble()
 		}
 		return delegatedNet
 	}
@@ -67,7 +73,8 @@ data class Account(
 	fun getSelfDelegatedResources(): Double {
 		var selfDelegatedResources = 0.00
 		if (selfDelegatedBandwidth != null) {
-			selfDelegatedResources = selfDelegatedBandwidth.cpuWeightToDouble() + selfDelegatedBandwidth.netWeightToDouble()
+			selfDelegatedResources =
+				selfDelegatedBandwidth.cpuWeightToDouble() + selfDelegatedBandwidth.netWeightToDouble()
 		}
 		return selfDelegatedResources
 	}

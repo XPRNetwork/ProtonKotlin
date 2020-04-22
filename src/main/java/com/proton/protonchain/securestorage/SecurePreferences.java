@@ -18,13 +18,12 @@ package com.proton.protonchain.securestorage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import android.text.TextUtils;
 
 import com.proton.protonchain.R;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.CRYPTO_EXCEPTION;

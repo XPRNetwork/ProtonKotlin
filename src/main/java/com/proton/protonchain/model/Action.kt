@@ -12,8 +12,14 @@ import java.util.*
 import kotlin.math.sign
 
 @Entity(
-	indices = [(Index("chainId", "accountName", "action_trace_act_account", "action_trace_act_data_quantity"))],
-	primaryKeys = ["chainId", "accountName", "action_trace_trxId", "action_trace_act_name", "action_trace_act_authorization"])
+	indices = [(Index(
+		"chainId",
+		"accountName",
+		"action_trace_act_account",
+		"action_trace_act_data_quantity"
+	))],
+	primaryKeys = ["chainId", "accountName", "action_trace_trxId", "action_trace_act_name", "action_trace_act_authorization"]
+)
 @TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class)
 data class Action(
 	@SerializedName("global_action_seq") val globalActionSeq: Int,

@@ -18,16 +18,15 @@ package com.proton.protonchain.securestorage;
 
 import android.content.Context;
 import android.content.res.Configuration;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-
+import android.os.Build.VERSION;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+
+import com.proton.protonchain.BuildConfig;
+import com.proton.protonchain.R;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,16 +46,15 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.security.auth.x500.X500Principal;
 
-import android.os.Build.VERSION;
-
-import com.proton.protonchain.BuildConfig;
-import com.proton.protonchain.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.P;
-import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.KEYSTORE_EXCEPTION;
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.CRYPTO_EXCEPTION;
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.INTERNAL_LIBRARY_EXCEPTION;
+import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.KEYSTORE_EXCEPTION;
 
 // Edited by joey-harward on 8/30/19
 

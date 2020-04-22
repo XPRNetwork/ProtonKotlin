@@ -7,6 +7,8 @@
 	<string name="defaultProtonChainName" translatable="false">Proton Chain</string>
 	<string name="defaultProtonChainUrl" translatable="false">https://testnet.lynxchain.io:499/api/</string>
 
+	<string name="chainProvidersUrl" translatable="false">https://e8245mepe3.execute-api.us-west-2.amazonaws.com/dev/chain-providers</string>
+
 	<string name="secureStorageKeyPairAlreadyExists">KeyPair already exists!</string>
 	<string name="secureStorageKeyPairDoesNotExist">KeyPair does not exist in Keystore</string>
 	<string name="secureStorageEncryptionError">Problem during encryption</string>

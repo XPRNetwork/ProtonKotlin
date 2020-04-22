@@ -1,10 +1,10 @@
 package com.proton.protonchain.db
 
 import androidx.room.TypeConverter
-import timber.log.Timber
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.proton.protonchain.model.AccountContact
+import timber.log.Timber
 
 object DefaultTypeConverters {
 	@TypeConverter

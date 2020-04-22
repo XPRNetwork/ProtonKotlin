@@ -1,8 +1,5 @@
 package com.proton.protonchain.securestorage;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import android.util.Base64;
 
 import java.io.ByteArrayInputStream;
@@ -19,6 +16,9 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.CRYPTO_EXCEPTION;
 import static com.proton.protonchain.securestorage.SecureStorageException.ExceptionType.KEYSTORE_EXCEPTION;

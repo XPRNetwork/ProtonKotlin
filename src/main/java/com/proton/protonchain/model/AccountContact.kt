@@ -8,7 +8,8 @@ import com.proton.protonchain.db.DefaultTypeConverters
 
 @Entity(
 	indices = [(Index("id", "chainId", "accountName"))],
-	primaryKeys = ["id", "chainId", "accountName"])
+	primaryKeys = ["id", "chainId", "accountName"]
+)
 @TypeConverters(DefaultTypeConverters::class)
 data class AccountContact(
 	val id: String,
