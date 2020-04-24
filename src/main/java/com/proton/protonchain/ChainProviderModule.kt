@@ -38,15 +38,15 @@ class ChainProviderModule {
 				try {
 					val response = chainProviderRepository.fetchChainProviders(chainProvidersUrl)
 					if (response.isSuccessful) {
-
-						// TODO: look at JsonArray, add chain provider to db, and return list of chain providers
-
 						val gson = Gson()
 						val chainProviders = mutableListOf<ChainProvider>()
 						response.body()?.entrySet()?.forEach { entry ->
 							val type = object : TypeToken<Map<String, Any>>() {}.type
 							val chainProviderMap = gson.fromJson<Map<String, Any>>(entry.value, type)
 							val chainProvider = ChainProvider(chainProviderMap)
+
+							chainProviderRepository.addChainProvider(chainProvider)
+
 							chainProviders.add(chainProvider)
 						}
 

@@ -7,7 +7,7 @@ import com.proton.protonchain.model.ChainProvider
 @Database(
 	entities = [
 		ChainProvider::class],
-	version = 1,
+	version = 2,
 	exportSchema = false
 )
 abstract class ProtonChainDb : RoomDatabase() {
