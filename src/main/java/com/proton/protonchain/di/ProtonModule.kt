@@ -2,12 +2,14 @@ package com.proton.protonchain.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.proton.protonchain.R
 import com.proton.protonchain.api.EOSService
 import com.proton.protonchain.api.LiveDataCallAdapterFactory
 import com.proton.protonchain.api.ProtonChainService
+import com.proton.protonchain.common.Prefs
 import com.proton.protonchain.db.ChainProviderDao
 import com.proton.protonchain.db.ProtonChainDb
 import com.proton.protonchain.eosio.commander.GsonEosTypeAdapterFactory
@@ -20,7 +22,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
-class ProtonModule() {
+class ProtonModule {
 	@Singleton
 	@Provides
 	fun provideGson(): Gson {
@@ -91,5 +93,11 @@ class ProtonModule() {
 			.client(httpClient.build())
 			.build()
 			.create(ProtonChainService::class.java)
+	}
+
+	@Singleton
+	@Provides
+	fun providePrefs(context: Context): Prefs {
+		return Prefs(context)
 	}
 }

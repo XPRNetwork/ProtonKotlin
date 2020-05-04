@@ -29,57 +29,50 @@ class ChainProviderModule {
 		chainProvidersUrl = context.getString(R.string.chainProvidersUrl)
 	}
 
+	suspend fun fetchChainProviders(): Resource<List<ChainProvider>> {
+		return try {
+			val response = chainProviderRepository.fetchChainProviders(chainProvidersUrl)
+			if (response.isSuccessful) {
+				val gson = Gson()
+				val chainProviders = mutableListOf<ChainProvider>()
+				response.body()?.entrySet()?.forEach { entry ->
+					val type = object : TypeToken<Map<String, Any>>() {}.type
+					val chainProviderMap = gson.fromJson<Map<String, Any>>(entry.value, type)
+					val chainProvider = ChainProvider(chainProviderMap)
+
+					chainProviderRepository.addChainProvider(chainProvider)
+
+					chainProviders.add(chainProvider)
+				}
+
+				Resource.success(chainProviders)
+			} else {
+				val msg = response.errorBody()?.string()
+				val errorMsg = if (msg.isNullOrEmpty()) {
+					response.message()
+				} else {
+					msg
+				}
+				Resource.error(errorMsg, null)
+			}
+		} catch (e: Exception) {
+			Timber.d(e)
+
+			Resource.error(e.localizedMessage.orEmpty(), null)
+		}
+	}
+
 	val chainProviders = MutableLiveData<Resource<List<ChainProvider>>>()
 	fun getChainProviders(shouldFetch: Boolean = true) = GlobalScope.launch {
 		chainProviders.postValue(Resource.loading(null))
 
 		chainProviders.postValue(withContext(Dispatchers.Default) {
 			if (shouldFetch) {
-				try {
-					val response = chainProviderRepository.fetchChainProviders(chainProvidersUrl)
-					if (response.isSuccessful) {
-						val gson = Gson()
-						val chainProviders = mutableListOf<ChainProvider>()
-						response.body()?.entrySet()?.forEach { entry ->
-							val type = object : TypeToken<Map<String, Any>>() {}.type
-							val chainProviderMap = gson.fromJson<Map<String, Any>>(entry.value, type)
-							val chainProvider = ChainProvider(chainProviderMap)
-
-							chainProviderRepository.addChainProvider(chainProvider)
-
-							chainProviders.add(chainProvider)
-						}
-
-						Resource.success(chainProviders)
-					} else {
-						val msg = response.errorBody()?.string()
-						val errorMsg = if (msg.isNullOrEmpty()) {
-							response.message()
-						} else {
-							msg
-						}
-						Resource.error(errorMsg, null)
-					}
-				} catch (e: Exception) {
-					Timber.d(e)
-
-					Resource.error(
-						"Connection Error or Timeout: Please check your network settings",
-						null
-					)
-				}
+				fetchChainProviders()
 			} else {
 				val chainProviders = chainProviderRepository.getAllChainProviders()
-
 				Resource.success(chainProviders)
 			}
-		})
-	}
-
-	val chainProvider = MutableLiveData<ChainProvider>()
-	fun getChainProvider(id: String) = GlobalScope.launch {
-		chainProvider.postValue(withContext(Dispatchers.Default) {
-			chainProviderRepository.getChainProvider(id)
 		})
 	}
 }
