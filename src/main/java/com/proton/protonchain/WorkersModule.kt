@@ -6,8 +6,7 @@ import androidx.lifecycle.Observer
 import androidx.work.*
 import com.proton.protonchain.common.Prefs
 import com.proton.protonchain.di.DaggerInjector
-import com.proton.protonchain.workers.FetchChainProvidersWorker
-import com.proton.protonchain.workers.ProtonChainWorkerFactory
+import com.proton.protonchain.workers.*
 import javax.inject.Inject
 
 class WorkersModule {
@@ -37,29 +36,28 @@ class WorkersModule {
 		const val INIT = "WORKER_INIT"
 	}
 
-	fun prune() {
-		workManager.pruneWork()
-	}
-
 	fun init() {
+		workManager.pruneWork()
+
 		prefs.clearInit()
 
 		val constraints = Constraints.Builder()
 			.setRequiredNetworkType(NetworkType.CONNECTED)
 			.build()
 
-		val inputData = Data.Builder()
+		val chainProvidersInputData = Data.Builder()
 			.putString("chainProvidersUrl", context.getString(R.string.chainProvidersUrl))
 			.build()
 
-		val fetchChainProviders = OneTimeWorkRequest.Builder(FetchChainProvidersWorker::class.java)
-			.setConstraints(constraints).setInputData(inputData).build()
+		val initChainProviders = OneTimeWorkRequest.Builder(InitChainProvidersWorker::class.java)
+			.setConstraints(constraints).setInputData(chainProvidersInputData).build()
 
-		val initWork = workManager
-			.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, fetchChainProviders)
+		val initTokenContractsWorker = OneTimeWorkRequest.Builder(InitTokenContractsWorker::class.java)
+			.setConstraints(constraints).build()
 
-		initWork
-			//.then(fetchChainProviders)
+		workManager
+			.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProviders)
+			.then(initTokenContractsWorker)
 			.enqueue()
 	}
 
@@ -76,9 +74,33 @@ class WorkersModule {
 						observer.removeObservers(lifecycleOwner)
 					} else if (
 						workInfos
-							.filter { it.tags.contains(FetchChainProvidersWorker::class.java.name) }
+							.filter { it.tags.contains(InitChainProvidersWorker::class.java.name) }
 							.all { it.state == WorkInfo.State.SUCCEEDED }) {
 						prefs.hasChainProviders = true
+						callback(true)
+						observer.removeObservers(lifecycleOwner)
+					}
+				}
+			})
+		}
+	}
+
+	fun onInitTokenContracts(lifecycleOwner: LifecycleOwner, callback: (Boolean) -> Unit) {
+		if (prefs.hasTokenContracts) {
+			callback(true)
+		} else {
+			val observer = workManager.getWorkInfosForUniqueWorkLiveData(INIT)
+			observer.observe(lifecycleOwner, Observer { workInfos ->
+				if (workInfos.isNotEmpty()) {
+					if (workInfos
+							.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
+						callback(false)
+						observer.removeObservers(lifecycleOwner)
+					} else if (
+						workInfos
+							.filter { it.tags.contains(InitTokenContractsWorker::class.java.name) }
+							.all { it.state == WorkInfo.State.SUCCEEDED }) {
+						prefs.hasTokenContracts = true
 						callback(true)
 						observer.removeObservers(lifecycleOwner)
 					}

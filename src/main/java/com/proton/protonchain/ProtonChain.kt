@@ -8,6 +8,7 @@ import com.proton.protonchain.di.DaggerInjector
 import com.proton.protonchain.di.ProtonModule
 import com.proton.protonchain.model.ChainProvider
 import com.proton.protonchain.model.Resource
+import com.proton.protonchain.model.TokenContract
 import com.proton.protonchain.securestorage.PRNGFixes
 import timber.log.Timber
 
@@ -27,22 +28,39 @@ class ProtonChain private constructor(context: Context) {
 	companion object : SingletonHolder<ProtonChain, Context>(::ProtonChain)
 
 	private var workersModule: WorkersModule = WorkersModule()
-	private var chainProviderModule: ChainProviderModule = ChainProviderModule()
+	private var chainProvidersModule: ChainProvidersModule = ChainProvidersModule()
+	private var tokenContractsModule: TokenContractsModule = TokenContractsModule()
+
+	private val defaultProtonChainId = context.getString(R.string.defaultProtonChainId)
 
 	fun initialize() {
-		workersModule.prune()
-
 		workersModule.init()
 	}
 
 	fun getChainProviders(lifeCycleOwner: LifecycleOwner, observer: Observer<Resource<List<ChainProvider>>>) {
-		chainProviderModule.chainProviders.observe(lifeCycleOwner, observer)
+		chainProvidersModule.chainProviders.observe(lifeCycleOwner, observer)
+
+		chainProvidersModule.chainProviders.postValue(Resource.loading(null))
 
 		workersModule.onInitChainProviders(lifeCycleOwner, { success ->
 			if (success) {
-				chainProviderModule.getChainProviders(false)
+				chainProvidersModule.getChainProviders()
 			} else {
-				chainProviderModule.getChainProviders()
+				chainProvidersModule.chainProviders.postValue(Resource.error("Initialization Error", null))
+			}
+		})
+	}
+
+	fun getTokenContracts(lifeCycleOwner: LifecycleOwner, observer: Observer<Resource<List<TokenContract>>>) {
+		tokenContractsModule.tokenContracts.observe(lifeCycleOwner, observer)
+
+		tokenContractsModule.tokenContracts.postValue(Resource.loading(null))
+
+		workersModule.onInitTokenContracts(lifeCycleOwner, { success ->
+			if (success) {
+				tokenContractsModule.getTokenContracts(defaultProtonChainId)
+			} else {
+				tokenContractsModule.tokenContracts.postValue(Resource.error("Initialization Error", null))
 			}
 		})
 	}

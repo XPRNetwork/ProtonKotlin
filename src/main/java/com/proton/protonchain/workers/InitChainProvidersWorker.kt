@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.proton.protonchain.model.ChainProvider
 import com.proton.protonchain.repository.ChainProviderRepository
 import com.squareup.inject.assisted.Assisted
@@ -12,7 +11,7 @@ import com.squareup.inject.assisted.AssistedInject
 import timber.log.Timber
 import java.lang.Exception
 
-class FetchChainProvidersWorker
+class InitChainProvidersWorker
 @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
@@ -24,11 +23,11 @@ class FetchChainProvidersWorker
 		return try {
 			val response = chainProviderRepository.fetchChainProviders(chainProvidersUrl)
 			if (response.isSuccessful) {
+				chainProviderRepository.removeAll()
+
 				val gson = Gson()
 				response.body()?.entrySet()?.forEach { entry ->
-					val type = object : TypeToken<Map<String, Any>>() {}.type
-					val chainProviderMap = gson.fromJson<Map<String, Any>>(entry.value, type)
-					val chainProvider = ChainProvider(chainProviderMap)
+					val chainProvider = gson.fromJson(entry.value, ChainProvider::class.java)
 
 					chainProviderRepository.addChainProvider(chainProvider)
 				}

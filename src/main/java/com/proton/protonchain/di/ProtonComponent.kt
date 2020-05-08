@@ -1,7 +1,8 @@
 package com.proton.protonchain.di
 
 import android.content.Context
-import com.proton.protonchain.ChainProviderModule
+import com.proton.protonchain.ChainProvidersModule
+import com.proton.protonchain.TokenContractsModule
 import com.proton.protonchain.WorkersModule
 import dagger.BindsInstance
 import dagger.Component
@@ -25,5 +26,6 @@ interface ProtonComponent {
 	fun inject(protonModule: ProtonModule)
 
 	fun inject(workersModule: WorkersModule)
-	fun inject(chainProviderModule: ChainProviderModule)
+	fun inject(chainProvidersModule: ChainProvidersModule)
+	fun inject(tokenContractsModule: TokenContractsModule)
 }

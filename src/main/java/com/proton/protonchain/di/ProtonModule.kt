@@ -2,7 +2,6 @@ package com.proton.protonchain.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.proton.protonchain.R
@@ -12,6 +11,7 @@ import com.proton.protonchain.api.ProtonChainService
 import com.proton.protonchain.common.Prefs
 import com.proton.protonchain.db.ChainProviderDao
 import com.proton.protonchain.db.ProtonChainDb
+import com.proton.protonchain.db.TokenContractDao
 import com.proton.protonchain.eosio.commander.GsonEosTypeAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -51,7 +51,13 @@ class ProtonModule {
 
 	@Singleton
 	@Provides
-	fun provideChainService(context: Context, gson: Gson): EOSService {
+	fun provideTokenContractDao(db: ProtonChainDb): TokenContractDao {
+		return db.tokenContractDao()
+	}
+
+	@Singleton
+	@Provides
+	fun provideEOSService(context: Context, gson: Gson): EOSService {
 //		val logging = HttpLoggingInterceptor()
 //		logging.level = HttpLoggingInterceptor.Level.BODY
 //		val httpClient = OkHttpClient.Builder()

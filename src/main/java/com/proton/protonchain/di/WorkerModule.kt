@@ -11,8 +11,13 @@ import dagger.multibindings.IntoMap
 abstract class WorkerModule {
     @Binds
     @IntoMap
-    @WorkerKey(FetchChainProvidersWorker::class)
-    abstract fun bindFetchChainProvidersWorker(factory: FetchChainProvidersWorker.Factory): ChildWorkerFactory
+    @WorkerKey(InitChainProvidersWorker::class)
+    abstract fun bindInitChainProvidersWorker(factory: InitChainProvidersWorker.Factory): ChildWorkerFactory
+
+    @Binds
+    @IntoMap
+    @WorkerKey(InitTokenContractsWorker::class)
+    abstract fun bindInitTokenContractsWorker(factory: InitTokenContractsWorker.Factory): ChildWorkerFactory
 
     @Binds
     abstract fun bindWorkerFactory(factory: ProtonChainWorkerFactory): WorkerFactory
