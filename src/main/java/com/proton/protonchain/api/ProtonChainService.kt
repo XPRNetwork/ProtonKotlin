@@ -11,6 +11,10 @@ import retrofit2.http.Url
 data class UserNameBody(val account: String, val sign: String, val name: String)
 
 interface ProtonChainService {
+	@GET
+	suspend fun getChainProviders(
+		@Url url: String): Response<JsonObject>
+
 	@POST
 	suspend fun updateUserName(
 		@Url url: String,
@@ -20,8 +24,4 @@ interface ProtonChainService {
 	suspend fun uploadUserAvatar(
 		@Url url: String,
 		@Body body: MultipartBody): Response<JsonObject>
-
-	@GET
-	suspend fun getChainProviders(
-		@Url url: String): Response<JsonObject>
 }

@@ -1,22 +1,20 @@
 package com.proton.protonchain
 
 import android.content.Context
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import com.proton.protonchain.common.SingletonHolder
 import com.proton.protonchain.di.DaggerInjector
 import com.proton.protonchain.di.ProtonModule
 import com.proton.protonchain.model.ChainProvider
 import com.proton.protonchain.model.Resource
 import com.proton.protonchain.model.TokenContract
-import com.proton.protonchain.securestorage.PRNGFixes
+import kotlinx.coroutines.*
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class ProtonChain private constructor(context: Context) {
 	init {
-		// https://android-developers.googleblog.com/2013/08/some-securerandom-thoughts.html
-		PRNGFixes.apply()
-
 		if (BuildConfig.DEBUG) {
 			Timber.plant(Timber.DebugTree())
 		}
@@ -33,35 +31,61 @@ class ProtonChain private constructor(context: Context) {
 
 	private val defaultProtonChainId = context.getString(R.string.defaultProtonChainId)
 
+	private val protonCoroutineScope = CoroutineScope(Dispatchers.Default)
+
 	fun initialize() {
 		workersModule.init()
 	}
 
-	fun getChainProviders(lifeCycleOwner: LifecycleOwner, observer: Observer<Resource<List<ChainProvider>>>) {
-		chainProvidersModule.chainProviders.observe(lifeCycleOwner, observer)
+	fun getChainProviders(): LiveData<Resource<List<ChainProvider>>> = liveData {
+		emit(Resource.loading())
 
-		chainProvidersModule.chainProviders.postValue(Resource.loading(null))
-
-		workersModule.onInitChainProviders(lifeCycleOwner, { success ->
-			if (success) {
-				chainProvidersModule.getChainProviders()
-			} else {
-				chainProvidersModule.chainProviders.postValue(Resource.error("Initialization Error", null))
+		emit(suspendCoroutine<Resource<List<ChainProvider>>> { continuation ->
+			workersModule.onInitChainProviders { success ->
+				if (success) {
+					protonCoroutineScope.launch {
+						continuation.resume(Resource.success(chainProvidersModule.getChainProviders()))
+					}
+				} else {
+					continuation.resume(Resource.error("Initialization Error", emptyList<ChainProvider>()))
+				}
 			}
 		})
 	}
 
-	fun getTokenContracts(lifeCycleOwner: LifecycleOwner, observer: Observer<Resource<List<TokenContract>>>) {
-		tokenContractsModule.tokenContracts.observe(lifeCycleOwner, observer)
+    fun getTokenContracts(): LiveData<Resource<List<TokenContract>>> {
+        return getTokenContracts(defaultProtonChainId)
+    }
 
-		tokenContractsModule.tokenContracts.postValue(Resource.loading(null))
+    fun getTokenContracts(chainId: String): LiveData<Resource<List<TokenContract>>> = liveData {
+        emit(Resource.loading())
 
-		workersModule.onInitTokenContracts(lifeCycleOwner, { success ->
-			if (success) {
-				tokenContractsModule.getTokenContracts(defaultProtonChainId)
-			} else {
-				tokenContractsModule.tokenContracts.postValue(Resource.error("Initialization Error", null))
-			}
-		})
+        emit(suspendCoroutine<Resource<List<TokenContract>>> { continuation ->
+            workersModule.onInitTokenContracts { success ->
+                if (success) {
+					protonCoroutineScope.launch {
+                        continuation.resume(Resource.success(tokenContractsModule.getTokenContracts(chainId)))
+                    }
+                } else {
+                    continuation.resume(Resource.error("Initialization Error", emptyList<TokenContract>()))
+                }
+            }
+        })
+    }
+
+    fun createAccount() {
+
+	}
+
+	fun importAccount(privateKey: String) {
+
+	}
+
+	fun getAccount() {
+
+	}
+
+	fun getAccountTokens(chainId: String, accountName: String) {
+
 	}
 }

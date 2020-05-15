@@ -9,7 +9,6 @@ import com.proton.protonchain.repository.ChainProviderRepository
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import timber.log.Timber
-import java.lang.Exception
 
 class InitChainProvidersWorker
 @AssistedInject constructor(
