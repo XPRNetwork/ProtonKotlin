@@ -28,6 +28,7 @@ class ProtonChain private constructor(context: Context) {
 	private var workersModule: WorkersModule = WorkersModule()
 	private var chainProvidersModule: ChainProvidersModule = ChainProvidersModule()
 	private var tokenContractsModule: TokenContractsModule = TokenContractsModule()
+	private var accountModule: AccountModule = AccountModule()
 
 	private val defaultProtonChainId = context.getString(R.string.defaultProtonChainId)
 
@@ -73,19 +74,15 @@ class ProtonChain private constructor(context: Context) {
 		})
 	}
 
-	fun createAccount() {
+	fun findAccounts(privateKey: String) {
 		TODO("need to implement")
 	}
 
-	fun importAccount(privateKey: String) {
+	fun setSelectedAccount() {
 		TODO("need to implement")
 	}
 
-	fun getAccount() {
-		TODO("need to implement")
-	}
-
-	fun getAccountTokens(chainId: String, accountName: String) {
+	fun getSelectedAccountTokens() {
 		TODO("need to implement")
 	}
 }

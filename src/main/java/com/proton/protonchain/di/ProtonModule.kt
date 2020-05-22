@@ -9,6 +9,7 @@ import com.proton.protonchain.api.EOSService
 import com.proton.protonchain.api.LiveDataCallAdapterFactory
 import com.proton.protonchain.api.ProtonChainService
 import com.proton.protonchain.common.Prefs
+import com.proton.protonchain.db.AccountDao
 import com.proton.protonchain.db.ChainProviderDao
 import com.proton.protonchain.db.ProtonChainDb
 import com.proton.protonchain.db.TokenContractDao
@@ -53,6 +54,12 @@ class ProtonModule {
 	@Provides
 	fun provideTokenContractDao(db: ProtonChainDb): TokenContractDao {
 		return db.tokenContractDao()
+	}
+
+	@Singleton
+	@Provides
+	fun provideAccountDao(db: ProtonChainDb): AccountDao {
+		return db.accountDao()
 	}
 
 	@Singleton

@@ -1,6 +1,7 @@
 package com.proton.protonchain.di
 
 import android.content.Context
+import com.proton.protonchain.AccountModule
 import com.proton.protonchain.ChainProvidersModule
 import com.proton.protonchain.TokenContractsModule
 import com.proton.protonchain.WorkersModule
@@ -28,4 +29,5 @@ interface ProtonComponent {
 	fun inject(workersModule: WorkersModule)
 	fun inject(chainProvidersModule: ChainProvidersModule)
 	fun inject(tokenContractsModule: TokenContractsModule)
+	fun inject(accountModule: AccountModule)
 }
