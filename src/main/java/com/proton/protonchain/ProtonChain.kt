@@ -5,9 +5,8 @@ import androidx.lifecycle.*
 import com.proton.protonchain.common.SingletonHolder
 import com.proton.protonchain.di.DaggerInjector
 import com.proton.protonchain.di.ProtonModule
-import com.proton.protonchain.model.ChainProvider
-import com.proton.protonchain.model.Resource
-import com.proton.protonchain.model.TokenContract
+import com.proton.protonchain.eosio.commander.ec.EosPrivateKey
+import com.proton.protonchain.model.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -74,11 +73,43 @@ class ProtonChain private constructor(context: Context) {
 		})
 	}
 
-	fun findAccounts(privateKey: String) {
+	fun findAccounts(privateKeyStr: String): LiveData<Resource<List<SelectableAccount>>> = liveData {
+		emit(Resource.loading())
+
+		val selectableAccounts = mutableListOf<SelectableAccount>()
+
+		val chainProviders = chainProvidersModule.getChainProviders()
+		if (chainProviders.isNotEmpty()) {
+			chainProviders.forEach { chainProvider ->
+				val privateKey = EosPrivateKey(privateKeyStr)
+				val publicKey = privateKey.publicKey.toString()
+				if (publicKey.isNotEmpty()) {
+					val accountNames =
+						accountModule.getAccountNamesForKey(chainProvider.chainUrl, publicKey)
+					accountNames.forEach { accountName ->
+						val selectableAccount = SelectableAccount(
+							privateKey = privateKey,
+							accountName = accountName,
+							chainProvider = chainProvider
+						)
+						selectableAccounts.add(selectableAccount)
+					}
+				}
+			}
+		} else {
+			emit(Resource.error("No Chain Providers, needs initialization", selectableAccounts))
+		}
+
+		emit(Resource.success(selectableAccounts.toList()))
+	}
+
+	fun selectAccount(selectableAccount: SelectableAccount): LiveData<Resource<Account>> = liveData {
+		emit(Resource.loading())
+
 		TODO("need to implement")
 	}
 
-	fun setSelectedAccount() {
+	fun getSelectedAccount(): LiveData<Resource<Account>> = liveData {
 		TODO("need to implement")
 	}
 

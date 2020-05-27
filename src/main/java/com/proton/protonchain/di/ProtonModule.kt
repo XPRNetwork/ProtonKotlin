@@ -5,7 +5,6 @@ import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.proton.protonchain.R
-import com.proton.protonchain.api.EOSService
 import com.proton.protonchain.api.LiveDataCallAdapterFactory
 import com.proton.protonchain.api.ProtonChainService
 import com.proton.protonchain.common.Prefs
@@ -60,29 +59,6 @@ class ProtonModule {
 	@Provides
 	fun provideAccountDao(db: ProtonChainDb): AccountDao {
 		return db.accountDao()
-	}
-
-	@Singleton
-	@Provides
-	fun provideEOSService(context: Context, gson: Gson): EOSService {
-//		val logging = HttpLoggingInterceptor()
-//		logging.level = HttpLoggingInterceptor.Level.BODY
-//		val httpClient = OkHttpClient.Builder()
-//		httpClient.addInterceptor(logging)
-
-		val httpClient = OkHttpClient.Builder()
-			.callTimeout(30, TimeUnit.SECONDS)
-			.connectTimeout(30, TimeUnit.SECONDS)
-			.readTimeout(30, TimeUnit.SECONDS)
-			.writeTimeout(30, TimeUnit.SECONDS)
-
-		return Retrofit.Builder()
-			.baseUrl(context.getString(R.string.defaultEOSChainUrl))
-			.addConverterFactory(GsonConverterFactory.create(gson))
-			.addCallAdapterFactory(LiveDataCallAdapterFactory())
-			.client(httpClient.build())
-			.build()
-			.create(EOSService::class.java)
 	}
 
 	@Singleton
