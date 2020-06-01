@@ -37,20 +37,38 @@ class ProtonChain private constructor(context: Context) {
 		workersModule.init()
 	}
 
+	private suspend fun getChainProvidersAsync() = suspendCoroutine<List<ChainProvider>> { continuation ->
+		workersModule.onInitChainProviders { success ->
+			if (success) {
+				protonCoroutineScope.launch {
+					continuation.resume(chainProvidersModule.getChainProviders())
+				}
+			} else {
+				continuation.resume(emptyList())
+			}
+		}
+	}
+
 	fun getChainProviders(): LiveData<Resource<List<ChainProvider>>> = liveData {
 		emit(Resource.loading())
+		val chainProviders = getChainProvidersAsync()
+		if (chainProviders.isNotEmpty()) {
+			emit(Resource.success(chainProviders))
+		} else {
+			emit(Resource.error("Initialization Error", chainProviders))
+		}
+	}
 
-		emit(suspendCoroutine<Resource<List<ChainProvider>>> { continuation ->
-			workersModule.onInitChainProviders { success ->
-				if (success) {
-					protonCoroutineScope.launch {
-						continuation.resume(Resource.success(chainProvidersModule.getChainProviders()))
-					}
-				} else {
-					continuation.resume(Resource.error("Initialization Error", emptyList<ChainProvider>()))
+	private suspend fun getTokenContractsAsync(chainId: String) = suspendCoroutine<List<TokenContract>> { continuation ->
+		workersModule.onInitTokenContracts { success ->
+			if (success) {
+				protonCoroutineScope.launch {
+					continuation.resume(tokenContractsModule.getTokenContracts(chainId))
 				}
+			} else {
+				continuation.resume(emptyList())
 			}
-		})
+		}
 	}
 
 	fun getTokenContracts(): LiveData<Resource<List<TokenContract>>> {
@@ -60,26 +78,21 @@ class ProtonChain private constructor(context: Context) {
 	fun getTokenContracts(chainId: String): LiveData<Resource<List<TokenContract>>> = liveData {
 		emit(Resource.loading())
 
-		emit(suspendCoroutine<Resource<List<TokenContract>>> { continuation ->
-			workersModule.onInitTokenContracts { success ->
-				if (success) {
-					protonCoroutineScope.launch {
-						continuation.resume(Resource.success(tokenContractsModule.getTokenContracts(chainId)))
-					}
-				} else {
-					continuation.resume(Resource.error("Initialization Error", emptyList<TokenContract>()))
-				}
-			}
-		})
+		val tokenContracts = getTokenContractsAsync(chainId)
+		if (tokenContracts.isNotEmpty()) {
+			emit(Resource.success(tokenContracts))
+		} else {
+			emit(Resource.error("Initialization Error", tokenContracts))
+		}
 	}
 
 	fun findAccounts(privateKeyStr: String): LiveData<Resource<List<SelectableAccount>>> = liveData {
 		emit(Resource.loading())
 
-		val selectableAccounts = mutableListOf<SelectableAccount>()
-
-		val chainProviders = chainProvidersModule.getChainProviders()
+		val chainProviders = getChainProvidersAsync()
 		if (chainProviders.isNotEmpty()) {
+			val selectableAccounts = mutableListOf<SelectableAccount>()
+
 			chainProviders.forEach { chainProvider ->
 				val privateKey = EosPrivateKey(privateKeyStr)
 				val publicKey = privateKey.publicKey.toString()
@@ -96,17 +109,17 @@ class ProtonChain private constructor(context: Context) {
 					}
 				}
 			}
-		} else {
-			emit(Resource.error("No Chain Providers, needs initialization", selectableAccounts))
-		}
 
-		emit(Resource.success(selectableAccounts.toList()))
+			emit(Resource.success(selectableAccounts.toList()))
+		} else {
+			emit(Resource.error("Initialization Error", emptyList<SelectableAccount>()))
+		}
 	}
 
 	fun selectAccount(selectableAccount: SelectableAccount): LiveData<Resource<Account>> = liveData {
 		emit(Resource.loading())
 
-		TODO("need to implement")
+
 	}
 
 	fun getSelectedAccount(): LiveData<Resource<Account>> = liveData {

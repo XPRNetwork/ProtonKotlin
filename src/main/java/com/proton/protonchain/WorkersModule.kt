@@ -18,7 +18,7 @@ class WorkersModule {
 	@Inject
 	lateinit var prefs: Prefs
 
-	var workManager: WorkManager
+	private var workManager: WorkManager
 
 	init {
 		DaggerInjector.component.inject(this)
