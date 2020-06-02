@@ -13,7 +13,7 @@ class WorkersModule {
 	lateinit var context: Context
 
 	@Inject
-	lateinit var workerFactory: ProtonChainWorkerFactory
+	lateinit var workerFactory: ProtonWorkerFactory
 
 	@Inject
 	lateinit var prefs: Prefs

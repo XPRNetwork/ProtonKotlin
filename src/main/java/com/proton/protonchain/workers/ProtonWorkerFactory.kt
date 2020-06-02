@@ -8,7 +8,7 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
-class ProtonChainWorkerFactory @Inject constructor(
+class ProtonWorkerFactory @Inject constructor(
 	private val workerFactory: Map<Class<out ListenableWorker>, @JvmSuppressWildcards Provider<ChildWorkerFactory>>
 ) : WorkerFactory() {
 	override fun createWorker(

@@ -14,7 +14,7 @@ import com.proton.protonchain.model.TokenContract
 	version = 6,
 	exportSchema = false
 )
-abstract class ProtonChainDb : RoomDatabase() {
+abstract class ProtonDb : RoomDatabase() {
 	abstract fun chainProviderDao(): ChainProviderDao
 	abstract fun tokenContractDao(): TokenContractDao
 	abstract fun accountDao(): AccountDao

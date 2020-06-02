@@ -11,7 +11,7 @@ import com.proton.protonchain.common.AccountPrefs
 import com.proton.protonchain.common.Prefs
 import com.proton.protonchain.db.AccountDao
 import com.proton.protonchain.db.ChainProviderDao
-import com.proton.protonchain.db.ProtonChainDb
+import com.proton.protonchain.db.ProtonDb
 import com.proton.protonchain.db.TokenContractDao
 import com.proton.protonchain.eosio.commander.GsonEosTypeAdapterFactory
 import dagger.Module
@@ -37,28 +37,28 @@ class ProtonModule {
 
 	@Singleton
 	@Provides
-	fun provideDb(context: Context): ProtonChainDb {
+	fun provideDb(context: Context): ProtonDb {
 		return Room
-			.databaseBuilder(context, ProtonChainDb::class.java, "protonchain.db")
+			.databaseBuilder(context, ProtonDb::class.java, "proton.db")
 			.fallbackToDestructiveMigration()
 			.build()
 	}
 
 	@Singleton
 	@Provides
-	fun provideChainProviderDao(db: ProtonChainDb): ChainProviderDao {
+	fun provideChainProviderDao(db: ProtonDb): ChainProviderDao {
 		return db.chainProviderDao()
 	}
 
 	@Singleton
 	@Provides
-	fun provideTokenContractDao(db: ProtonChainDb): TokenContractDao {
+	fun provideTokenContractDao(db: ProtonDb): TokenContractDao {
 		return db.tokenContractDao()
 	}
 
 	@Singleton
 	@Provides
-	fun provideAccountDao(db: ProtonChainDb): AccountDao {
+	fun provideAccountDao(db: ProtonDb): AccountDao {
 		return db.accountDao()
 	}
 

@@ -12,7 +12,7 @@ import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class ProtonChain private constructor(context: Context) {
+class Proton private constructor(context: Context) {
 	init {
 		if (BuildConfig.DEBUG) {
 			Timber.plant(Timber.DebugTree())
@@ -22,7 +22,7 @@ class ProtonChain private constructor(context: Context) {
 		DaggerInjector.component.inject(ProtonModule())
 	}
 
-	companion object : SingletonHolder<ProtonChain, Context>(::ProtonChain)
+	companion object : SingletonHolder<Proton, Context>(::Proton)
 
 	private var workersModule: WorkersModule = WorkersModule()
 	private var chainProvidersModule: ChainProvidersModule = ChainProvidersModule()
@@ -122,8 +122,10 @@ class ProtonChain private constructor(context: Context) {
 		emit(accountModule.addAccount(selectableAccount, pin))
 	}
 
-	fun getSelectedAccount(): LiveData<Resource<Account>> = liveData {
-		TODO("need to implement")
+	fun getSelectedAccount(): LiveData<Resource<ChainAccount>> = liveData {
+//		emit(Resource.loading())
+//
+//		emit(accountModule.getSelectedAccount())
 	}
 
 	fun getSelectedAccountTokens() {

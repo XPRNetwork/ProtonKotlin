@@ -9,8 +9,8 @@ import com.proton.protonchain.db.DefaultTypeConverters
 import com.proton.protonchain.db.EOSTypeConverters
 
 @Entity(
-	indices = [(Index("chainId", "accountName"))],
-	primaryKeys = ["chainId", "accountName"]
+	indices = [(Index("accountChainId", "accountName"))],
+	primaryKeys = ["accountChainId", "accountName"]
 )
 @TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class)
 data class Account(
@@ -44,7 +44,7 @@ data class Account(
 	@SerializedName("voter_info")
 	@Embedded(prefix = "voter_info_") val voterInfo: AccountVoterInfo?
 ) {
-	lateinit var chainId: String
+	lateinit var accountChainId: String
 
 	lateinit var accountContact: AccountContact
 

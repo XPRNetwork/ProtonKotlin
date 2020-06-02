@@ -20,5 +20,5 @@ abstract class WorkerModule {
     abstract fun bindInitTokenContractsWorker(factory: InitTokenContractsWorker.Factory): ChildWorkerFactory
 
     @Binds
-    abstract fun bindWorkerFactory(factory: ProtonChainWorkerFactory): WorkerFactory
+    abstract fun bindWorkerFactory(factory: ProtonWorkerFactory): WorkerFactory
 }
