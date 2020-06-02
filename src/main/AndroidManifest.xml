@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	package="com.proton.protonchain">
+	package="com.metallicus.protonsdk">
 
 	<uses-permission android:name="android.permission.INTERNET"/>
 
@@ -13,4 +13,3 @@
 	</application>
 
 </manifest>
-
