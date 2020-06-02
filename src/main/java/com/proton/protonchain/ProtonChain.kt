@@ -116,10 +116,10 @@ class ProtonChain private constructor(context: Context) {
 		}
 	}
 
-	fun selectAccount(selectableAccount: SelectableAccount): LiveData<Resource<Account>> = liveData {
+	fun selectAccount(selectableAccount: SelectableAccount, pin: String): LiveData<Resource<ChainAccount>> = liveData {
 		emit(Resource.loading())
 
-
+		emit(accountModule.addAccount(selectableAccount, pin))
 	}
 
 	fun getSelectedAccount(): LiveData<Resource<Account>> = liveData {

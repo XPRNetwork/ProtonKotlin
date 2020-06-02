@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder
 import com.proton.protonchain.R
 import com.proton.protonchain.api.LiveDataCallAdapterFactory
 import com.proton.protonchain.api.ProtonChainService
+import com.proton.protonchain.common.AccountPrefs
 import com.proton.protonchain.common.Prefs
 import com.proton.protonchain.db.AccountDao
 import com.proton.protonchain.db.ChainProviderDao
@@ -88,5 +89,11 @@ class ProtonModule {
 	@Provides
 	fun providePrefs(context: Context): Prefs {
 		return Prefs(context)
+	}
+
+	@Singleton
+	@Provides
+	fun provideAccountPrefs(context: Context): AccountPrefs {
+		return AccountPrefs(context)
 	}
 }

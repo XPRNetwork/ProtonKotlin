@@ -11,7 +11,7 @@ import com.proton.protonchain.model.TokenContract
 		ChainProvider::class,
 		TokenContract::class,
 		Account::class],
-	version = 5,
+	version = 6,
 	exportSchema = false
 )
 abstract class ProtonChainDb : RoomDatabase() {

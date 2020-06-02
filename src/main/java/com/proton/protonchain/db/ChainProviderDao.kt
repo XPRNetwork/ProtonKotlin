@@ -14,7 +14,7 @@ interface ChainProviderDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(chainProvider: ChainProvider)
 
-	@Query("SELECT * FROM chainProvider WHERE id = :id")
+	@Query("SELECT * FROM chainProvider WHERE chainId = :id")
 	suspend fun findById(id: String): ChainProvider
 
 	@Query("SELECT * FROM chainProvider")

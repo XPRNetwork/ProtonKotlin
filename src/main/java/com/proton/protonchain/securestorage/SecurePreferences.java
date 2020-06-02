@@ -267,16 +267,6 @@ public final class SecurePreferences {
 //		}
 	}
 
-	public static void registerOnSharedPreferenceChangeListener(@NonNull Context context,
-																@NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
-		getSharedPreferences(context).registerOnSharedPreferenceChangeListener(listener);
-	}
-
-	public static void unregisterOnSharedPreferenceChangeListener(@NonNull Context context,
-																  @NonNull SharedPreferences.OnSharedPreferenceChangeListener listener) {
-		getSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(listener);
-	}
-
 	private static void setSecureValue(@NonNull Context context,
 									   @NonNull String key,
 									   @NonNull String value) {

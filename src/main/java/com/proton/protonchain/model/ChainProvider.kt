@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 @Entity
 data class ChainProvider(
 	@PrimaryKey
-	@SerializedName("chainId") val id: String,
+	@SerializedName("chainId") val chainId: String,
 
 	@SerializedName("name") val name: String,
 	@SerializedName("description") val description: String,
