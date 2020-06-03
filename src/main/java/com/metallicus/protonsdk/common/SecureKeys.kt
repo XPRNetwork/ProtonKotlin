@@ -7,14 +7,14 @@ import com.metallicus.protonsdk.securestorage.SecureStorageException
 import timber.log.Timber
 import java.lang.Exception
 
-class AccountPrefs(private val context: Context) {
+class SecureKeys(private val context: Context) {
 	companion object {
-		const val SHARED_PREFS_FILENAME = "protonsdk.accounts"
+		const val SHARED_PREFS_FILENAME = "protonsdk.secure_keys"
 	}
 
 	//private val backupManager: BackupManager = BackupManager(context)
 
-	fun checkPin(pin: String): Boolean {
+	fun isPinValid(pin: String): Boolean {
 		var isValid = false
 		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 		val securePrefs = SecurePreferences.getSharedPreferences(context)
@@ -22,7 +22,7 @@ class AccountPrefs(private val context: Context) {
 			isValid = try {
 				val firstAccount = securePrefs.all.entries.iterator().next()
 				val publicKey = firstAccount.key
-				val privateKey = getAccountKey(firstAccount.key, pin)
+				val privateKey = getPrivateKey(firstAccount.key, pin)
 				EosPrivateKey(privateKey).publicKey.toString() == publicKey
 			} catch (e: Exception) {
 				false
@@ -31,23 +31,23 @@ class AccountPrefs(private val context: Context) {
 		return isValid
 	}
 
-	fun hasAccounts(): Boolean {
+	fun hasKeys(): Boolean {
 		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 		val securePrefs = SecurePreferences.getSharedPreferences(context)
 		return securePrefs.all.isNotEmpty()
 	}
 
-	fun accountExists(publicKey: String): Boolean {
+	fun keyExists(publicKey: String): Boolean {
 		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 		return SecurePreferences.contains(context, publicKey)
 	}
 
-	fun getAccountKey(publicKey: String, pin: String): String? {
+	fun getPrivateKey(publicKey: String, pin: String): String? {
 		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 		return SecurePreferences.getStringValue(context, publicKey, pin, "")
 	}
 
-	fun getAccountKeys(): ArrayList<String> {
+	fun getPublicKeys(): ArrayList<String> {
 		val publicKeys = arrayListOf<String>()
 		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 		val securePrefs = SecurePreferences.getSharedPreferences(context)
@@ -58,7 +58,7 @@ class AccountPrefs(private val context: Context) {
 		return publicKeys
 	}
 
-	fun addAccountKey(publicKey: String, privateKey: String, pin: String): Boolean {
+	fun addKey(publicKey: String, privateKey: String, pin: String): Boolean {
 		return try {
 			SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 			SecurePreferences.setValue(context, publicKey, privateKey, pin)
@@ -70,7 +70,7 @@ class AccountPrefs(private val context: Context) {
 		}
 	}
 
-	fun remove(publicKey: String) {
+	fun removeKey(publicKey: String) {
 		try {
 			SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 			SecurePreferences.removeValue(context, publicKey)

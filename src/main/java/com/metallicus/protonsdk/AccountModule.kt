@@ -1,7 +1,9 @@
 package com.metallicus.protonsdk
 
 import android.content.Context
-import com.metallicus.protonsdk.common.AccountPrefs
+import com.metallicus.protonsdk.common.SecureKeys
+import com.metallicus.protonsdk.common.Prefs
+import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountRepository
@@ -16,7 +18,10 @@ class AccountModule {
 	lateinit var accountRepository: AccountRepository
 
 	@Inject
-	lateinit var accountPrefs: AccountPrefs
+	lateinit var prefs: Prefs
+
+	@Inject
+	lateinit var secureKeys: SecureKeys
 
 	init {
 		DaggerInjector.component.inject(this)
@@ -39,10 +44,10 @@ class AccountModule {
 		return accountNames
 	}
 
-	suspend fun addAccount(selectableAccount: SelectableAccount, pin: String): Resource<ChainAccount> {
+	suspend fun setSelectedAccount(selectableAccount: SelectableAccount, pin: String): Resource<ChainAccount> {
 		val publicKey = selectableAccount.privateKey.publicKey.toString()
 		val privateKey = selectableAccount.privateKey.toString()
-		accountPrefs.addAccountKey(publicKey, privateKey, pin)
+		secureKeys.addKey(publicKey, privateKey, pin)
 
 		val chainId = selectableAccount.chainProvider.chainId
 		val chainUrl = selectableAccount.chainProvider.chainUrl
@@ -86,9 +91,10 @@ class AccountModule {
 
 					accountRepository.addAccount(account)
 
-					val chainAccount = accountRepository.getChainAccount(chainId, accountName)
+					prefs.selectedAccountChainId = chainId
+					prefs.selectedAccountName = accountName
 
-					Resource.success(chainAccount)
+					return getSelectedAccount()
 				} ?: Resource.error("Account Error", null)
 			} else {
 				val msg = response.errorBody()?.string()
@@ -102,6 +108,16 @@ class AccountModule {
 			}
 		} catch (e: Exception) {
 			Resource.error("Connection Error or Timeout: Please check your network settings", null)
+		}
+	}
+
+	suspend fun getSelectedAccount(): Resource<ChainAccount> {
+		val chainId = prefs.selectedAccountChainId.orEmpty()
+		val accountName = prefs.selectedAccountName.orEmpty()
+		return if (chainId.isNotEmpty() && accountName.isNotEmpty()) {
+			Resource.success(accountRepository.getChainAccount(chainId, accountName))
+		} else {
+			Resource.error("No Selected Account")
 		}
 	}
 }

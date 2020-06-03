@@ -7,7 +7,7 @@ import com.google.gson.GsonBuilder
 import com.metallicus.protonsdk.R
 import com.metallicus.protonsdk.api.LiveDataCallAdapterFactory
 import com.metallicus.protonsdk.api.ProtonChainService
-import com.metallicus.protonsdk.common.AccountPrefs
+import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.db.AccountDao
 import com.metallicus.protonsdk.db.ChainProviderDao
@@ -93,7 +93,7 @@ class ProtonModule {
 
 	@Singleton
 	@Provides
-	fun provideAccountPrefs(context: Context): AccountPrefs {
-		return AccountPrefs(context)
+	fun provideSecureKeys(context: Context): SecureKeys {
+		return SecureKeys(context)
 	}
 }

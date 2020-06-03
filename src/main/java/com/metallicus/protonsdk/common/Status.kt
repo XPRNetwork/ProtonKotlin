@@ -1,4 +1,4 @@
-package com.metallicus.protonsdk.model
+package com.metallicus.protonsdk.common
 
 enum class Status {
 	SUCCESS,
