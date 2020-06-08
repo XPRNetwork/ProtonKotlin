@@ -13,18 +13,18 @@ interface AccountDao {
 	suspend fun insert(account: Account)
 
 	@Update
-	fun update(account: Account)
+	suspend fun update(account: Account)
 
 	@Transaction
 	@Query("SELECT * FROM account WHERE accountChainId = :chainId AND accountName = :accountName")
 	suspend fun findByAccountName(chainId: String, accountName: String): ChainAccount
 
 	@Query("DELETE FROM account WHERE accountChainId = :chainId AND accountName = :accountName")
-	fun remove(chainId: String, accountName: String)
+	suspend fun remove(chainId: String, accountName: String)
 
 	@Query("DELETE FROM account WHERE accountChainId = :chainId AND accountName IN(:accounts)")
-	fun remove(chainId: String, accounts: List<String>)
+	suspend fun remove(chainId: String, accounts: List<String>)
 
 	@Query("DELETE FROM account")
-	fun removeAll()
+	suspend fun removeAll()
 }

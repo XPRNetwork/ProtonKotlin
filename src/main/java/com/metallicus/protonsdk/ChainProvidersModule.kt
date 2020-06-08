@@ -13,11 +13,8 @@ class ChainProvidersModule {
 	@Inject
 	lateinit var chainProviderRepository: ChainProviderRepository
 
-	private var chainProvidersUrl: String
-
 	init {
 		DaggerInjector.component.inject(this)
-		chainProvidersUrl = context.getString(R.string.chainProvidersUrl)
 	}
 
 	suspend fun getChainProviders(): List<ChainProvider> {

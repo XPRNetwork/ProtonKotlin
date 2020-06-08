@@ -24,12 +24,9 @@ class InitChainProvidersWorker
 			if (response.isSuccessful) {
 				chainProviderRepository.removeAll()
 
-				val gson = Gson()
-				response.body()?.entrySet()?.forEach { entry ->
-					val chainProvider = gson.fromJson(entry.value, ChainProvider::class.java)
+				val chainProvider = Gson().fromJson(response.body(), ChainProvider::class.java)
 
-					chainProviderRepository.addChainProvider(chainProvider)
-				}
+				chainProviderRepository.addChainProvider(chainProvider)
 
 				Result.success()
 			} else {

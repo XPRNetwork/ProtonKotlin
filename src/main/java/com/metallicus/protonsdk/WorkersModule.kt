@@ -35,7 +35,7 @@ class WorkersModule {
 		const val INIT = "WORKER_INIT"
 	}
 
-	fun init() {
+	fun init(chainProvidersUrl: String, apiKey: String, apiSecret: String) {
 		workManager.pruneWork()
 
 		prefs.clearInit()
@@ -45,7 +45,7 @@ class WorkersModule {
 			.build()
 
 		val chainProvidersInputData = Data.Builder()
-			.putString("chainProvidersUrl", context.getString(R.string.chainProvidersUrl))
+			.putString("chainProvidersUrl", chainProvidersUrl)
 			.build()
 
 		val initChainProviders = OneTimeWorkRequest.Builder(InitChainProvidersWorker::class.java)
