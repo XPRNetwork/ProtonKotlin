@@ -13,11 +13,11 @@ class ChainProviderRepository @Inject constructor(
 	private val chainProviderDao: ChainProviderDao,
 	private val protonChainService: ProtonChainService
 ) {
-	fun removeAll() {
+	suspend fun removeAll() {
 		chainProviderDao.removeAll()
 	}
 
-	fun addChainProvider(chainProvider: ChainProvider) {
+	suspend fun addChainProvider(chainProvider: ChainProvider) {
 		chainProviderDao.insert(chainProvider)
 	}
 

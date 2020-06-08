@@ -1,13 +1,14 @@
 <resources>
-	<string name="defaultEOSChainId" translatable="false">aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906</string>
-	<string name="defaultEOSChainName" translatable="false">EOS</string>
-	<string name="defaultEOSChainUrl" translatable="false">https://eos.greymass.com</string>
-
 	<string name="defaultProtonChainId" translatable="false">384da888112027f0321850a169f737c33e53b388aad48b5adace4bab97f437e0</string>
-	<string name="defaultProtonChainName" translatable="false">Proton</string>
 	<string name="defaultProtonChainUrl" translatable="false">https://proton.cryptolions.io/</string>
 
-	<string name="chainProvidersUrl" translatable="false">https://e8245mepe3.execute-api.us-west-2.amazonaws.com/dev/chain-providers</string>
+	<string name="protonChainUsersInfoTableScope" translatable="false">eosio.proton</string>
+	<string name="protonChainUsersInfoTableCode" translatable="false">eosio.proton</string>
+	<string name="protonChainUsersInfoTableName" translatable="false">usersinfo</string>
+
+	<string name="protonChainTokensTableScope" translatable="false">token.proton</string>
+	<string name="protonChainTokensTableCode" translatable="false">token.proton</string>
+	<string name="protonChainTokensTableName" translatable="false">tokens</string>
 
 	<string name="secureStorageKeyPairAlreadyExists">KeyPair already exists!</string>
 	<string name="secureStorageKeyPairDoesNotExist">KeyPair does not exist in Keystore</string>

@@ -1,6 +1,5 @@
 package com.metallicus.protonsdk.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.metallicus.protonsdk.model.TokenContract
 
@@ -10,20 +9,20 @@ import com.metallicus.protonsdk.model.TokenContract
 @Dao
 interface TokenContractDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun insert(tokenContract: TokenContract)
+	suspend fun insert(tokenContract: TokenContract)
 
 	@Update
-	fun update(tokenContract: TokenContract)
+	suspend fun update(tokenContract: TokenContract)
 
 	@Query("SELECT * FROM tokenContract WHERE id = :id")
-	fun findById(id: String): LiveData<TokenContract>
+	suspend fun findById(id: String): TokenContract
 
 	@Query("SELECT * FROM tokenContract WHERE chainId = :chainId")
 	suspend fun findAllByChainId(chainId: String): List<TokenContract>
 
 	@Query("DELETE FROM tokenContract WHERE chainId = :chainId")
-	fun removeAllByChainId(chainId: String)
+	suspend fun removeAllByChainId(chainId: String)
 
 	@Query("DELETE FROM tokenContract")
-	fun removeAll()
+	suspend fun removeAll()
 }

@@ -12,7 +12,7 @@ import com.metallicus.protonsdk.model.ChainProvider
 @Dao
 interface ChainProviderDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun insert(chainProvider: ChainProvider)
+	suspend fun insert(chainProvider: ChainProvider)
 
 	@Query("SELECT * FROM chainProvider WHERE chainId = :id")
 	suspend fun findById(id: String): ChainProvider
@@ -21,5 +21,5 @@ interface ChainProviderDao {
 	suspend fun findAll(): List<ChainProvider>
 
 	@Query("DELETE FROM chainProvider")
-	fun removeAll()
+	suspend fun removeAll()
 }

@@ -14,16 +14,16 @@ class TokenContractRepository @Inject constructor(
 	private val tokenContractDao: TokenContractDao,
 	private val protonChainService: ProtonChainService
 ) {
-	fun removeAll() {
+	suspend fun removeAll() {
 		tokenContractDao.removeAll()
 	}
 
-	fun addTokenContract(tokenContract: TokenContract) {
+	suspend fun addTokenContract(tokenContract: TokenContract) {
 		tokenContractDao.insert(tokenContract)
 	}
 
-	suspend fun fetchTokenContracts(chainUrl: String, tokensTableScope: String, tokensTableCode: String): Response<JsonObject> {
-		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(tokensTableScope, tokensTableCode, "tokens"))
+	suspend fun fetchTokenContracts(chainUrl: String, tokensTableScope: String, tokensTableCode: String, tokensTableName: String): Response<JsonObject> {
+		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(tokensTableScope, tokensTableCode, tokensTableName))
 	}
 
 	suspend fun getAllTokenContracts(chainId: String): List<TokenContract> {

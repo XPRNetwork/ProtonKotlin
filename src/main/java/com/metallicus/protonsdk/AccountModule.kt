@@ -51,8 +51,9 @@ class AccountModule {
 
 		val chainId = selectableAccount.chainProvider.chainId
 		val chainUrl = selectableAccount.chainProvider.chainUrl
-		val usersInfoTableScope = selectableAccount.chainProvider.usersInfoTableScope
-		val usersInfoTableCode = selectableAccount.chainProvider.usersInfoTableCode
+		val usersInfoTableScope = context.getString(R.string.protonChainUsersInfoTableScope)
+		val usersInfoTableCode = context.getString(R.string.protonChainUsersInfoTableCode)
+		val usersInfoTableName = context.getString(R.string.protonChainUsersInfoTableName)
 		val accountName = selectableAccount.accountName
 
 		return try {
@@ -65,7 +66,8 @@ class AccountModule {
 					accountContact.accountName = accountName
 					accountContact.chainId = chainId
 
-					val accountInfoResponse = accountRepository.fetchAccountInfo(chainUrl, accountName, usersInfoTableScope, usersInfoTableCode)
+					val accountInfoResponse = accountRepository.fetchAccountInfo(
+						chainUrl, accountName, usersInfoTableScope, usersInfoTableCode, usersInfoTableName)
 					if (accountInfoResponse.isSuccessful) {
 						val userInfoJsonObject = accountInfoResponse.body()
 
