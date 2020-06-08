@@ -11,7 +11,7 @@ import com.metallicus.protonsdk.model.TokenContract
 		ChainProvider::class,
 		TokenContract::class,
 		Account::class],
-	version = 6,
+	version = 7,
 	exportSchema = false
 )
 abstract class ProtonDb : RoomDatabase() {

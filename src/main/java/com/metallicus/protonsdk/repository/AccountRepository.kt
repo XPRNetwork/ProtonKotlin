@@ -21,8 +21,8 @@ class AccountRepository @Inject constructor(
 		return protonChainService.getAccountAsync("$chainUrl/v1/chain/get_account", AccountBody(accountName))
 	}
 
-	suspend fun fetchAccountInfo(chainUrl: String, accountName: String, usersInfoTableScope: String, usersInfoTableCode: String): Response<JsonObject> {
-		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(usersInfoTableScope, usersInfoTableCode, "usersinfo", accountName, accountName))
+	suspend fun fetchAccountInfo(chainUrl: String, accountName: String, usersInfoTableScope: String, usersInfoTableCode: String, usersInfoTableName: String): Response<JsonObject> {
+		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(usersInfoTableScope, usersInfoTableCode, usersInfoTableName, accountName, accountName))
 	}
 
 	suspend fun getChainAccount(chainId: String, accountName: String): ChainAccount {
@@ -33,7 +33,7 @@ class AccountRepository @Inject constructor(
 		accountDao.insert(account)
 	}
 
-	fun updateAccount(account: Account) {
+	suspend fun updateAccount(account: Account) {
 		accountDao.update(account)
 	}
 

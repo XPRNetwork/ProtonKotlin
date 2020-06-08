@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
+import com.metallicus.protonsdk.R
 import com.metallicus.protonsdk.model.TokenContract
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.metallicus.protonsdk.repository.TokenContractRepository
@@ -19,6 +20,11 @@ class InitTokenContractsWorker
 	private val chainProviderRepository: ChainProviderRepository,
 	private val tokenContractRepository: TokenContractRepository
 ) : CoroutineWorker(context, params) {
+
+	private val protonChainTokensTableScope = context.getString(R.string.protonChainTokensTableScope)
+	private val protonChainTokensTableCode = context.getString(R.string.protonChainTokensTableCode)
+	private val protonChainTokensTableName = context.getString(R.string.protonChainTokensTableName)
+
 	override suspend fun doWork(): Result {
 		return try {
 			val chainProviders = chainProviderRepository.getAllChainProviders()
@@ -28,12 +34,15 @@ class InitTokenContractsWorker
 				tokenContractRepository.removeAll()
 
 				chainProviders.forEach { chainProvider ->
-					val tokenContractsResponse = tokenContractRepository.fetchTokenContracts(chainProvider.chainUrl, chainProvider.tokensTableScope, chainProvider.tokensTableCode)
+					val tokenContractsResponse = tokenContractRepository.fetchTokenContracts(
+						chainProvider.chainUrl,
+						protonChainTokensTableScope,
+						protonChainTokensTableCode,
+						protonChainTokensTableName)
 					if (tokenContractsResponse.isSuccessful) {
 						val responseJsonObject = tokenContractsResponse.body()
 
-						//val gsonBuilder = GsonBuilder().registerTypeAdapter(Int::class.java, IntTypeAdapter())
-						val gson = Gson()//gsonBuilder.create()
+						val gson = Gson()
 						val rows = responseJsonObject?.getAsJsonArray("rows")
 						rows?.forEach {
 							val tokenContractJsonObject = it.asJsonObject
