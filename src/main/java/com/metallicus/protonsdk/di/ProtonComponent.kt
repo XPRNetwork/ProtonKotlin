@@ -2,7 +2,7 @@ package com.metallicus.protonsdk.di
 
 import android.content.Context
 import com.metallicus.protonsdk.AccountModule
-import com.metallicus.protonsdk.ChainProvidersModule
+import com.metallicus.protonsdk.ChainProviderModule
 import com.metallicus.protonsdk.TokenContractsModule
 import com.metallicus.protonsdk.WorkersModule
 import dagger.BindsInstance
@@ -27,7 +27,7 @@ interface ProtonComponent {
 	fun inject(protonModule: ProtonModule)
 
 	fun inject(workersModule: WorkersModule)
-	fun inject(chainProvidersModule: ChainProvidersModule)
+	fun inject(chainProviderModule: ChainProviderModule)
 	fun inject(tokenContractsModule: TokenContractsModule)
 	fun inject(accountModule: AccountModule)
 }

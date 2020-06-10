@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.metallicus.protonsdk.R
+import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.model.TokenContract
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.metallicus.protonsdk.repository.TokenContractRepository
@@ -17,6 +18,7 @@ class InitTokenContractsWorker
 @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
+	private val prefs: Prefs,
 	private val chainProviderRepository: ChainProviderRepository,
 	private val tokenContractRepository: TokenContractRepository
 ) : CoroutineWorker(context, params) {
@@ -27,42 +29,45 @@ class InitTokenContractsWorker
 
 	override suspend fun doWork(): Result {
 		return try {
-			val chainProviders = chainProviderRepository.getAllChainProviders()
-			if (chainProviders.isNotEmpty()) {
-				var tokenContractsResult = Result.success()
+			val chainProvider = chainProviderRepository.getChainProvider(prefs.activeChainId)
 
-				tokenContractRepository.removeAll()
+			tokenContractRepository.removeAll()
 
-				chainProviders.forEach { chainProvider ->
-					val tokenContractsResponse = tokenContractRepository.fetchTokenContracts(
-						chainProvider.chainUrl,
-						protonChainTokensTableScope,
-						protonChainTokensTableCode,
-						protonChainTokensTableName)
-					if (tokenContractsResponse.isSuccessful) {
-						val responseJsonObject = tokenContractsResponse.body()
+			var tokenContractsResult = Result.success()
 
-						val gson = Gson()
-						val rows = responseJsonObject?.getAsJsonArray("rows")
-						rows?.forEach {
-							val tokenContractJsonObject = it.asJsonObject
+			val tokenContractsResponse = tokenContractRepository.fetchTokenContracts(
+				chainProvider.chainUrl,
+				protonChainTokensTableScope,
+				protonChainTokensTableCode,
+				protonChainTokensTableName)
+			if (tokenContractsResponse.isSuccessful) {
+				val responseJsonObject = tokenContractsResponse.body()
 
-							val tokenContract = gson.fromJson(tokenContractJsonObject, TokenContract::class.java)
-							tokenContract.chainId = chainProvider.chainId
+				val gson = Gson()
+				val rows = responseJsonObject?.getAsJsonArray("rows")
+				rows?.forEach {
+					val tokenContractJsonObject = it.asJsonObject
 
-							// TODO: add params from get_currency_stats
+					val tokenContract = gson.fromJson(tokenContractJsonObject, TokenContract::class.java)
+					tokenContract.chainId = chainProvider.chainId
 
-							tokenContractRepository.addTokenContract(tokenContract)
-						}
-					} else {
-						tokenContractsResult = Result.failure()
-					}
+					// TODO: add params from get_currency_stats
+
+					tokenContractRepository.addTokenContract(tokenContract)
 				}
-
-				tokenContractsResult
 			} else {
-				Result.failure()
+				val msg = tokenContractsResponse.errorBody()?.string()
+				val errorMsg = if (msg.isNullOrEmpty()) {
+					tokenContractsResponse.message()
+				} else {
+					msg
+				}
+				Timber.d(errorMsg)
+
+				tokenContractsResult = Result.failure()
 			}
+
+			tokenContractsResult
 		} catch (e: Exception) {
 			Timber.d(e)
 

@@ -32,7 +32,7 @@ data class TableRowsBody(
 
 interface ProtonChainService {
 	@GET
-	suspend fun getChainProviders(
+	suspend fun getChainProvider(
 		@Url url: String): Response<JsonObject>
 
 	@POST

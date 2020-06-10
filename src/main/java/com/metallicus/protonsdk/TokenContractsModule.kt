@@ -1,6 +1,7 @@
 package com.metallicus.protonsdk
 
 import android.content.Context
+import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.model.TokenContract
 import com.metallicus.protonsdk.repository.TokenContractRepository
@@ -13,11 +14,15 @@ class TokenContractsModule {
 	@Inject
 	lateinit var tokenContractRepository: TokenContractRepository
 
+	@Inject
+	lateinit var prefs: Prefs
+
 	init {
 		DaggerInjector.component.inject(this)
 	}
 
-	suspend fun getTokenContracts(chainId: String): List<TokenContract> {
+	suspend fun getActiveTokenContracts(): List<TokenContract> {
+		val chainId = prefs.activeChainId
 		return tokenContractRepository.getAllTokenContracts(chainId)
 	}
 }

@@ -37,7 +37,7 @@ class AccountRepository @Inject constructor(
 		accountDao.update(account)
 	}
 
-	suspend fun fetchStateHistoryKeyAccount(chainUrl: String, publicKey: String): Response<KeyAccount> {
-		return protonChainService.getStateHistoryKeyAccountsAsync("$chainUrl/v2/state/get_key_accounts", publicKey)
+	suspend fun fetchStateHistoryKeyAccount(stateHistoryUrl: String, publicKey: String): Response<KeyAccount> {
+		return protonChainService.getStateHistoryKeyAccountsAsync("$stateHistoryUrl/v2/state/get_key_accounts", publicKey)
 	}
 }
