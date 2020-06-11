@@ -13,6 +13,8 @@ class Prefs(context: Context) {
 
 		const val ACTIVE_CHAIN_ID = "active_chain_id"
 		const val ACTIVE_ACCOUNT_NAME = "active_account_name"
+
+		const val HAS_ACTIVE_ACCOUNT = "has_active_account"
 	}
 
 	//private val backupManager: BackupManager = BackupManager(context)
@@ -50,21 +52,28 @@ class Prefs(context: Context) {
 			}
 		}
 
-	fun clearActiveAccount() {
-		prefs.edit { remove(ACTIVE_CHAIN_ID) }
-		prefs.edit { remove(ACTIVE_ACCOUNT_NAME) }
-	}
+	var hasActiveAccount: Boolean
+		get() = prefs.getBoolean(HAS_ACTIVE_ACCOUNT, false)
+		set(value) {
+			value.let {
+				prefs.edit { putBoolean(HAS_ACTIVE_ACCOUNT, it) }
+			}
+		}
 
 	fun clearInit() {
 		prefs.edit {
 			remove(HAS_CHAIN_PROVIDER)
 			remove(HAS_TOKEN_CONTRACTS)
+			remove(HAS_ACTIVE_ACCOUNT)
 		}
 	}
 
 	fun clearAll() {
 		clearInit()
-		clearActiveAccount()
+
+		prefs.edit { remove(ACTIVE_CHAIN_ID) }
+
+		prefs.edit { remove(ACTIVE_ACCOUNT_NAME) }
 
 		//backupManager.dataChanged()
 	}

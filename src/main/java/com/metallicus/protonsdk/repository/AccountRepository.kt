@@ -17,16 +17,8 @@ class AccountRepository @Inject constructor(
 	private val accountDao: AccountDao,
 	private val protonChainService: ProtonChainService
 ) {
-	suspend fun fetchAccount(chainUrl: String, accountName: String): Response<Account> {
-		return protonChainService.getAccountAsync("$chainUrl/v1/chain/get_account", AccountBody(accountName))
-	}
-
-	suspend fun fetchAccountInfo(chainUrl: String, accountName: String, usersInfoTableScope: String, usersInfoTableCode: String, usersInfoTableName: String): Response<JsonObject> {
-		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(usersInfoTableScope, usersInfoTableCode, usersInfoTableName, accountName, accountName))
-	}
-
-	suspend fun getChainAccount(chainId: String, accountName: String): ChainAccount {
-		return accountDao.findByAccountName(chainId, accountName)
+	suspend fun removeAll() {
+		accountDao.removeAll()
 	}
 
 	suspend fun addAccount(account: Account) {
@@ -35,6 +27,18 @@ class AccountRepository @Inject constructor(
 
 	suspend fun updateAccount(account: Account) {
 		accountDao.update(account)
+	}
+
+	suspend fun getChainAccount(chainId: String, accountName: String): ChainAccount {
+		return accountDao.findByAccountName(chainId, accountName)
+	}
+
+	suspend fun fetchAccount(chainUrl: String, accountName: String): Response<Account> {
+		return protonChainService.getAccountAsync("$chainUrl/v1/chain/get_account", AccountBody(accountName))
+	}
+
+	suspend fun fetchAccountInfo(chainUrl: String, accountName: String, usersInfoTableScope: String, usersInfoTableCode: String, usersInfoTableName: String): Response<JsonObject> {
+		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(usersInfoTableScope, usersInfoTableCode, usersInfoTableName, accountName, accountName))
 	}
 
 	suspend fun fetchStateHistoryKeyAccount(stateHistoryUrl: String, publicKey: String): Response<KeyAccount> {

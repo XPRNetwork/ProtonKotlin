@@ -20,5 +20,10 @@ abstract class WorkerModule {
     abstract fun bindInitTokenContractsWorker(factory: InitTokenContractsWorker.Factory): ChildWorkerFactory
 
     @Binds
+    @IntoMap
+    @WorkerKey(InitActiveAccountWorker::class)
+    abstract fun bindInitActiveAccountWorker(factory: InitActiveAccountWorker.Factory): ChildWorkerFactory
+
+    @Binds
     abstract fun bindWorkerFactory(factory: ProtonWorkerFactory): WorkerFactory
 }

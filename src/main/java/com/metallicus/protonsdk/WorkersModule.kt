@@ -54,10 +54,22 @@ class WorkersModule {
 		val initTokenContracts = OneTimeWorkRequest.Builder(InitTokenContractsWorker::class.java)
 			.setConstraints(constraints).build()
 
-		workManager
+		val initActiveAccount = OneTimeWorkRequest.Builder(InitActiveAccountWorker::class.java)
+			.setConstraints(constraints).build()
+
+		val initWork = workManager
 			.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
-			.then(initTokenContracts)
-			.enqueue()
+
+		if (prefs.activeAccountName.isNotEmpty()) {
+			initWork
+				.then(initTokenContracts)
+				.then(initActiveAccount)
+				.enqueue()
+		} else {
+			initWork
+				.then(initTokenContracts)
+				.enqueue()
+		}
 	}
 
 	fun onInitChainProvider(callback: (Boolean) -> Unit) {
@@ -99,6 +111,30 @@ class WorkersModule {
 						workInfoLiveData.removeObserver(this)
 					} else if (tokenContractWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
 						prefs.hasTokenContracts = true
+						callback(true)
+						workInfoLiveData.removeObserver(this)
+					}
+				}
+			}
+			workInfoLiveData.observeForever(workInfoObserver)
+		}
+	}
+
+	fun onInitActiveAccount(callback: (Boolean) -> Unit) {
+		if (prefs.hasActiveAccount) {
+			callback(true)
+		} else {
+			val workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(INIT)
+			val workInfoObserver = object : Observer<List<WorkInfo>> {
+				override fun onChanged(workInfos: List<WorkInfo>) {
+					val activeAccountWorkInfos =
+						workInfos.filter { it.tags.contains(InitActiveAccountWorker::class.java.name) }
+					if (activeAccountWorkInfos.isEmpty() ||
+						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
+						callback(false)
+						workInfoLiveData.removeObserver(this)
+					} else if (activeAccountWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
+						prefs.hasActiveAccount = true
 						callback(true)
 						workInfoLiveData.removeObserver(this)
 					}

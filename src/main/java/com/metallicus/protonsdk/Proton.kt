@@ -52,8 +52,8 @@ class Proton private constructor(context: Context) {
 		emit(Resource.loading())
 
 		try {
-			val chainProviders = getChainProviderAsync()
-			emit(Resource.success(chainProviders))
+			val chainProvider = getChainProviderAsync()
+			emit(Resource.success(chainProvider))
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty(), null))
 		}
@@ -82,20 +82,52 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
+	fun hasActiveAccount(): Boolean {
+		return accountModule.hasActiveAccount()
+	}
+
 	fun findAccounts(privateKeyStr: String): LiveData<Resource<List<ChainAccount>>> = liveData {
 		emit(Resource.loading())
 
-		emit(accountModule.getAccountsForPrivateKey(privateKeyStr))
+		try {
+			val chainProvider = getChainProviderAsync()
+
+			emit(
+				accountModule.getAccountsForPrivateKey(
+					chainProvider.chainId,
+					chainProvider.chainUrl,
+					chainProvider.stateHistoryUrl,
+					privateKeyStr))
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+		}
 	}
 
 	fun setActiveAccount(account: ChainAccount, privateKey: String, pin: String) {
 		accountModule.setActiveAccount(account, privateKey, pin)
 	}
 
+	private suspend fun getActiveAccountAsync() = suspendCoroutine<ChainAccount> { continuation ->
+		workersModule.onInitActiveAccount { success ->
+			if (success) {
+				protonCoroutineScope.launch {
+					continuation.resume(accountModule.getActiveAccount())
+				}
+			} else {
+				continuation.resumeWithException(Exception("Initialization Error"))
+			}
+		}
+	}
+
 	fun getActiveAccount(): LiveData<Resource<ChainAccount>> = liveData {
 		emit(Resource.loading())
 
-		emit(accountModule.getActiveAccount())
+		try {
+			val activeAccount = getActiveAccountAsync()
+			emit(Resource.success(activeAccount))
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+		}
 	}
 
 	fun refreshActiveAccount(): LiveData<Resource<ChainAccount>> = liveData {

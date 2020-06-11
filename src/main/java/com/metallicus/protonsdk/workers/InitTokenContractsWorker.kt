@@ -33,8 +33,6 @@ class InitTokenContractsWorker
 
 			tokenContractRepository.removeAll()
 
-			var tokenContractsResult = Result.success()
-
 			val tokenContractsResponse = tokenContractRepository.fetchTokenContracts(
 				chainProvider.chainUrl,
 				protonChainTokensTableScope,
@@ -55,6 +53,8 @@ class InitTokenContractsWorker
 
 					tokenContractRepository.addTokenContract(tokenContract)
 				}
+
+				Result.success()
 			} else {
 				val msg = tokenContractsResponse.errorBody()?.string()
 				val errorMsg = if (msg.isNullOrEmpty()) {
@@ -64,10 +64,8 @@ class InitTokenContractsWorker
 				}
 				Timber.d(errorMsg)
 
-				tokenContractsResult = Result.failure()
+				Result.failure()
 			}
-
-			tokenContractsResult
 		} catch (e: Exception) {
 			Timber.d(e)
 
