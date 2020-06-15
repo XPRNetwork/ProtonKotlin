@@ -4,11 +4,10 @@ import androidx.room.*
 import com.google.gson.annotations.SerializedName
 import com.metallicus.protonsdk.db.DefaultTypeConverters
 
-@Entity(
-	indices = [(Index("chainId", "id"))],
-	primaryKeys = ["chainId", "id"])
+@Entity
 @TypeConverters(DefaultTypeConverters::class)
 data class TokenContract(
+	@PrimaryKey
 	@SerializedName("id") val id: String,
 
 	@SerializedName("tcontract") val contract: String,
@@ -16,14 +15,23 @@ data class TokenContract(
 	@SerializedName("url") val url: String,
 	@SerializedName("desc") val description: String,
 	@SerializedName("iconurl") val iconUrl: String,
-	@SerializedName("symbol") val symbol: String,
+	@SerializedName("symbol") val precisionSymbol: String,
 	@SerializedName("blisted") val blacklisted: Int
 ) {
-	lateinit var chainId: String
+	var rateUSD: Double = 0.0
 
 //	lateinit var supply: String
 //	lateinit var maxString: String
 //	lateinit var issuer: String
+
+	fun getSymbol(): String {
+		return precisionSymbol.split(",")[1]
+	}
+
+	fun getPrecision(): Int {
+		val precision = precisionSymbol.split(",")[0]
+		return precision.toInt()
+	}
 
 //	fun formatRate(currency: String): String {
 //		val value = if (rates.containsKey(currency)) { rates.getValue(currency) } else { 0.0 }

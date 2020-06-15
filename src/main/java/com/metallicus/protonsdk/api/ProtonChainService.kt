@@ -45,62 +45,11 @@ interface ProtonChainService {
 		@Url url: String,
 		@Body body: MultipartBody): Response<JsonObject>
 
-	@POST//("/v1/history/get_key_accounts")
-	fun getKeyAccounts(
-		@Url url: String,
-		@Body body: KeyAccountsBody
-	): Call<KeyAccount>
-
 	@GET//("/v2/state/get_key_accounts?public_key=")
-	fun getStateHistoryKeyAccounts(
-		@Url url: String,
-		@Query("public_key") publicKey: String
-	): Call<KeyAccount>
-
-	@POST//("/v1/history/get_key_accounts")
-	suspend fun getKeyAccountsAsync(
-		@Url url: String,
-		@Body body: KeyAccountsBody
-	): Response<KeyAccount>
-
-	@GET//("/v2/state/get_key_accounts?public_key=")
-	suspend fun getStateHistoryKeyAccountsAsync(
+	suspend fun getKeyAccounts(
 		@Url url: String,
 		@Query("public_key") publicKey: String
 	): Response<KeyAccount>
-
-	@POST//("/v1/chain/get_currency_balance")
-	suspend fun getCurrencyBalanceAsync(
-		@Url url: String,
-		@Body body: CurrencyBalanceBody
-	): Response<JsonArray>
-
-	@POST//("/v1/chain/get_currency_balances")
-	suspend fun getCurrencyBalancesAsync(
-		@Url url: String,
-		@Body body: CurrencyBalancesBody
-	): Response<JsonArray>
-
-	@GET//("/v2/state/get_tokens?account=")
-	suspend fun getStateHistoryCurrencyBalancesAsync(
-		@Url url: String,
-		@Query("account") account: String
-	): Response<JsonObject>
-
-	@POST//("/v1/history/get_actions")
-	suspend fun getActionsAsync(
-		@Url url: String,
-		@Body body: ActionsBody
-	): Response<JsonObject>
-
-	@GET//("/v2/history/get_actions?account=&transfer.symbol=&filter=&limit=")
-	suspend fun getStateHistoryActionsAsync(
-		@Url url: String,
-		@Query("account") account: String,
-		@Query("transfer.symbol") symbol: String,
-		//@Query("filter") filter: String,
-		@Query("limit") limit: Int
-	): Response<JsonObject>
 
 	@POST//("/v1/chain/get_account")
 	suspend fun getAccountAsync(
@@ -108,26 +57,20 @@ interface ProtonChainService {
 		@Body body: AccountBody
 	): Response<Account>
 
-	@POST//("/v1/chain/abi_json_to_bin")
-	fun jsonToBin(
+	@GET//("/v2/state/get_tokens?account=")
+	suspend fun getCurrencyBalances(
 		@Url url: String,
-		@Body body: JsonToBinBody
-	): LiveData<ApiResponse<JsonToBinResponse>>
+		@Query("account") account: String
+	): Response<JsonObject>
 
-	@POST//("/v1/chain/get_info")
-	fun getChainInfo(@Url url: String): LiveData<ApiResponse<EOSChainInfo>>
-
-	@POST//("/v1/chain/get_required_keys")
-	fun getRequiredKeys(
+	@GET//("/v2/history/get_actions?account=&transfer.symbol=&filter=&limit=")
+	suspend fun getActions(
 		@Url url: String,
-		@Body body: RequiredKeysBody
-	): LiveData<ApiResponse<RequiredKeysResponse>>
-
-	@POST//("/v1/chain/push_transaction")
-	fun pushTransaction(
-		@Url url: String,
-		@Body body: PackedTransaction
-	): LiveData<ApiResponse<JsonObject>>
+		@Query("account") account: String,
+		@Query("transfer.symbol") symbol: String,
+		//@Query("filter") filter: String,
+		@Query("limit") limit: Int
+	): Response<JsonObject>
 
 	@POST//("/v1/chain/get_table_rows")
 	suspend fun getTableRows(

@@ -40,6 +40,10 @@ class WorkersModule {
 
 		prefs.clearInit()
 
+		// save api key and secret
+		prefs.apiKey = apiKey
+		prefs.apiSecret = apiSecret
+
 		val constraints = Constraints.Builder()
 			.setRequiredNetworkType(NetworkType.CONNECTED)
 			.build()

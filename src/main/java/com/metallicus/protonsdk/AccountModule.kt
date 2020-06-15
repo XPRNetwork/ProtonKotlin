@@ -44,7 +44,7 @@ class AccountModule {
 			val publicKeyStr = privateKey.publicKey.toString()
 
 			val keyAccountResponse =
-				accountRepository.fetchStateHistoryKeyAccount(stateHistoryUrl, publicKeyStr)
+				accountRepository.fetchKeyAccount(stateHistoryUrl, publicKeyStr)
 			if (keyAccountResponse.isSuccessful) {
 				keyAccountResponse.body()?.let { keyAccount ->
 					keyAccount.accountNames.forEach { accountName ->
@@ -72,10 +72,9 @@ class AccountModule {
 		}
 	}
 
-	private suspend fun fetchAccountContact(chainId: String, chainUrl: String, accountName: String): AccountContact {
+	private suspend fun fetchAccountContact(chainUrl: String, accountName: String): AccountContact {
 		val accountContact = AccountContact(accountName)
 		accountContact.accountName = accountName
-		accountContact.chainId = chainId
 
 		val usersInfoTableScope = context.getString(R.string.protonChainUsersInfoTableScope)
 		val usersInfoTableCode = context.getString(R.string.protonChainUsersInfoTableCode)
@@ -114,12 +113,11 @@ class AccountModule {
 		if (response.isSuccessful) {
 			response.body()?.let { account ->
 				account.accountChainId = chainId
-
-				account.accountContact = fetchAccountContact(chainId, chainUrl, accountName)
+				account.accountContact = fetchAccountContact(chainUrl, accountName)
 
 				accountRepository.addAccount(account)
 
-				chainAccount = accountRepository.getChainAccount(chainId, accountName)
+				chainAccount = accountRepository.getChainAccount(accountName)
 			}
 		} else {
 			val msg = response.errorBody()?.string()
@@ -145,9 +143,8 @@ class AccountModule {
 	}
 
 	suspend fun getActiveAccount(): ChainAccount {
-		val chainId = prefs.activeChainId
 		val accountName = prefs.activeAccountName
-		return accountRepository.getChainAccount(chainId, accountName)
+		return accountRepository.getChainAccount(accountName)
 	}
 
 	suspend fun refreshActiveAccount(): Resource<ChainAccount> {

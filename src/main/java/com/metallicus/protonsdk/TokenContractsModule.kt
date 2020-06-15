@@ -21,8 +21,7 @@ class TokenContractsModule {
 		DaggerInjector.component.inject(this)
 	}
 
-	suspend fun getActiveTokenContracts(): List<TokenContract> {
-		val chainId = prefs.activeChainId
-		return tokenContractRepository.getAllTokenContracts(chainId)
+	suspend fun getTokenContracts(): List<TokenContract> {
+		return tokenContractRepository.getTokenContracts()
 	}
 }

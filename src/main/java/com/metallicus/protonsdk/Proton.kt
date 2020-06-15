@@ -32,7 +32,7 @@ class Proton private constructor(context: Context) {
 
 	private val protonCoroutineScope = CoroutineScope(Dispatchers.Default)
 
-	fun initialize(chainProviderUrl: String, apiKey: String, apiSecret: String) {
+	fun initialize(chainProviderUrl: String, apiKey: String="", apiSecret: String="") {
 		workersModule.init(chainProviderUrl, apiKey, apiSecret)
 	}
 
@@ -63,7 +63,7 @@ class Proton private constructor(context: Context) {
 		workersModule.onInitTokenContracts { success ->
 			if (success) {
 				protonCoroutineScope.launch {
-					continuation.resume(tokenContractsModule.getActiveTokenContracts())
+					continuation.resume(tokenContractsModule.getTokenContracts())
 				}
 			} else {
 				continuation.resumeWithException(Exception("Initialization Error"))
@@ -134,5 +134,10 @@ class Proton private constructor(context: Context) {
 		emit(Resource.loading())
 
 		emit(accountModule.refreshActiveAccount())
+	}
+
+	fun getActiveAccountTokenBalances(): LiveData<Resource<TokenCurrencyBalance>> = liveData {
+		emit(Resource.loading())
+
 	}
 }

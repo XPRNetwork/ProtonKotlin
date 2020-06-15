@@ -42,7 +42,6 @@ class InitActiveAccountWorker
 
 					val accountContact = AccountContact(accountName)
 					accountContact.accountName = accountName
-					accountContact.chainId = chainId
 
 					val accountInfoResponse = accountRepository.fetchAccountInfo(
 						chainProvider.chainUrl, accountName, usersInfoTableScope, usersInfoTableCode, usersInfoTableName)

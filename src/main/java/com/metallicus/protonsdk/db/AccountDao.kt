@@ -16,14 +16,8 @@ interface AccountDao {
 	suspend fun update(account: Account)
 
 	@Transaction
-	@Query("SELECT * FROM account WHERE accountChainId = :chainId AND accountName = :accountName")
-	suspend fun findByAccountName(chainId: String, accountName: String): ChainAccount
-
-	@Query("DELETE FROM account WHERE accountChainId = :chainId AND accountName = :accountName")
-	suspend fun remove(chainId: String, accountName: String)
-
-	@Query("DELETE FROM account WHERE accountChainId = :chainId AND accountName IN(:accounts)")
-	suspend fun remove(chainId: String, accounts: List<String>)
+	@Query("SELECT * FROM account WHERE accountName = :accountName")
+	suspend fun findByAccountName(accountName: String): ChainAccount
 
 	@Query("DELETE FROM account")
 	suspend fun removeAll()

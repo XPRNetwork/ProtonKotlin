@@ -47,7 +47,6 @@ class InitTokenContractsWorker
 					val tokenContractJsonObject = it.asJsonObject
 
 					val tokenContract = gson.fromJson(tokenContractJsonObject, TokenContract::class.java)
-					tokenContract.chainId = chainProvider.chainId
 
 					// TODO: add params from get_currency_stats
 
