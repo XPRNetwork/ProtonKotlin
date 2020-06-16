@@ -55,18 +55,4 @@ object DefaultTypeConverters {
 		val type = object : TypeToken<Map<String, Double>>() {}.type
 		return Gson().toJson(map, type)
 	}
-
-	@TypeConverter
-	@JvmStatic
-	fun stringToAccountContact(value: String?): AccountContact? {
-		val type = object : TypeToken<AccountContact>() {}.type
-		return Gson().fromJson(value, type)
-	}
-
-	@TypeConverter
-	@JvmStatic
-	fun accountContactToString(accountContact: AccountContact): String {
-		val type = object : TypeToken<AccountContact>() {}.type
-		return Gson().toJson(accountContact, type)
-	}
 }

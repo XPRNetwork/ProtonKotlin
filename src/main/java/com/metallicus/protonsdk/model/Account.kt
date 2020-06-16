@@ -1,19 +1,15 @@
 package com.metallicus.protonsdk.model
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.google.gson.annotations.SerializedName
 import com.metallicus.protonsdk.db.DefaultTypeConverters
 import com.metallicus.protonsdk.db.EOSTypeConverters
+import com.metallicus.protonsdk.db.ProtonTypeConverters
 
-@Entity(
-	indices = [(Index("accountChainId", "accountName"))],
-	primaryKeys = ["accountChainId", "accountName"]
-)
-@TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class)
+@Entity
+@TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class, ProtonTypeConverters::class)
 data class Account(
+	@PrimaryKey
 	@SerializedName("account_name") val accountName: String,
 
 	@SerializedName("head_block_num") val headBlockNum: Int,

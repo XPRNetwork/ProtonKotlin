@@ -7,18 +7,16 @@ import androidx.room.TypeConverters
 import com.metallicus.protonsdk.db.DefaultTypeConverters
 
 @Entity(
-	indices = [(Index("id", "chainId", "accountName"))],
-	primaryKeys = ["id", "chainId", "accountName"]
+	indices = [(Index("id", "accountName"))],
+	primaryKeys = ["id", "accountName"]
 )
 @TypeConverters(DefaultTypeConverters::class)
 data class AccountContact(
-	val id: String,
+	val id: String, // accountName
 	var name: String = "",
-	var avatar: String = "",
-	var isLynxChain: Boolean = false
+	var avatar: String = ""
 ) {
-	lateinit var chainId: String
-	lateinit var accountName: String
+	lateinit var accountName: String // owner accountName
 
 	fun getDisplayName(): String {
 		return name.ifEmpty { id }

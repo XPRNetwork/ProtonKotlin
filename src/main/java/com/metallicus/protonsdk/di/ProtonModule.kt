@@ -9,10 +9,7 @@ import com.metallicus.protonsdk.api.LiveDataCallAdapterFactory
 import com.metallicus.protonsdk.api.ProtonChainService
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
-import com.metallicus.protonsdk.db.AccountDao
-import com.metallicus.protonsdk.db.ChainProviderDao
-import com.metallicus.protonsdk.db.ProtonDb
-import com.metallicus.protonsdk.db.TokenContractDao
+import com.metallicus.protonsdk.db.*
 import com.metallicus.protonsdk.eosio.commander.GsonEosTypeAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -60,6 +57,18 @@ class ProtonModule {
 	@Provides
 	fun provideAccountDao(db: ProtonDb): AccountDao {
 		return db.accountDao()
+	}
+
+	@Singleton
+	@Provides
+	fun provideAccountContactDao(db: ProtonDb): AccountContactDao {
+		return db.accountContactDao()
+	}
+
+	@Singleton
+	@Provides
+	fun provideCurrencyBalanceDao(db: ProtonDb): CurrencyBalanceDao {
+		return db.currencyBalanceDao()
 	}
 
 	@Singleton

@@ -21,12 +21,8 @@ class ChainProviderRepository @Inject constructor(
 		chainProviderDao.insert(chainProvider)
 	}
 
-	suspend fun fetchChainProviders(chainProvidersUrl: String): Response<JsonObject> {
-		return protonChainService.getChainProviders(chainProvidersUrl)
-	}
-
-	suspend fun getAllChainProviders(): List<ChainProvider> {
-		return chainProviderDao.findAll()
+	suspend fun fetchChainProvider(chainProviderUrl: String): Response<JsonObject> {
+		return protonChainService.getChainProvider(chainProviderUrl)
 	}
 
 	suspend fun getChainProvider(id: String): ChainProvider {

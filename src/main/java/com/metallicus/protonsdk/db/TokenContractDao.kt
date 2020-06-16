@@ -17,11 +17,8 @@ interface TokenContractDao {
 	@Query("SELECT * FROM tokenContract WHERE id = :id")
 	suspend fun findById(id: String): TokenContract
 
-	@Query("SELECT * FROM tokenContract WHERE chainId = :chainId")
-	suspend fun findAllByChainId(chainId: String): List<TokenContract>
-
-	@Query("DELETE FROM tokenContract WHERE chainId = :chainId")
-	suspend fun removeAllByChainId(chainId: String)
+	@Query("SELECT * FROM tokenContract")
+	suspend fun findAll(): List<TokenContract>
 
 	@Query("DELETE FROM tokenContract")
 	suspend fun removeAll()
