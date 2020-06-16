@@ -22,6 +22,10 @@ class AccountContactRepository @Inject constructor(
 		accountContactDao.update(accountContact)
 	}
 
+	suspend fun getAccountContacts(accountName: String): List<AccountContact> {
+		return accountContactDao.findByAccountName(accountName)
+	}
+
 	suspend fun fetchAccountContact(chainUrl: String, accountName: String, usersInfoTableScope: String, usersInfoTableCode: String, usersInfoTableName: String): Response<JsonObject> {
 		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(usersInfoTableScope, usersInfoTableCode, usersInfoTableName, accountName, accountName))
 	}

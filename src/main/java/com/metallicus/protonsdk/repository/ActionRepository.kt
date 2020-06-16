@@ -12,16 +12,10 @@ import javax.inject.Singleton
 @Singleton
 class ActionRepository @Inject constructor(
 	private val actionDao: ActionDao,
-	private val accountContactDao: AccountContactDao,
 	private val protonChainService: ProtonChainService
 ) {
-	suspend fun getAccountContacts(accountName: String): List<AccountContact> {
-		return accountContactDao.findByAccountName(accountName)
-	}
-
-	fun addAction(action: Action) {
-		// only transfers!
-		if (action.actionTrace.act.name == "transfer") {
+	suspend fun addAction(action: Action) {
+		if (action.isTransfer()) {
 			actionDao.insert(action)
 		}
 	}

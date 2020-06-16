@@ -7,9 +7,7 @@ import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountContactRepository
-import com.metallicus.protonsdk.repository.AccountRepository
 import com.metallicus.protonsdk.repository.ActionRepository
-import kotlinx.coroutines.async
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import com.metallicus.protonsdk.db.DefaultTypeConverters
 
 @Entity(
-	indices = [(Index("tokenContractId", "accountName"))],
+	indices = [(Index("tokenContractId", "accountName", "contract", "symbol"))],
 	primaryKeys = ["tokenContractId", "accountName"])
 @TypeConverters(DefaultTypeConverters::class)
 data class CurrencyBalance(

@@ -12,7 +12,7 @@ import com.metallicus.protonsdk.model.Action
 @Dao
 interface ActionDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun insert(action: Action)
+	suspend fun insert(action: Action)
 
 	@Query("SELECT * FROM `action` " +
 		"WHERE accountName = :accountName " +
@@ -26,5 +26,5 @@ interface ActionDao {
 	suspend fun findByTokenContract(accountName: String, contract: String, symbol: String): List<Action>
 
 	@Query("DELETE FROM `action`")
-	fun removeAll()
+	suspend fun removeAll()
 }
