@@ -9,56 +9,15 @@ import com.metallicus.protonsdk.model.TokenCurrencyBalance
  */
 @Dao
 interface CurrencyBalanceDao {
-	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	suspend fun insert(currencyBalance: CurrencyBalance): Long
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	suspend fun insert(currencyBalance: CurrencyBalance)
+
+	@Query("UPDATE currencyBalance SET amount = :amount WHERE accountName = :accountName AND contract = :contract AND symbol = :symbol")
+	suspend fun updateAmount(accountName: String, contract: String, symbol: String, amount: String)
 
 	@Transaction
-	suspend fun updateAmount(currencyBalance: CurrencyBalance) {
-		val id = insert(currencyBalance)
-		if (id == -1L) {
-			initializeVisible(
-				currencyBalance.accountName,
-				currencyBalance.code,
-				currencyBalance.symbol,
-				currencyBalance.visible)
-			updateAmount(
-				currencyBalance.accountName,
-				currencyBalance.code,
-				currencyBalance.symbol,
-				currencyBalance.amount)
-		}
-	}
-
-	@Query("UPDATE currencyBalance SET visible = :visible " +
-		"WHERE accountName = :accountName AND code = :code AND symbol = :symbol AND initialized = 0")
-	suspend fun initializeVisible(accountName: String, code: String, symbol: String, visible: Boolean)
-
-	@Query("UPDATE currencyBalance SET amount = :amount, initialized = 1 " +
-		"WHERE accountName = :accountName AND code = :code AND symbol = :symbol")
-	suspend fun updateAmount(accountName: String, code: String, symbol: String, amount: String)
-
-	@Transaction
-	suspend fun insertOrUpdateVisible(currencyBalance: CurrencyBalance) {
-		val id = insert(currencyBalance)
-		if (id == -1L) {
-			updateVisible(
-				currencyBalance.accountName,
-				currencyBalance.code,
-				currencyBalance.symbol,
-				currencyBalance.visible)
-		}
-	}
-
-	@Query("UPDATE currencyBalance SET visible = :visible WHERE accountName = :accountName AND code = :code AND symbol = :symbol")
-	suspend fun updateVisible(accountName: String, code: String, symbol: String, visible: Boolean)
-
-	@Transaction
-	@Query("SELECT * FROM currencyBalance WHERE accountName = :accountName AND code IN(:contracts) AND symbol IN(:symbols)")
-	suspend fun findByAccountTokenContract(accountName: String, contracts: List<String>, symbols: List<String>): List<TokenCurrencyBalance>
-
-	@Transaction
-	@Query("SELECT * FROM currencyBalance WHERE accountName = :accountName AND code = :contract AND symbol = :symbol")
-	suspend fun findByAccountTokenContract(accountName: String, contract: String, symbol: String): TokenCurrencyBalance
+	@Query("SELECT * FROM currencyBalance WHERE tokenContractId = :tokenContractId")
+	suspend fun findByTokenContract(tokenContractId: String): TokenCurrencyBalance
 
 	@Transaction
 	@Query("SELECT * FROM currencyBalance WHERE accountName = :accountName")

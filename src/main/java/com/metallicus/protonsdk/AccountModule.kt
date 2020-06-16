@@ -9,6 +9,8 @@ import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountRepository
 import com.metallicus.protonsdk.repository.ChainProviderRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,7 +38,7 @@ class AccountModule {
 		return prefs.activeAccountName.isNotEmpty()
 	}
 
-	suspend fun getAccountsForPrivateKey(chainId: String, chainUrl: String, stateHistoryUrl: String, privateKeyStr: String): Resource<List<ChainAccount>> {
+	suspend fun getAccountsForPrivateKey(chainId: String, chainUrl: String, hyperionHistoryUrl: String, privateKeyStr: String): Resource<List<ChainAccount>> {
 		val accounts = mutableListOf<ChainAccount>()
 
 		return try {
@@ -44,7 +46,7 @@ class AccountModule {
 			val publicKeyStr = privateKey.publicKey.toString()
 
 			val keyAccountResponse =
-				accountRepository.fetchKeyAccount(stateHistoryUrl, publicKeyStr)
+				accountRepository.fetchKeyAccount(hyperionHistoryUrl, publicKeyStr)
 			if (keyAccountResponse.isSuccessful) {
 				keyAccountResponse.body()?.let { keyAccount ->
 					keyAccount.accountNames.forEach { accountName ->

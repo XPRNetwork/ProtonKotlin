@@ -1,25 +1,13 @@
 package com.metallicus.protonsdk.api
 
-import androidx.lifecycle.LiveData
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.metallicus.protonsdk.eosio.commander.model.chain.PackedTransaction
-import com.metallicus.protonsdk.eosio.commander.model.chain.SignedTransaction
 import com.metallicus.protonsdk.model.*
 import okhttp3.MultipartBody
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
 data class UserNameBody(val account: String, val sign: String, val name: String)
-data class KeyAccountsBody(val public_key: String)
-data class CurrencyBalanceBody(val account: String, val code: String, val symbol: String)
-data class CurrencyBalancesBody(val account: String, val tokens: List<String>)
-data class ActionsBody(val account_name: String, val offset: Int, val pos: Int)
 data class AccountBody(val account_name: String)
-data class JsonToBinBody(val code: String, val action: String, val args: JsonElement)
-data class RequiredKeysBody(val transaction: SignedTransaction, val available_keys: List<String>)
 data class TableRowsBody(
 	val scope: String,
 	val code: String,
@@ -52,7 +40,7 @@ interface ProtonChainService {
 	): Response<KeyAccount>
 
 	@POST//("/v1/chain/get_account")
-	suspend fun getAccountAsync(
+	suspend fun getAccount(
 		@Url url: String,
 		@Body body: AccountBody
 	): Response<Account>

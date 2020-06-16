@@ -21,6 +21,10 @@ class TokenContractsModule {
 		DaggerInjector.component.inject(this)
 	}
 
+	suspend fun getTokenContract(tokenContractId: String): TokenContract {
+		return tokenContractRepository.getTokenContract(tokenContractId)
+	}
+
 	suspend fun getTokenContracts(): List<TokenContract> {
 		return tokenContractRepository.getTokenContracts()
 	}

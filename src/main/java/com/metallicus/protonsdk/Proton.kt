@@ -29,6 +29,7 @@ class Proton private constructor(context: Context) {
 	private var chainProviderModule: ChainProviderModule = ChainProviderModule()
 	private var tokenContractsModule: TokenContractsModule = TokenContractsModule()
 	private var accountModule: AccountModule = AccountModule()
+	private var currencyBalancesModule: CurrencyBalancesModule = CurrencyBalancesModule()
 
 	private val protonCoroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -96,7 +97,7 @@ class Proton private constructor(context: Context) {
 				accountModule.getAccountsForPrivateKey(
 					chainProvider.chainId,
 					chainProvider.chainUrl,
-					chainProvider.stateHistoryUrl,
+					chainProvider.hyperionHistoryUrl,
 					privateKeyStr))
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty(), null))
@@ -136,8 +137,41 @@ class Proton private constructor(context: Context) {
 		emit(accountModule.refreshActiveAccount())
 	}
 
-	fun getActiveAccountTokenBalances(): LiveData<Resource<TokenCurrencyBalance>> = liveData {
+	fun getActiveAccountTokenBalances(): LiveData<Resource<List<TokenCurrencyBalance>>> = liveData {
 		emit(Resource.loading())
 
+		try {
+			val tokenContracts = getTokenContractsAsync()
+			val activeAccount = getActiveAccountAsync()
+
+			val tokenContractMap = mutableMapOf<String, String>()
+			tokenContracts.forEach {
+				tokenContractMap["${it.contract}:${it.getSymbol()}"] = it.id
+			}
+
+			val tokenBalances =
+				currencyBalancesModule.getTokenCurrencyBalances(activeAccount.chainProvider.hyperionHistoryUrl, activeAccount.account.accountName, tokenContractMap)
+
+			emit(tokenBalances)
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+		}
+	}
+
+	fun getActiveAccountTokenBalance(tokenContractId: String): LiveData<Resource<TokenCurrencyBalance>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			val tokenContract = tokenContractsModule.getTokenContract(tokenContractId)
+
+			val tokenBalance =
+				currencyBalancesModule.getTokenCurrencyBalance(activeAccount.chainProvider.hyperionHistoryUrl, activeAccount.account.accountName, tokenContract)
+
+			emit(tokenBalance)
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+		}
 	}
 }

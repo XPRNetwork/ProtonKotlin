@@ -9,11 +9,9 @@ import com.metallicus.protonsdk.db.DefaultTypeConverters
 	primaryKeys = ["tokenContractId", "accountName"])
 @TypeConverters(DefaultTypeConverters::class)
 data class CurrencyBalance(
-	@SerializedName("code") val code: String,
+	@SerializedName("contract") val contract: String,
 	@SerializedName("symbol") val symbol: String,
-	@SerializedName("amount") val amount: String,
-	@SerializedName("visible") var visible: Boolean,
-	@SerializedName("initialized") var initialized: Boolean = false
+	@SerializedName("amount") val amount: String
 ) {
 	lateinit var tokenContractId: String
 	lateinit var accountName: String
