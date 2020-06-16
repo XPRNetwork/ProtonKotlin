@@ -35,46 +35,62 @@ class WorkersModule {
 		const val INIT = "WORKER_INIT"
 	}
 
-	fun init(chainProvidersUrl: String, apiKey: String, apiSecret: String) {
+	fun init(chainProviderUrl: String, apiKey: String, apiSecret: String) {
 		workManager.pruneWork()
 
 		prefs.clearInit()
+
+		// save api key and secret
+		prefs.apiKey = apiKey
+		prefs.apiSecret = apiSecret
 
 		val constraints = Constraints.Builder()
 			.setRequiredNetworkType(NetworkType.CONNECTED)
 			.build()
 
-		val chainProvidersInputData = Data.Builder()
-			.putString("chainProvidersUrl", chainProvidersUrl)
+		val chainProviderInputData = Data.Builder()
+			.putString(InitChainProviderWorker.CHAIN_PROVIDER_URL, chainProviderUrl)
 			.build()
 
-		val initChainProviders = OneTimeWorkRequest.Builder(InitChainProvidersWorker::class.java)
-			.setConstraints(constraints).setInputData(chainProvidersInputData).build()
+		val initChainProvider = OneTimeWorkRequest.Builder(InitChainProviderWorker::class.java)
+			.setConstraints(constraints).setInputData(chainProviderInputData).build()
 
 		val initTokenContracts = OneTimeWorkRequest.Builder(InitTokenContractsWorker::class.java)
 			.setConstraints(constraints).build()
 
-		workManager
-			.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProviders)
-			.then(initTokenContracts)
-			.enqueue()
+		val initActiveAccount = OneTimeWorkRequest.Builder(InitActiveAccountWorker::class.java)
+			.setConstraints(constraints).build()
+
+		val initWork = workManager
+			.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
+
+		if (prefs.activeAccountName.isNotEmpty()) {
+			initWork
+				.then(initTokenContracts)
+				.then(initActiveAccount)
+				.enqueue()
+		} else {
+			initWork
+				.then(initTokenContracts)
+				.enqueue()
+		}
 	}
 
-	fun onInitChainProviders(callback: (Boolean) -> Unit) {
-		if (prefs.hasChainProviders) {
+	fun onInitChainProvider(callback: (Boolean) -> Unit) {
+		if (prefs.hasChainProvider) {
 			callback(true)
 		} else {
 			val workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(INIT)
 			val workInfoObserver = object : Observer<List<WorkInfo>> {
 				override fun onChanged(workInfos: List<WorkInfo>) {
 					val chainProviderWorkInfos =
-						workInfos.filter { it.tags.contains(InitChainProvidersWorker::class.java.name) }
+						workInfos.filter { it.tags.contains(InitChainProviderWorker::class.java.name) }
 					if (chainProviderWorkInfos.isEmpty() ||
 						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
 						callback(false)
 						workInfoLiveData.removeObserver(this)
 					} else if (chainProviderWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
-						prefs.hasChainProviders = true
+						prefs.hasChainProvider = true
 						callback(true)
 						workInfoLiveData.removeObserver(this)
 					}
@@ -99,6 +115,30 @@ class WorkersModule {
 						workInfoLiveData.removeObserver(this)
 					} else if (tokenContractWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
 						prefs.hasTokenContracts = true
+						callback(true)
+						workInfoLiveData.removeObserver(this)
+					}
+				}
+			}
+			workInfoLiveData.observeForever(workInfoObserver)
+		}
+	}
+
+	fun onInitActiveAccount(callback: (Boolean) -> Unit) {
+		if (prefs.hasActiveAccount) {
+			callback(true)
+		} else {
+			val workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(INIT)
+			val workInfoObserver = object : Observer<List<WorkInfo>> {
+				override fun onChanged(workInfos: List<WorkInfo>) {
+					val activeAccountWorkInfos =
+						workInfos.filter { it.tags.contains(InitActiveAccountWorker::class.java.name) }
+					if (activeAccountWorkInfos.isEmpty() ||
+						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
+						callback(false)
+						workInfoLiveData.removeObserver(this)
+					} else if (activeAccountWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
+						prefs.hasActiveAccount = true
 						callback(true)
 						workInfoLiveData.removeObserver(this)
 					}

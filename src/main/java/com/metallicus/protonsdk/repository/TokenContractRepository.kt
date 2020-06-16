@@ -26,7 +26,11 @@ class TokenContractRepository @Inject constructor(
 		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(tokensTableScope, tokensTableCode, tokensTableName))
 	}
 
-	suspend fun getAllTokenContracts(chainId: String): List<TokenContract> {
-		return tokenContractDao.findAllByChainId(chainId)
+	suspend fun getTokenContract(tokenContractId: String): TokenContract {
+		return tokenContractDao.findById(tokenContractId)
+	}
+
+	suspend fun getTokenContracts(): List<TokenContract> {
+		return tokenContractDao.findAll()
 	}
 }

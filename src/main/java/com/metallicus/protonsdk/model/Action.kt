@@ -13,12 +13,11 @@ import kotlin.math.sign
 
 @Entity(
 	indices = [(Index(
-		"chainId",
 		"accountName",
 		"action_trace_act_account",
 		"action_trace_act_data_quantity"
 	))],
-	primaryKeys = ["chainId", "accountName", "action_trace_trxId", "action_trace_act_name", "action_trace_act_authorization"]
+	primaryKeys = ["accountName", "action_trace_trxId", "action_trace_act_name", "action_trace_act_authorization"]
 )
 @TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class)
 data class Action(
@@ -28,7 +27,6 @@ data class Action(
 	@SerializedName("action_trace")
 	@Embedded(prefix = "action_trace_") val actionTrace: ActionTrace
 ) {
-	lateinit var chainId: String
 	lateinit var accountName: String
 
 	lateinit var accountContact: AccountContact
@@ -40,21 +38,23 @@ data class Action(
 	}
 
 	fun getIconType(): IconType {
-		return if (accountContact.isLynxChain) {
-			IconType.AVATAR
-		} else {
-			if (actionTrace.act.data?.to == "eosio.ramfee" || actionTrace.act.data?.to == "eosio.ram") {
-				IconType.BUY_RAM
-			} else if (actionTrace.act.data?.to == "eosio.stake") {
-				IconType.STAKE
-			} else if (actionTrace.act.data?.from == "eosio.stake") {
-				IconType.UNSTAKE
-			} else if (!isSender()) {
-				IconType.RECEIVE
-			} else {
-				IconType.SEND
-			}
-		}
+		return IconType.AVATAR
+
+//		return if (accountContact.isLynxChain) {
+//			IconType.AVATAR
+//		} else {
+//			if (actionTrace.act.data?.to == "eosio.ramfee" || actionTrace.act.data?.to == "eosio.ram") {
+//				IconType.BUY_RAM
+//			} else if (actionTrace.act.data?.to == "eosio.stake") {
+//				IconType.STAKE
+//			} else if (actionTrace.act.data?.from == "eosio.stake") {
+//				IconType.UNSTAKE
+//			} else if (!isSender()) {
+//				IconType.RECEIVE
+//			} else {
+//				IconType.SEND
+//			}
+//		}
 	}
 
 	fun getDisplayName(): String {
