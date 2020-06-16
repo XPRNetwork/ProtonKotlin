@@ -73,6 +73,12 @@ class ProtonModule {
 
 	@Singleton
 	@Provides
+	fun provideActionDao(db: ProtonDb): ActionDao {
+		return db.actionDao()
+	}
+
+	@Singleton
+	@Provides
 	fun provideProtonChainService(context: Context, gson: Gson): ProtonChainService {
 //		val logging = HttpLoggingInterceptor()
 //		logging.level = HttpLoggingInterceptor.Level.BODY
