@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import com.metallicus.protonsdk.R
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.model.AccountContact
+import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.squareup.inject.assisted.Assisted
@@ -19,7 +20,8 @@ class InitActiveAccountWorker
 	@Assisted params: WorkerParameters,
 	private val prefs: Prefs,
 	private val chainProviderRepository: ChainProviderRepository,
-	private val accountRepository: AccountRepository
+	private val accountRepository: AccountRepository,
+	private val accountContactRepository: AccountContactRepository
 ) : CoroutineWorker(context, params) {
 
 	private val usersInfoTableScope = context.getString(R.string.protonChainUsersInfoTableScope)
@@ -43,7 +45,7 @@ class InitActiveAccountWorker
 					val accountContact = AccountContact(accountName)
 					accountContact.accountName = accountName
 
-					val accountInfoResponse = accountRepository.fetchAccountInfo(
+					val accountInfoResponse = accountContactRepository.fetchAccountContact(
 						chainProvider.chainUrl, accountName, usersInfoTableScope, usersInfoTableCode, usersInfoTableName)
 					if (accountInfoResponse.isSuccessful) {
 						val userInfoJsonObject = accountInfoResponse.body()

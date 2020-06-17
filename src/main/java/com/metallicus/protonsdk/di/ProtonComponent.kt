@@ -28,4 +28,5 @@ interface ProtonComponent {
 	fun inject(tokenContractsModule: TokenContractsModule)
 	fun inject(accountModule: AccountModule)
 	fun inject(currencyBalancesModule: CurrencyBalancesModule)
+	fun inject(actionModule: ActionsModule)
 }
