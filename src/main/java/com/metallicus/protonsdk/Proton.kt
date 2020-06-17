@@ -30,6 +30,7 @@ class Proton private constructor(context: Context) {
 	private var tokenContractsModule: TokenContractsModule = TokenContractsModule()
 	private var accountModule: AccountModule = AccountModule()
 	private var currencyBalancesModule: CurrencyBalancesModule = CurrencyBalancesModule()
+	private var actionsModule: ActionsModule = ActionsModule()
 
 	private val protonCoroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -170,6 +171,26 @@ class Proton private constructor(context: Context) {
 				currencyBalancesModule.getTokenCurrencyBalance(activeAccount.chainProvider.hyperionHistoryUrl, activeAccount.account.accountName, tokenContract)
 
 			emit(tokenBalance)
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+		}
+	}
+
+	fun getActiveAccountActions(contract: String, symbol: String): LiveData<Resource<List<Action>>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			val actions =
+				actionsModule.getActions(
+					activeAccount.chainProvider.chainUrl,
+					activeAccount.chainProvider.hyperionHistoryUrl,
+					activeAccount.account.accountName,
+					contract,
+					symbol)
+
+			emit(actions)
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty(), null))
 		}

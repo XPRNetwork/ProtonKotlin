@@ -9,14 +9,14 @@ import com.metallicus.protonsdk.model.AccountContact
 @Dao
 interface AccountContactDao {
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	fun insert(accountContact: AccountContact)
+	suspend fun insert(accountContact: AccountContact)
 
 	@Update
-	fun update(accountContact: AccountContact)
+	suspend fun update(accountContact: AccountContact)
 
 	@Query("SELECT * FROM accountContact WHERE accountName = :accountName")
 	suspend fun findByAccountName(accountName: String): List<AccountContact>
 
 	@Query("DELETE FROM accountContact")
-	fun removeAll()
+	suspend fun removeAll()
 }

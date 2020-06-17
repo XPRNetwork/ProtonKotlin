@@ -7,6 +7,7 @@ import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.model.*
+import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import kotlinx.coroutines.async
@@ -23,6 +24,9 @@ class AccountModule {
 
 	@Inject
 	lateinit var accountRepository: AccountRepository
+
+	@Inject
+	lateinit var accountContactRepository: AccountContactRepository
 
 	@Inject
 	lateinit var prefs: Prefs
@@ -82,7 +86,7 @@ class AccountModule {
 		val usersInfoTableCode = context.getString(R.string.protonChainUsersInfoTableCode)
 		val usersInfoTableName = context.getString(R.string.protonChainUsersInfoTableName)
 
-		val response = accountRepository.fetchAccountInfo(
+		val response = accountContactRepository.fetchAccountContact(
 			chainUrl, accountName, usersInfoTableScope, usersInfoTableCode, usersInfoTableName)
 		if (response.isSuccessful) {
 			val userInfoJsonObject = response.body()
