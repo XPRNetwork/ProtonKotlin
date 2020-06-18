@@ -6,6 +6,7 @@ import androidx.work.*
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.workers.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class WorkersModule {
@@ -33,6 +34,7 @@ class WorkersModule {
 
 	companion object {
 		const val INIT = "WORKER_INIT"
+		const val UPDATE_RATES = "WORKER_UPDATE_RATES"
 	}
 
 	fun init(chainProviderUrl: String, apiKey: String, apiSecret: String) {
@@ -53,7 +55,7 @@ class WorkersModule {
 			.build()
 
 		val initChainProvider = OneTimeWorkRequest.Builder(InitChainProviderWorker::class.java)
-			.setConstraints(constraints).setInputData(chainProviderInputData).build()
+			.setConstraints(constraints).setInitialDelay(10, TimeUnit.SECONDS).setInputData(chainProviderInputData).build()
 
 		val initTokenContracts = OneTimeWorkRequest.Builder(InitTokenContractsWorker::class.java)
 			.setConstraints(constraints).build()
@@ -74,6 +76,13 @@ class WorkersModule {
 				.then(initTokenContracts)
 				.enqueue()
 		}
+
+		// start periodic worker to update exchange rates
+		val updateTokenContractRates = PeriodicWorkRequest.Builder(UpdateTokenContractRatesWorker::class.java, 15, TimeUnit.MINUTES)
+			.setConstraints(constraints)
+			.setInitialDelay(1, TimeUnit.MINUTES)
+			.build()
+		workManager.enqueueUniquePeriodicWork(UPDATE_RATES, ExistingPeriodicWorkPolicy.REPLACE, updateTokenContractRates)
 	}
 
 	fun onInitChainProvider(callback: (Boolean) -> Unit) {

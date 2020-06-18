@@ -1,6 +1,7 @@
 package com.metallicus.protonsdk
 
 import android.content.Context
+import com.google.gson.JsonArray
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.model.*

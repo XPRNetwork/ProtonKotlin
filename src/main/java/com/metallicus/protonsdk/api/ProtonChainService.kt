@@ -1,5 +1,6 @@
 package com.metallicus.protonsdk.api
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.metallicus.protonsdk.model.*
 import okhttp3.MultipartBody
@@ -20,8 +21,10 @@ data class TableRowsBody(
 
 interface ProtonChainService {
 	@GET
-	suspend fun getChainProvider(
-		@Url url: String): Response<JsonObject>
+	suspend fun getChainProvider(@Url url: String): Response<JsonObject>
+
+	@GET
+	suspend fun getExchangeRates(@Url url: String): Response<JsonArray>
 
 	@POST
 	suspend fun updateUserName(

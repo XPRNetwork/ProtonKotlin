@@ -145,13 +145,15 @@ class Proton private constructor(context: Context) {
 			val tokenContracts = getTokenContractsAsync()
 			val activeAccount = getActiveAccountAsync()
 
-			val tokenContractMap = mutableMapOf<String, String>()
+			val tokenContractsMap = mutableMapOf<String, String>()
 			tokenContracts.forEach {
-				tokenContractMap["${it.contract}:${it.getSymbol()}"] = it.id
+				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
 			}
 
+			tokenContractsModule.updateExchangeRates(activeAccount.chainProvider.exchangeRateUrl, tokenContractsMap)
+
 			val tokenBalances =
-				currencyBalancesModule.getTokenCurrencyBalances(activeAccount.chainProvider.hyperionHistoryUrl, activeAccount.account.accountName, tokenContractMap)
+				currencyBalancesModule.getTokenCurrencyBalances(activeAccount.chainProvider.hyperionHistoryUrl, activeAccount.account.accountName, tokenContractsMap)
 
 			emit(tokenBalances)
 		} catch (e: Exception) {
