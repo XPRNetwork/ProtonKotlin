@@ -8,9 +8,6 @@ class Prefs(context: Context) {
 	companion object {
 		const val SHARED_PREFS_FILENAME = "protonsdk.prefs"
 
-		const val API_KEY = "api_key"
-		const val API_SECRET = "api_secret"
-
 		const val HAS_CHAIN_PROVIDER = "has_chain_provider"
 		const val HAS_TOKEN_CONTRACTS = "has_token_contracts"
 
@@ -22,22 +19,6 @@ class Prefs(context: Context) {
 
 	//private val backupManager: BackupManager = BackupManager(context)
 	private val prefs: SharedPreferences = context.getSharedPreferences(SHARED_PREFS_FILENAME, 0)
-
-	var apiKey: String
-		get() = prefs.getString(API_KEY, "").orEmpty()
-		set(value) {
-			value.let {
-				prefs.edit { putString(API_KEY, it) }
-			}
-		}
-
-	var apiSecret: String
-		get() = prefs.getString(API_SECRET, "").orEmpty()
-		set(value) {
-			value.let {
-				prefs.edit { putString(API_SECRET, it) }
-			}
-		}
 
 	var hasChainProvider: Boolean
 		get() = prefs.getBoolean(HAS_CHAIN_PROVIDER, false)
@@ -63,13 +44,21 @@ class Prefs(context: Context) {
 			}
 		}
 
-	var activeAccountName: String
-		get() = prefs.getString(ACTIVE_ACCOUNT_NAME, "").orEmpty()
-		set(value) {
-			value.let {
-				prefs.edit { putString(ACTIVE_ACCOUNT_NAME, it) }
-			}
+	fun getActiveAccountName(): String {
+		return prefs.getString(ACTIVE_ACCOUNT_NAME, "").orEmpty()
+	}
+
+	fun getActivePublicKey(): String {
+		val activeAccountName = getActiveAccountName()
+		return prefs.getString(activeAccountName, "").orEmpty()
+	}
+
+	fun setActiveAccount(publicKey: String, accountName: String) {
+		prefs.edit {
+			putString(ACTIVE_ACCOUNT_NAME, accountName)
+			putString(accountName, publicKey)
 		}
+	}
 
 	var hasActiveAccount: Boolean
 		get() = prefs.getBoolean(HAS_ACTIVE_ACCOUNT, false)

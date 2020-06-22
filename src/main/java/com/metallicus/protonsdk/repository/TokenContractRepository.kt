@@ -1,5 +1,6 @@
 package com.metallicus.protonsdk.repository
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.metallicus.protonsdk.api.ProtonChainService
 import com.metallicus.protonsdk.api.TableRowsBody
@@ -32,5 +33,13 @@ class TokenContractRepository @Inject constructor(
 
 	suspend fun getTokenContracts(): List<TokenContract> {
 		return tokenContractDao.findAll()
+	}
+
+	suspend fun fetchExchangeRates(exchangeRateUrl: String): Response<JsonArray> {
+		return protonChainService.getExchangeRates(exchangeRateUrl)
+	}
+
+	suspend fun updateRates(tokenContractId: String, rates: String) {
+		return tokenContractDao.updateRates(tokenContractId, rates)
 	}
 }

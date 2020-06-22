@@ -1,10 +1,7 @@
 package com.metallicus.protonsdk.repository
 
 import com.google.gson.JsonObject
-import com.metallicus.protonsdk.api.AccountBody
 import com.metallicus.protonsdk.api.ProtonChainService
-import com.metallicus.protonsdk.api.TableRowsBody
-import com.metallicus.protonsdk.db.AccountDao
 import com.metallicus.protonsdk.db.CurrencyBalanceDao
 import com.metallicus.protonsdk.model.*
 import retrofit2.Response

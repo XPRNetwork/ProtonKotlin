@@ -20,6 +20,9 @@ interface TokenContractDao {
 	@Query("SELECT * FROM tokenContract")
 	suspend fun findAll(): List<TokenContract>
 
+	@Query("UPDATE tokenContract SET rates = :rates WHERE id = :tokenContractId")
+	suspend fun updateRates(tokenContractId: String, rates: String)
+
 	@Query("DELETE FROM tokenContract")
 	suspend fun removeAll()
 }
