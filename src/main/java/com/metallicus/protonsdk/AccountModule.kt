@@ -5,11 +5,14 @@ import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
+import com.metallicus.protonsdk.eosio.commander.digest.Sha256
+import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import timber.log.Timber
+import java.nio.charset.Charset
 import javax.inject.Inject
 
 class AccountModule {
@@ -183,11 +186,70 @@ class AccountModule {
 		}
 	}
 
-	suspend fun updateAccountName(updateAccountNameUrl: String, accountName: String, name: String) {
-		accountRepository.updateAccountName(updateAccountNameUrl, accountName, "", name)
+	private fun getActiveAccountSignature(pin: String): String {
+		val accountName = prefs.getActiveAccountName()
+		val publicKey = prefs.getActivePublicKey()
+
+		val privateKeyStr = secureKeys.getPrivateKey(publicKey, pin)
+		val privateKey = EosPrivateKey(privateKeyStr)
+		val sha256 = Sha256.from(accountName.toByteArray())
+		val signature = privateKey.sign(sha256).toString()
+		return signature
 	}
 
-	suspend fun updateAccountAvatar(updateAccountAvatarUrl: String, accountName: String, imageByteArray: ByteArray) {
-		accountRepository.updateAccountAvatar(updateAccountAvatarUrl, accountName, "", imageByteArray)
+	suspend fun updateAccountName(chainAccount: ChainAccount, pin: String, name: String): Resource<ChainAccount> {
+		val signature = getActiveAccountSignature(pin)
+
+		val accountName = chainAccount.account.accountName
+
+		val response = accountRepository.updateAccountName(
+			chainAccount.chainProvider.updateAccountNameUrl,
+			accountName,
+			signature,
+			name)
+
+		return if (response.isSuccessful) {
+			val account = chainAccount.account
+			account.accountContact.name = name
+			accountRepository.updateAccount(account)
+
+			Resource.success(chainAccount)
+		} else {
+			val msg = response.errorBody()?.string()
+			val errorMsg = if (msg.isNullOrEmpty()) {
+				response.message()
+			} else {
+				msg
+			}
+			Resource.error(errorMsg)
+		}
+	}
+
+	suspend fun updateAccountAvatar(chainAccount: ChainAccount, pin: String, imageByteArray: ByteArray): Resource<ChainAccount> {
+		val signature = getActiveAccountSignature(pin)
+
+		val accountName = chainAccount.account.accountName
+
+		val response = accountRepository.updateAccountAvatar(
+			chainAccount.chainProvider.updateAccountAvatarUrl,
+			accountName,
+			signature,
+			imageByteArray)
+
+		return if (response.isSuccessful) {
+			val account = chainAccount.account
+			account.accountContact.avatar = imageByteArray.toString(Charset.defaultCharset())
+			accountRepository.updateAccount(account)
+
+			Resource.success(chainAccount)
+		} else {
+			val msg = response.errorBody()?.string()
+			val errorMsg = if (msg.isNullOrEmpty()) {
+				response.message()
+			} else {
+				msg
+			}
+			Resource.error(errorMsg)
+		}
 	}
 }

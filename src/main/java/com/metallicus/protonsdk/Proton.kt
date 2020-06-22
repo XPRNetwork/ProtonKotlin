@@ -190,7 +190,10 @@ class Proton private constructor(context: Context) {
 			tokenContractsModule.updateExchangeRates(activeAccount.chainProvider.exchangeRateUrl, tokenContractsMap)
 
 			val tokenBalances =
-				currencyBalancesModule.getTokenCurrencyBalances(activeAccount.chainProvider.hyperionHistoryUrl, activeAccount.account.accountName, tokenContractsMap)
+				currencyBalancesModule.getTokenCurrencyBalances(
+					activeAccount.chainProvider.hyperionHistoryUrl,
+					activeAccount.account.accountName,
+					tokenContractsMap)
 
 			emit(tokenBalances)
 		} catch (e: Exception) {
@@ -207,7 +210,10 @@ class Proton private constructor(context: Context) {
 			val tokenContract = tokenContractsModule.getTokenContract(tokenContractId)
 
 			val tokenBalance =
-				currencyBalancesModule.getTokenCurrencyBalance(activeAccount.chainProvider.hyperionHistoryUrl, activeAccount.account.accountName, tokenContract)
+				currencyBalancesModule.getTokenCurrencyBalance(
+					activeAccount.chainProvider.hyperionHistoryUrl,
+					activeAccount.account.accountName,
+					tokenContract)
 
 			emit(tokenBalance)
 		} catch (e: Exception) {
@@ -232,6 +238,30 @@ class Proton private constructor(context: Context) {
 			emit(actions)
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty(), emptyList()))
+		}
+	}
+
+	fun updateAccountName(pin: String, name: String): LiveData<Resource<ChainAccount>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			emit(accountModule.updateAccountName(activeAccount, pin, name))
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+		}
+	}
+
+	fun updateAccountAvatar(pin: String, byteArray: ByteArray): LiveData<Resource<ChainAccount>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			emit(accountModule.updateAccountAvatar(activeAccount, pin, byteArray))
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
 		}
 	}
 }
