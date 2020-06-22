@@ -3,6 +3,8 @@ package com.metallicus.protonsdk.model
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
 import com.metallicus.protonsdk.db.DefaultTypeConverters
+import java.text.NumberFormat
+import java.util.*
 
 @Entity
 @TypeConverters(DefaultTypeConverters::class)
@@ -18,10 +20,10 @@ data class TokenContract(
 	@SerializedName("symbol") val precisionSymbol: String,
 	@SerializedName("blisted") val blacklisted: Int
 ) {
-	var rateUSD: Double = 0.0
+	lateinit var rates: Map<String, Double>
 
 //	lateinit var supply: String
-//	lateinit var maxString: String
+//	lateinit var maxSupply: String
 //	lateinit var issuer: String
 
 	fun getSymbol(): String {
@@ -33,14 +35,14 @@ data class TokenContract(
 		return precision.toInt()
 	}
 
-//	fun formatRate(currency: String): String {
-//		val value = if (rates.containsKey(currency)) { rates.getValue(currency) } else { 0.0 }
-//		val cf = NumberFormat.getCurrencyInstance(Locale.US)
-//		cf.minimumFractionDigits = 2
-//		cf.maximumFractionDigits = 6
-//		return cf.format(value)
-//	}
-//
+	fun formatRate(currency: String): String {
+		val value = if (rates.containsKey(currency)) { rates.getValue(currency) } else { 0.0 }
+		val cf = NumberFormat.getCurrencyInstance(Locale.US)
+		cf.minimumFractionDigits = 2
+		cf.maximumFractionDigits = 6
+		return cf.format(value)
+	}
+
 //	fun formatSupply(includeSymbol: Boolean): String {
 //		return if (supply.isEmpty()) {
 //			""

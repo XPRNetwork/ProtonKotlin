@@ -1,12 +1,12 @@
 package com.metallicus.protonsdk.api
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.metallicus.protonsdk.model.*
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 
-data class UserNameBody(val account: String, val sign: String, val name: String)
 data class AccountBody(val account_name: String)
 data class TableRowsBody(
 	val scope: String,
@@ -15,20 +15,22 @@ data class TableRowsBody(
 	val lower_bound: String = "",
 	val upper_bound: String = "",
 	val limit: Long = 1,
-	val json: Boolean = true
-)
+	val json: Boolean = true)
+data class UserNameBody(val signature: String, val name: String)
 
 interface ProtonChainService {
 	@GET
-	suspend fun getChainProvider(
-		@Url url: String): Response<JsonObject>
+	suspend fun getChainProvider(@Url url: String): Response<JsonObject>
 
-	@POST
+	@GET
+	suspend fun getExchangeRates(@Url url: String): Response<JsonArray>
+
+	@PUT
 	suspend fun updateUserName(
 		@Url url: String,
 		@Body body: UserNameBody): Response<JsonObject>
 
-	@POST
+	@PUT
 	suspend fun uploadUserAvatar(
 		@Url url: String,
 		@Body body: MultipartBody): Response<JsonObject>

@@ -31,11 +31,9 @@ class InitActiveAccountWorker
 	override suspend fun doWork(): Result {
 		return try {
 			val chainId = prefs.activeChainId
-			val accountName = prefs.activeAccountName
+			val accountName = prefs.getActiveAccountName()
 
 			val chainProvider = chainProviderRepository.getChainProvider(chainId)
-
-			accountRepository.removeAll()
 
 			val response = accountRepository.fetchAccount(chainProvider.chainUrl, accountName)
 			if (response.isSuccessful) {

@@ -37,8 +37,8 @@ data class TokenCurrencyBalance(
 
 	fun getBalanceForCurrencyDouble(currency: String, selfDelegatedResources: Double): Double {
 		val amount = getBalanceDouble(selfDelegatedResources)
-		val rate = if (currency=="USD") {
-			tokenContract.rateUSD
+		val rate = if (tokenContract.rates.containsKey(currency)) {
+			tokenContract.rates.getValue(currency)
 		} else {
 			0.0
 		}
