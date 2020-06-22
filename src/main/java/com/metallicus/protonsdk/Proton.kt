@@ -6,6 +6,7 @@ import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.common.SingletonHolder
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.di.ProtonModule
+import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.model.*
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -34,8 +35,8 @@ class Proton private constructor(context: Context) {
 
 	private val protonCoroutineScope = CoroutineScope(Dispatchers.Default)
 
-	fun initialize(chainProviderUrl: String, apiKey: String="", apiSecret: String="") {
-		workersModule.init(chainProviderUrl, apiKey, apiSecret)
+	fun initialize(chainProviderUrl: String) {
+		workersModule.init(chainProviderUrl)
 	}
 
 	private suspend fun getChainProviderAsync() = suspendCoroutine<ChainProvider> { continuation ->
@@ -80,33 +81,61 @@ class Proton private constructor(context: Context) {
 			val tokenContracts = getTokenContractsAsync()
 			emit(Resource.success(tokenContracts))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty(), emptyList()))
 		}
+	}
+
+	fun generatePrivateKey(): EosPrivateKey {
+		return EosPrivateKey()
 	}
 
 	fun hasActiveAccount(): Boolean {
 		return accountModule.hasActiveAccount()
 	}
 
-	fun findAccounts(privateKeyStr: String): LiveData<Resource<List<ChainAccount>>> = liveData {
+	private suspend fun findAccounts(publicKeyStr: String): Resource<List<Account>> {
+		return try {
+			val chainProvider = getChainProviderAsync()
+
+			accountModule.fetchAccountsForKey(
+				chainProvider.chainId,
+				chainProvider.chainUrl,
+				chainProvider.hyperionHistoryUrl,
+				publicKeyStr)
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty(), emptyList())
+		}
+	}
+
+	fun findAccountsForPublicKey(publicKeyStr: String): LiveData<Resource<List<Account>>> = liveData {
+		emit(Resource.loading())
+
+		emit(findAccounts(publicKeyStr))
+	}
+
+	fun findAccountsForPrivateKey(privateKeyStr: String): LiveData<Resource<List<Account>>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val privateKey = EosPrivateKey(privateKeyStr)
+			val publicKeyStr = privateKey.publicKey.toString()
+
+			val accounts = findAccounts(publicKeyStr)
+			emit(accounts)
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), emptyList()))
+		}
+	}
+
+	fun setActiveAccount(activeAccount: ActiveAccount): LiveData<Resource<ChainAccount>> = liveData {
 		emit(Resource.loading())
 
 		try {
 			val chainProvider = getChainProviderAsync()
-
-			emit(
-				accountModule.getAccountsForPrivateKey(
-					chainProvider.chainId,
-					chainProvider.chainUrl,
-					chainProvider.hyperionHistoryUrl,
-					privateKeyStr))
+			emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty(), null))
 		}
-	}
-
-	fun setActiveAccount(account: ChainAccount, privateKey: String, pin: String) {
-		accountModule.setActiveAccount(account, privateKey, pin)
 	}
 
 	private suspend fun getActiveAccountAsync() = suspendCoroutine<ChainAccount> { continuation ->
@@ -135,7 +164,15 @@ class Proton private constructor(context: Context) {
 	fun refreshActiveAccount(): LiveData<Resource<ChainAccount>> = liveData {
 		emit(Resource.loading())
 
-		emit(accountModule.refreshActiveAccount())
+		try {
+			val activeAccount = getActiveAccountAsync()
+			emit(accountModule.refreshAccount(
+					activeAccount.chainProvider.chainId,
+					activeAccount.chainProvider.chainUrl,
+					activeAccount.account.accountName))
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+		}
 	}
 
 	fun getActiveAccountTokenBalances(): LiveData<Resource<List<TokenCurrencyBalance>>> = liveData {
@@ -194,7 +231,7 @@ class Proton private constructor(context: Context) {
 
 			emit(actions)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty(), emptyList()))
 		}
 	}
 }

@@ -5,13 +5,10 @@ import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
-import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
 import com.metallicus.protonsdk.repository.ChainProviderRepository
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,18 +36,15 @@ class AccountModule {
 	}
 
 	fun hasActiveAccount(): Boolean {
-		return prefs.activeAccountName.isNotEmpty()
+		return prefs.getActiveAccountName().isNotEmpty()
 	}
 
-	suspend fun getAccountsForPrivateKey(chainId: String, chainUrl: String, hyperionHistoryUrl: String, privateKeyStr: String): Resource<List<ChainAccount>> {
-		val accounts = mutableListOf<ChainAccount>()
+	suspend fun fetchAccountsForKey(chainId: String, chainUrl: String, hyperionHistoryUrl: String, publicKey: String): Resource<List<Account>> {
+		val accounts = mutableListOf<Account>()
 
 		return try {
-			val privateKey = EosPrivateKey(privateKeyStr)
-			val publicKeyStr = privateKey.publicKey.toString()
-
 			val keyAccountResponse =
-				accountRepository.fetchKeyAccount(hyperionHistoryUrl, publicKeyStr)
+				accountRepository.fetchKeyAccount(hyperionHistoryUrl, publicKey)
 			if (keyAccountResponse.isSuccessful) {
 				keyAccountResponse.body()?.let { keyAccount ->
 					keyAccount.accountNames.forEach { accountName ->
@@ -112,18 +106,16 @@ class AccountModule {
 		return accountContact
 	}
 
-	private suspend fun fetchAccount(chainId: String, chainUrl: String, accountName: String): ChainAccount? {
-		var chainAccount: ChainAccount? = null
+	private suspend fun fetchAccount(chainId: String, chainUrl: String, accountName: String): Account? {
+		var account: Account? = null
 
 		val response = accountRepository.fetchAccount(chainUrl, accountName)
 		if (response.isSuccessful) {
-			response.body()?.let { account ->
-				account.accountChainId = chainId
-				account.accountContact = fetchAccountContact(chainUrl, accountName)
+			response.body()?.let { it ->
+				it.accountChainId = chainId
+				it.accountContact = fetchAccountContact(chainUrl, accountName)
 
-				accountRepository.addAccount(account)
-
-				chainAccount = accountRepository.getChainAccount(accountName)
+				account = it
 			}
 		} else {
 			val msg = response.errorBody()?.string()
@@ -136,32 +128,66 @@ class AccountModule {
 			Timber.d(errorMsg)
 		}
 
-		return chainAccount
+		return account
 	}
 
-	fun setActiveAccount(account: ChainAccount, privateKeyStr: String, pin: String) {
-		val privateKey = EosPrivateKey(privateKeyStr)
-		val publicKeyStr = privateKey.publicKey.toString()
-		secureKeys.addKey(publicKeyStr, privateKeyStr, pin)
+	private suspend fun addAccount(chainId: String, chainUrl: String, accountName: String) {
+		val account = fetchAccount(chainId, chainUrl, accountName)
 
-		prefs.activeAccountName = account.account.accountName
-		prefs.hasActiveAccount = true
+		requireNotNull(account)
+
+		accountRepository.addAccount(account)
 	}
 
-	suspend fun getActiveAccount(): ChainAccount {
-		val accountName = prefs.activeAccountName
+	private suspend fun updateAccount(chainId: String, chainUrl: String, accountName: String): ChainAccount {
+		val account = fetchAccount(chainId, chainUrl, accountName)
+
+		requireNotNull(account)
+
+		accountRepository.updateAccount(account)
+
 		return accountRepository.getChainAccount(accountName)
 	}
 
-	suspend fun refreshActiveAccount(): Resource<ChainAccount> {
-		val chainId = prefs.activeChainId
-		val accountName = prefs.activeAccountName
+	suspend fun setActiveAccount(chainId: String, chainUrl: String, activeAccount: ActiveAccount): Resource<ChainAccount> {
+		val publicKey = activeAccount.publicKey
+		val accountName = activeAccount.accountName
 
-		return if (chainId.isNotEmpty() && accountName.isNotEmpty()) {
-			val chainProvider = chainProviderRepository.getChainProvider(chainId)
-			Resource.success(fetchAccount(chainId, chainProvider.chainUrl, accountName))
-		} else {
-			Resource.error("No Active Chain or Account")
+		prefs.setActiveAccount(publicKey, accountName)
+
+		return try {
+			if (activeAccount.hasPrivateKey()) {
+				secureKeys.addKey(publicKey, activeAccount.privateKey, activeAccount.pin)
+			}
+
+			addAccount(chainId, chainUrl, accountName)
+
+			prefs.hasActiveAccount = true
+
+			Resource.success(accountRepository.getChainAccount(accountName))
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty(), null)
 		}
+	}
+
+	suspend fun getActiveAccount(): ChainAccount {
+		val accountName = prefs.getActiveAccountName()
+		return accountRepository.getChainAccount(accountName)
+	}
+
+	suspend fun refreshAccount(chainId: String, chainUrl: String, accountName: String): Resource<ChainAccount> {
+		return try {
+			Resource.success(updateAccount(chainId, chainUrl, accountName))
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty(), null)
+		}
+	}
+
+	suspend fun updateAccountName(updateAccountNameUrl: String, accountName: String, name: String) {
+		accountRepository.updateAccountName(updateAccountNameUrl, accountName, "", name)
+	}
+
+	suspend fun updateAccountAvatar(updateAccountAvatarUrl: String, accountName: String, imageByteArray: ByteArray) {
+		accountRepository.updateAccountAvatar(updateAccountAvatarUrl, accountName, "", imageByteArray)
 	}
 }

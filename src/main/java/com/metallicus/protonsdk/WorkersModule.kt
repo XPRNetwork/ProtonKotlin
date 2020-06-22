@@ -37,14 +37,10 @@ class WorkersModule {
 		const val UPDATE_RATES = "WORKER_UPDATE_RATES"
 	}
 
-	fun init(chainProviderUrl: String, apiKey: String, apiSecret: String) {
+	fun init(chainProviderUrl: String) {
 		workManager.pruneWork()
 
 		prefs.clearInit()
-
-		// save api key and secret
-		prefs.apiKey = apiKey
-		prefs.apiSecret = apiSecret
 
 		val constraints = Constraints.Builder()
 			.setRequiredNetworkType(NetworkType.CONNECTED)
@@ -66,7 +62,7 @@ class WorkersModule {
 		val initWork = workManager
 			.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
 
-		if (prefs.activeAccountName.isNotEmpty()) {
+		if (prefs.getActiveAccountName().isNotEmpty()) {
 			initWork
 				.then(initTokenContracts)
 				.then(initActiveAccount)
