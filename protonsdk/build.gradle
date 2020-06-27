@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'maven-publish'
 
 android {
 	compileSdkVersion 29
@@ -21,7 +22,7 @@ android {
 		targetSdkVersion 29
 
 		versionCode 5
-		versionName "0.3.0"
+		versionName "0.3.1"
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		consumerProguardFiles 'consumer-rules.pro'
@@ -67,10 +68,10 @@ dependencies {
 	implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
 	// Dagger
-	implementation 'com.google.dagger:dagger:2.28'
-	implementation 'com.google.dagger:dagger-android-support:2.28'
-	kapt 'com.google.dagger:dagger-android-processor:2.28'
-	kapt 'com.google.dagger:dagger-compiler:2.28'
+	implementation 'com.google.dagger:dagger:2.28.1'
+	implementation 'com.google.dagger:dagger-android-support:2.28.1'
+	kapt 'com.google.dagger:dagger-android-processor:2.28.1'
+	kapt 'com.google.dagger:dagger-compiler:2.28.1'
 
 	// Assisted Inject (Dagger)
 	compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:0.5.2"
@@ -91,4 +92,31 @@ dependencies {
 
 	// Greymass ESR
 	implementation "com.greymass:esrsdk:1.0.1"
+}
+
+project.afterEvaluate {
+	publishing {
+		publications {
+			aar(MavenPublication) {
+				groupId = 'com.metallicus'
+				artifactId 'protonsdk'
+				version = '0.3.1'
+
+				artifact bundleDebugAar
+
+				pom.withXml {
+					def dependenciesNode = asNode().appendNode('dependencies')
+					configurations.implementation.allDependencies.each {
+						if (it.group != null && it.name != null && it.version != null &&
+							it.name != 'unspecified' && it.version != 'unspecified') {
+							def dependencyNode = dependenciesNode.appendNode('dependency')
+							dependencyNode.appendNode('groupId', it.group)
+							dependencyNode.appendNode('artifactId', it.name)
+							dependencyNode.appendNode('version', it.version)
+						}
+					}
+				}
+			}
+		}
+	}
 }
