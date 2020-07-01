@@ -2,6 +2,7 @@ package com.metallicus.protonsdk
 
 import android.content.Context
 import androidx.lifecycle.*
+import com.google.gson.JsonObject
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.common.SingletonHolder
 import com.metallicus.protonsdk.di.DaggerInjector
@@ -260,6 +261,25 @@ class Proton private constructor(context: Context) {
 			val activeAccount = getActiveAccountAsync()
 
 			emit(accountModule.updateAccountAvatar(activeAccount, pin, byteArray))
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+		}
+	}
+
+	fun transferTokens(pin: String, contract: String, toAccount: String, amount: String, memo: String): LiveData<Resource<JsonObject>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			emit(actionsModule.transferTokens(
+				activeAccount.chainProvider.chainUrl,
+				pin,
+				contract,
+				activeAccount.account.accountName,
+				toAccount,
+				amount,
+				memo))
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty(), null))
 		}

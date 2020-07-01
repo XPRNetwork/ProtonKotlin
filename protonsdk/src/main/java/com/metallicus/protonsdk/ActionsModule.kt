@@ -3,9 +3,18 @@ package com.metallicus.protonsdk
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
+import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.di.DaggerInjector
+import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
+import com.metallicus.protonsdk.eosio.commander.model.chain.Action
+import com.metallicus.protonsdk.eosio.commander.model.chain.PackedTransaction
+import com.metallicus.protonsdk.eosio.commander.model.chain.SignedTransaction
+import com.metallicus.protonsdk.eosio.commander.model.types.EosTransfer
+import com.metallicus.protonsdk.eosio.commander.model.types.TypeChainId
 import com.metallicus.protonsdk.model.*
+import com.metallicus.protonsdk.model.Action as AccountAction
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.ActionRepository
 import timber.log.Timber
@@ -21,11 +30,17 @@ class ActionsModule {
 	@Inject
 	lateinit var accountContactRepository: AccountContactRepository
 
+	@Inject
+	lateinit var prefs: Prefs
+
+	@Inject
+	lateinit var secureKeys: SecureKeys
+
 	init {
 		DaggerInjector.component.inject(this)
 	}
 
-	suspend fun getActions(chainUrl: String, hyperionHistoryUrl: String, accountName: String, contract: String, symbol: String): Resource<List<Action>> {
+	suspend fun getActions(chainUrl: String, hyperionHistoryUrl: String, accountName: String, contract: String, symbol: String): Resource<List<AccountAction>> {
 		return try {
 			val response = actionRepository.fetchAccountTokenActions(hyperionHistoryUrl, accountName, symbol)
 			if (response.isSuccessful) {
@@ -109,11 +124,11 @@ class ActionsModule {
 				Resource.error(errorMsg, null)
 			}
 		} catch (e: Exception) {
-			Resource.error("Connection Error or Timeout: Please check your network settings", null)
+			Resource.error(e.localizedMessage.orEmpty(), null)
 		}
 	}
 
-	private fun convertStateHistoryAction(stateHistoryActionJson: JsonObject): Action {
+	private fun convertStateHistoryAction(stateHistoryActionJson: JsonObject): AccountAction {
 		val actionGlobalActionSeq = stateHistoryActionJson.get("global_sequence").asLong.toInt()
 		val actionBlockNum = stateHistoryActionJson.get("block_num").asLong.toInt()
 		val actionBlockTime = stateHistoryActionJson.get("@timestamp").asString
@@ -155,10 +170,92 @@ class ActionsModule {
 			actionTraceActAuthorizationList,
 			actionTraceActData)
 
-		return Action(
+		return AccountAction(
 			actionGlobalActionSeq,
 			actionBlockNum,
 			actionBlockTime,
 			ActionTrace(actionTrxId, actionTraceAct))
+	}
+
+	suspend fun transferTokens(chainUrl: String, pin: String, contract: String, from: String, to: String, quantity: String, memo: String): Resource<JsonObject> {
+		return try {
+			val eosTransfer = EosTransfer(from, to, quantity, memo)
+			val jsonToBinArgs = eosTransfer.jsonToBinArgs()
+
+			val jsonToBinResponse =
+				actionRepository.jsonToBin(
+					chainUrl,
+					contract,
+					eosTransfer.action,
+					jsonToBinArgs)
+			if (jsonToBinResponse.isSuccessful) {
+				val jsonToBin = jsonToBinResponse.body()
+
+				requireNotNull(jsonToBin)
+
+				val action = Action(contract, eosTransfer.action)
+				action.setData(jsonToBin.binArgs)
+				action.setAuthorization(eosTransfer.activePermission)
+
+				val signedTransaction = SignedTransaction()
+				signedTransaction.addAction(action)
+
+				val chainInfoResponse = actionRepository.getChainInfo(chainUrl)
+				if (chainInfoResponse.isSuccessful) {
+					val chainInfo = chainInfoResponse.body()
+
+					requireNotNull(chainInfo)
+
+					signedTransaction.setReferenceBlock(chainInfo.headBlockId)
+					signedTransaction.expiration = chainInfo.getTimeAfterHeadBlockTime(30000)
+
+					val publicKey = prefs.getActivePublicKey()
+
+					val privateKeyStr = secureKeys.getPrivateKey(publicKey, pin)
+
+					require(privateKeyStr != null && privateKeyStr != "") { "No private key found" }
+
+					val privateKey = EosPrivateKey(privateKeyStr)
+
+					signedTransaction.sign(privateKey, TypeChainId(chainInfo.chainId))
+
+					val packedTransaction = PackedTransaction(signedTransaction)
+
+					val pushTransactionResponse = actionRepository.pushTransaction(chainUrl, packedTransaction)
+					if (pushTransactionResponse.isSuccessful) {
+						Resource.success(pushTransactionResponse.body())
+					} else {
+						val msg = jsonToBinResponse.errorBody()?.string()
+						val errorMsg = if (msg.isNullOrEmpty()) {
+							jsonToBinResponse.message()
+						} else {
+							msg
+						}
+
+						Resource.error(errorMsg, null)
+					}
+				} else {
+					val msg = jsonToBinResponse.errorBody()?.string()
+					val errorMsg = if (msg.isNullOrEmpty()) {
+						jsonToBinResponse.message()
+					} else {
+						msg
+					}
+
+					Resource.error(errorMsg, null)
+				}
+			} else {
+				val msg = jsonToBinResponse.errorBody()?.string()
+				val errorMsg = if (msg.isNullOrEmpty()) {
+					jsonToBinResponse.message()
+				} else {
+					msg
+				}
+
+				Resource.error(errorMsg, null)
+			}
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty(), null)
+		}
 	}
 }

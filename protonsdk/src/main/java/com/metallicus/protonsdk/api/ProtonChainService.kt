@@ -1,7 +1,10 @@
 package com.metallicus.protonsdk.api
 
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.metallicus.protonsdk.eosio.commander.model.chain.PackedTransaction
+import com.metallicus.protonsdk.eosio.commander.model.chain.SignedTransaction
 import com.metallicus.protonsdk.model.*
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -17,6 +20,8 @@ data class TableRowsBody(
 	val limit: Long = 1,
 	val json: Boolean = true)
 data class UserNameBody(val signature: String, val name: String)
+data class JsonToBinBody(val code: String, val action: String, val args: JsonElement)
+data class RequiredKeysBody(val transaction: SignedTransaction, val available_keys: List<String>)
 
 interface ProtonChainService {
 	@GET
@@ -67,4 +72,22 @@ interface ProtonChainService {
 		@Url url: String,
 		@Body body: TableRowsBody
 	): Response<JsonObject>
+
+	@POST//("/v1/chain/abi_json_to_bin")
+	suspend fun jsonToBin(
+		@Url url: String,
+		@Body body: JsonToBinBody): Response<JsonToBinResponse>
+
+	@POST//("/v1/chain/get_info")
+	suspend fun getChainInfo(@Url url: String): Response<ChainInfo>
+
+	@POST//("/v1/chain/get_required_keys")
+	suspend fun getRequiredKeys(
+		@Url url: String,
+		@Body body: RequiredKeysBody): Response<RequiredKeysResponse>
+
+	@POST//("/v1/chain/push_transaction")
+	suspend fun pushTransaction(
+		@Url url: String,
+		@Body body: PackedTransaction): Response<JsonObject>
 }
