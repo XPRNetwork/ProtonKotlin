@@ -5,7 +5,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-data class EOSChainInfo(
+data class ChainInfo(
 	@SerializedName("server_version") val serverVersion: String,
 	@SerializedName("chain_id") val chainId: String,
 	@SerializedName("head_block_num") val headBlockNum: Int,

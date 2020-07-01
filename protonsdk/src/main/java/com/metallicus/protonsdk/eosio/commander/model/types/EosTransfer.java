@@ -23,8 +23,11 @@
  */
 package com.metallicus.protonsdk.eosio.commander.model.types;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import com.metallicus.protonsdk.eosio.commander.HexUtils;
+import com.metallicus.protonsdk.eosio.commander.Utils;
 
 /**
  * Created by swapnibble on 2017-09-15.
@@ -89,5 +92,11 @@ public class EosTransfer implements EosType.Packer {
 		pack(writer);
 
 		return HexUtils.toHex(writer.toBytes());
+	}
+
+	// Added by joey-harward on 7/1/20
+	public JsonElement jsonToBinArgs() {
+		String json = Utils.prettyPrintJson(this);
+		return JsonParser.parseString(json);
 	}
 }
