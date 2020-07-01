@@ -137,7 +137,7 @@ class AccountModule {
 	private suspend fun addAccount(chainId: String, chainUrl: String, accountName: String) {
 		val account = fetchAccount(chainId, chainUrl, accountName)
 
-		requireNotNull(account)
+		requireNotNull(account) { "$accountName Not Found" }
 
 		accountRepository.addAccount(account)
 	}
@@ -145,7 +145,7 @@ class AccountModule {
 	private suspend fun updateAccount(chainId: String, chainUrl: String, accountName: String): ChainAccount {
 		val account = fetchAccount(chainId, chainUrl, accountName)
 
-		requireNotNull(account)
+		requireNotNull(account) { "$accountName Not Found" }
 
 		accountRepository.updateAccount(account)
 

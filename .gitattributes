@@ -1,8 +1,8 @@
-src/main/java/com/metallicus/protonsdk/eosio/commander/* linguist-vendored
-src/main/java/com/metallicus/protonsdk/eosio/commander/digest/* linguist-vendored
-src/main/java/com/metallicus/protonsdk/eosio/commander/ec/* linguist-vendored
-src/main/java/com/metallicus/protonsdk/eosio/commander/model/* linguist-vendored
-src/main/java/com/metallicus/protonsdk/eosio/commander/model/chain/* linguist-vendored
-src/main/java/com/metallicus/protonsdk/eosio/commander/model/types/* linguist-vendored
+lib/src/main/java/com/metallicus/protonsdk/eosio/commander/* linguist-vendored
+lib/src/main/java/com/metallicus/protonsdk/eosio/commander/digest/* linguist-vendored
+lib/src/main/java/com/metallicus/protonsdk/eosio/commander/ec/* linguist-vendored
+lib/src/main/java/com/metallicus/protonsdk/eosio/commander/model/* linguist-vendored
+lib/src/main/java/com/metallicus/protonsdk/eosio/commander/model/chain/* linguist-vendored
+lib/src/main/java/com/metallicus/protonsdk/eosio/commander/model/types/* linguist-vendored
 
-src/main/java/com/metallicus/protonsdk/securestorage/* linguist-vendored
+lib/src/main/java/com/metallicus/protonsdk/securestorage/* linguist-vendored
