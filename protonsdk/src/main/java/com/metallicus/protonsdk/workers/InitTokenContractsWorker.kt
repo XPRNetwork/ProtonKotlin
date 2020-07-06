@@ -2,10 +2,12 @@ package com.metallicus.protonsdk.workers
 
 import android.content.Context
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.metallicus.protonsdk.R
 import com.metallicus.protonsdk.common.Prefs
+import com.metallicus.protonsdk.common.ProtonError
 import com.metallicus.protonsdk.model.TokenContract
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.metallicus.protonsdk.repository.TokenContractRepository
@@ -33,13 +35,13 @@ class InitTokenContractsWorker
 
 			tokenContractRepository.removeAll()
 
-			val tokenContractsResponse = tokenContractRepository.fetchTokenContracts(
+			val response = tokenContractRepository.fetchTokenContracts(
 				chainProvider.chainUrl,
 				protonChainTokensTableScope,
 				protonChainTokensTableCode,
 				protonChainTokensTableName)
-			if (tokenContractsResponse.isSuccessful) {
-				val responseJsonObject = tokenContractsResponse.body()
+			if (response.isSuccessful) {
+				val responseJsonObject = response.body()
 
 				val gson = Gson()
 				val rows = responseJsonObject?.getAsJsonArray("rows")
@@ -56,15 +58,20 @@ class InitTokenContractsWorker
 
 				Result.success()
 			} else {
-				val msg = tokenContractsResponse.errorBody()?.string()
+				val msg = response.errorBody()?.string()
 				val errorMsg = if (msg.isNullOrEmpty()) {
-					tokenContractsResponse.message()
+					response.message()
 				} else {
 					msg
 				}
 				Timber.d(errorMsg)
 
-				Result.failure()
+				val errorData = Data.Builder()
+					.putString(ProtonError.ERROR_MESSAGE_KEY, errorMsg)
+					.putInt(ProtonError.ERROR_CODE_KEY, response.code())
+					.build()
+
+				Result.failure(errorData)
 			}
 		} catch (e: Exception) {
 			Timber.d(e)

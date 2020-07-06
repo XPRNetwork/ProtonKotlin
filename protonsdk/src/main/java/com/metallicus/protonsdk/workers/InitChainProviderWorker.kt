@@ -2,9 +2,11 @@ package com.metallicus.protonsdk.workers
 
 import android.content.Context
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.metallicus.protonsdk.common.Prefs
+import com.metallicus.protonsdk.common.ProtonError
 import com.metallicus.protonsdk.model.ChainProvider
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.squareup.inject.assisted.Assisted
@@ -46,7 +48,12 @@ class InitChainProviderWorker
 				}
 				Timber.d(errorMsg)
 
-				Result.failure()
+				val errorData = Data.Builder()
+					.putString(ProtonError.ERROR_MESSAGE_KEY, errorMsg)
+					.putInt(ProtonError.ERROR_CODE_KEY, response.code())
+					.build()
+
+				Result.failure(errorData)
 			}
 		} catch (e: Exception) {
 			Timber.d(e)

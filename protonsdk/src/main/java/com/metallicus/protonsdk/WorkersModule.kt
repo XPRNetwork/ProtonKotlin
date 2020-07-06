@@ -59,19 +59,11 @@ class WorkersModule {
 		val initActiveAccount = OneTimeWorkRequest.Builder(InitActiveAccountWorker::class.java)
 			.setConstraints(constraints).build()
 
-		val initWork = workManager
+		workManager
 			.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
-
-		if (prefs.getActiveAccountName().isNotEmpty()) {
-			initWork
-				.then(initTokenContracts)
-				.then(initActiveAccount)
-				.enqueue()
-		} else {
-			initWork
-				.then(initTokenContracts)
-				.enqueue()
-		}
+			.then(initTokenContracts)
+			.then(initActiveAccount)
+			.enqueue()
 
 		// start periodic worker to update exchange rates
 		val updateTokenContractRates = PeriodicWorkRequest.Builder(UpdateTokenContractRatesWorker::class.java, 15, TimeUnit.MINUTES)
@@ -81,9 +73,9 @@ class WorkersModule {
 		workManager.enqueueUniquePeriodicWork(UPDATE_RATES, ExistingPeriodicWorkPolicy.REPLACE, updateTokenContractRates)
 	}
 
-	fun onInitChainProvider(callback: (Boolean) -> Unit) {
+	fun onInitChainProvider(callback: (Boolean, Data?) -> Unit) {
 		if (prefs.hasChainProvider) {
-			callback(true)
+			callback(true, null)
 		} else {
 			val workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(INIT)
 			val workInfoObserver = object : Observer<List<WorkInfo>> {
@@ -92,11 +84,12 @@ class WorkersModule {
 						workInfos.filter { it.tags.contains(InitChainProviderWorker::class.java.name) }
 					if (chainProviderWorkInfos.isEmpty() ||
 						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
-						callback(false)
+						val data = workInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
+						callback(false, data)
 						workInfoLiveData.removeObserver(this)
 					} else if (chainProviderWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
 						prefs.hasChainProvider = true
-						callback(true)
+						callback(true, null)
 						workInfoLiveData.removeObserver(this)
 					}
 				}
@@ -105,9 +98,9 @@ class WorkersModule {
 		}
 	}
 
-	fun onInitTokenContracts(callback: (Boolean) -> Unit) {
+	fun onInitTokenContracts(callback: (Boolean, Data?) -> Unit) {
 		if (prefs.hasTokenContracts) {
-			callback(true)
+			callback(true, null)
 		} else {
 			val workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(INIT)
 			val workInfoObserver = object : Observer<List<WorkInfo>> {
@@ -116,11 +109,12 @@ class WorkersModule {
 						workInfos.filter { it.tags.contains(InitTokenContractsWorker::class.java.name) }
 					if (tokenContractWorkInfos.isEmpty() ||
 						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
-						callback(false)
+						val data = workInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
+						callback(false, data)
 						workInfoLiveData.removeObserver(this)
 					} else if (tokenContractWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
 						prefs.hasTokenContracts = true
-						callback(true)
+						callback(true, null)
 						workInfoLiveData.removeObserver(this)
 					}
 				}
@@ -129,9 +123,9 @@ class WorkersModule {
 		}
 	}
 
-	fun onInitActiveAccount(callback: (Boolean) -> Unit) {
+	fun onInitActiveAccount(callback: (Boolean, Data?) -> Unit) {
 		if (prefs.hasActiveAccount) {
-			callback(true)
+			callback(true, null)
 		} else {
 			val workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(INIT)
 			val workInfoObserver = object : Observer<List<WorkInfo>> {
@@ -140,11 +134,12 @@ class WorkersModule {
 						workInfos.filter { it.tags.contains(InitActiveAccountWorker::class.java.name) }
 					if (activeAccountWorkInfos.isEmpty() ||
 						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
-						callback(false)
+						val data = workInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
+						callback(false, data)
 						workInfoLiveData.removeObserver(this)
 					} else if (activeAccountWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
 						prefs.hasActiveAccount = true
-						callback(true)
+						callback(true, null)
 						workInfoLiveData.removeObserver(this)
 					}
 				}
