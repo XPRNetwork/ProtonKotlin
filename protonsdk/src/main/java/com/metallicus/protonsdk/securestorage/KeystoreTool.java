@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/*
+ * Modifications Copyright (C) 2020 Metallicus, Joey Harward
+ */
+
 package com.metallicus.protonsdk.securestorage;
 
 import android.content.Context;
@@ -55,8 +59,6 @@ import static android.os.Build.VERSION_CODES.P;
 import static com.metallicus.protonsdk.securestorage.SecureStorageException.ExceptionType.CRYPTO_EXCEPTION;
 import static com.metallicus.protonsdk.securestorage.SecureStorageException.ExceptionType.INTERNAL_LIBRARY_EXCEPTION;
 import static com.metallicus.protonsdk.securestorage.SecureStorageException.ExceptionType.KEYSTORE_EXCEPTION;
-
-// Edited by joey-harward on 8/30/19
 
 final class KeystoreTool {
 	private static final String KEY_ALIAS = "ProtonKeyPair";

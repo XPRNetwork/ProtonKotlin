@@ -169,7 +169,7 @@ class AccountModule {
 
 			Resource.success(accountRepository.getChainAccount(accountName))
 		} catch (e: Exception) {
-			Resource.error(e.localizedMessage.orEmpty(), null)
+			Resource.error(e.localizedMessage.orEmpty())
 		}
 	}
 
@@ -182,7 +182,7 @@ class AccountModule {
 		return try {
 			Resource.success(updateAccount(chainId, chainUrl, accountName))
 		} catch (e: Exception) {
-			Resource.error(e.localizedMessage.orEmpty(), null)
+			Resource.error(e.localizedMessage.orEmpty())
 		}
 	}
 
@@ -202,8 +202,11 @@ class AccountModule {
 
 		val accountName = chainAccount.account.accountName
 
+		val updateAccountNameUrl =
+			chainAccount.chainProvider.chainUrl + chainAccount.chainProvider.updateAccountNamePath
+
 		val response = accountRepository.updateAccountName(
-			chainAccount.chainProvider.updateAccountNameUrl,
+			updateAccountNameUrl,
 			accountName,
 			signature,
 			name)
@@ -230,8 +233,11 @@ class AccountModule {
 
 		val accountName = chainAccount.account.accountName
 
+		val updateAccountAvatarUrl =
+			chainAccount.chainProvider.chainUrl + chainAccount.chainProvider.updateAccountAvatarPath
+
 		val response = accountRepository.updateAccountAvatar(
-			chainAccount.chainProvider.updateAccountAvatarUrl,
+			updateAccountAvatarUrl,
 			accountName,
 			signature,
 			imageByteArray)

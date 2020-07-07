@@ -31,7 +31,9 @@ class UpdateTokenContractRatesWorker
 				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
 			}
 
-			val exchangeRatesResponse = tokenContractRepository.fetchExchangeRates(chainProvider.exchangeRateUrl)
+			val exchangeRateUrl = chainProvider.chainUrl + chainProvider.exchangeRatePath
+
+			val exchangeRatesResponse = tokenContractRepository.fetchExchangeRates(exchangeRateUrl)
 			if (exchangeRatesResponse.isSuccessful) {
 				val exchangeRatesJsonArray = exchangeRatesResponse.body()
 				exchangeRatesJsonArray?.forEach {

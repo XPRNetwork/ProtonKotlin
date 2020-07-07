@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/*
+ * Modifications Copyright (C) 2020 Metallicus, Joey Harward
+ */
+
 package com.metallicus.protonsdk.securestorage;
 
 import android.content.Context;
@@ -27,8 +31,6 @@ import androidx.annotation.Nullable;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.metallicus.protonsdk.securestorage.SecureStorageException.ExceptionType.CRYPTO_EXCEPTION;
-
-// Edited by joey-harward on 9/19/18
 
 public final class SecurePreferences {
 	private static String SharedPreferencesName = "SecurePreferences";

@@ -3,6 +3,7 @@ package com.metallicus.protonsdk
 import android.content.Context
 import androidx.lifecycle.*
 import com.google.gson.JsonObject
+import com.metallicus.protonsdk.common.ProtonException
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.common.SingletonHolder
 import com.metallicus.protonsdk.di.DaggerInjector
@@ -41,13 +42,13 @@ class Proton private constructor(context: Context) {
 	}
 
 	private suspend fun getChainProviderAsync() = suspendCoroutine<ChainProvider> { continuation ->
-		workersModule.onInitChainProvider { success ->
+		workersModule.onInitChainProvider { success, data ->
 			if (success) {
 				protonCoroutineScope.launch {
 					continuation.resume(chainProviderModule.getActiveChainProvider())
 				}
 			} else {
-				continuation.resumeWithException(Exception("Initialization Error: No Chain Provider"))
+				continuation.resumeWithException(ProtonException(data))
 			}
 		}
 	}
@@ -58,19 +59,21 @@ class Proton private constructor(context: Context) {
 		try {
 			val chainProvider = getChainProviderAsync()
 			emit(Resource.success(chainProvider))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
 	private suspend fun getTokenContractsAsync() = suspendCoroutine<List<TokenContract>> { continuation ->
-		workersModule.onInitTokenContracts { success ->
+		workersModule.onInitTokenContracts { success, data ->
 			if (success) {
 				protonCoroutineScope.launch {
 					continuation.resume(tokenContractsModule.getTokenContracts())
 				}
 			} else {
-				continuation.resumeWithException(Exception("Initialization Error"))
+				continuation.resumeWithException(ProtonException(data))
 			}
 		}
 	}
@@ -81,17 +84,15 @@ class Proton private constructor(context: Context) {
 		try {
 			val tokenContracts = getTokenContractsAsync()
 			emit(Resource.success(tokenContracts))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), emptyList()))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
 	fun generatePrivateKey(): EosPrivateKey {
 		return EosPrivateKey()
-	}
-
-	fun hasActiveAccount(): Boolean {
-		return accountModule.hasActiveAccount()
 	}
 
 	private suspend fun findAccounts(publicKeyStr: String): Resource<List<Account>> {
@@ -103,8 +104,10 @@ class Proton private constructor(context: Context) {
 				chainProvider.chainUrl,
 				chainProvider.hyperionHistoryUrl,
 				publicKeyStr)
+		} catch (e: ProtonException) {
+			Resource.error(e)
 		} catch (e: Exception) {
-			Resource.error(e.localizedMessage.orEmpty(), emptyList())
+			Resource.error(e.localizedMessage.orEmpty())
 		}
 	}
 
@@ -123,8 +126,10 @@ class Proton private constructor(context: Context) {
 
 			val accounts = findAccounts(publicKeyStr)
 			emit(accounts)
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), emptyList()))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
@@ -134,19 +139,21 @@ class Proton private constructor(context: Context) {
 		try {
 			val chainProvider = getChainProviderAsync()
 			emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
 	private suspend fun getActiveAccountAsync() = suspendCoroutine<ChainAccount> { continuation ->
-		workersModule.onInitActiveAccount { success ->
+		workersModule.onInitActiveAccount { success, data ->
 			if (success) {
 				protonCoroutineScope.launch {
 					continuation.resume(accountModule.getActiveAccount())
 				}
 			} else {
-				continuation.resumeWithException(Exception("Initialization Error"))
+				continuation.resumeWithException(ProtonException(data))
 			}
 		}
 	}
@@ -157,8 +164,10 @@ class Proton private constructor(context: Context) {
 		try {
 			val activeAccount = getActiveAccountAsync()
 			emit(Resource.success(activeAccount))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
@@ -171,8 +180,10 @@ class Proton private constructor(context: Context) {
 					activeAccount.chainProvider.chainId,
 					activeAccount.chainProvider.chainUrl,
 					activeAccount.account.accountName))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
@@ -188,7 +199,10 @@ class Proton private constructor(context: Context) {
 				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
 			}
 
-			tokenContractsModule.updateExchangeRates(activeAccount.chainProvider.exchangeRateUrl, tokenContractsMap)
+			val exchangeRateUrl =
+				activeAccount.chainProvider.chainUrl + activeAccount.chainProvider.exchangeRatePath
+
+			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
 
 			val tokenBalances =
 				currencyBalancesModule.getTokenCurrencyBalances(
@@ -197,8 +211,10 @@ class Proton private constructor(context: Context) {
 					tokenContractsMap)
 
 			emit(tokenBalances)
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
@@ -217,8 +233,10 @@ class Proton private constructor(context: Context) {
 					tokenContract)
 
 			emit(tokenBalance)
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
@@ -237,8 +255,10 @@ class Proton private constructor(context: Context) {
 					symbol)
 
 			emit(actions)
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), emptyList()))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
@@ -249,8 +269,10 @@ class Proton private constructor(context: Context) {
 			val activeAccount = getActiveAccountAsync()
 
 			emit(accountModule.updateAccountName(activeAccount, pin, name))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
@@ -261,8 +283,10 @@ class Proton private constructor(context: Context) {
 			val activeAccount = getActiveAccountAsync()
 
 			emit(accountModule.updateAccountAvatar(activeAccount, pin, byteArray))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 
@@ -280,8 +304,10 @@ class Proton private constructor(context: Context) {
 				toAccount,
 				amount,
 				memo))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty(), null))
+			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
 	}
 }
