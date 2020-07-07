@@ -24,6 +24,7 @@ class InitChainProviderWorker
 		const val CHAIN_PROVIDER_URL = "chainProviderUrl"
 	}
 
+	@Suppress("BlockingMethodInNonBlockingContext")
 	override suspend fun doWork(): Result {
 		val chainProviderUrl = inputData.getString(CHAIN_PROVIDER_URL).orEmpty()
 

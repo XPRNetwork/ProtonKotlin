@@ -23,8 +23,6 @@ import androidx.annotation.Nullable;
 import static com.metallicus.protonsdk.securestorage.SecureStorageException.ExceptionType.CRYPTO_EXCEPTION;
 import static com.metallicus.protonsdk.securestorage.SecureStorageException.ExceptionType.KEYSTORE_EXCEPTION;
 
-// Added by joey-harward on 9/19/18
-
 final class SecretKeyTool {
 	private static final String KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA1";
 	private static final String KEY_ENCRYPTION_ALGORITHM = "AES";

@@ -30,6 +30,7 @@ class InitActiveAccountWorker
 	private val usersInfoTableCode = context.getString(R.string.protonChainUsersInfoTableCode)
 	private val usersInfoTableName = context.getString(R.string.protonChainUsersInfoTableName)
 
+	@Suppress("BlockingMethodInNonBlockingContext")
 	override suspend fun doWork(): Result {
 		return try {
 			val chainId = prefs.activeChainId

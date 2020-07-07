@@ -10,6 +10,7 @@ class ProtonError(
 		const val ERROR_MESSAGE_KEY = "errorMessage"
 		const val ERROR_CODE_KEY = "errorCode"
 
+		// Error Codes
 		const val NO_ERROR = 0
 		const val DEFAULT_ERROR = -1
 		const val ACCOUNT_NOT_FOUND = -2

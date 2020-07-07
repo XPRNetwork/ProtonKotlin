@@ -29,6 +29,7 @@ class InitTokenContractsWorker
 	private val protonChainTokensTableCode = context.getString(R.string.protonChainTokensTableCode)
 	private val protonChainTokensTableName = context.getString(R.string.protonChainTokensTableName)
 
+	@Suppress("BlockingMethodInNonBlockingContext")
 	override suspend fun doWork(): Result {
 		return try {
 			val chainProvider = chainProviderRepository.getChainProvider(prefs.activeChainId)
