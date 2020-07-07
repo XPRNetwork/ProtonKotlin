@@ -5,7 +5,6 @@ import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.metallicus.protonsdk.R
-import com.metallicus.protonsdk.api.LiveDataCallAdapterFactory
 import com.metallicus.protonsdk.api.ProtonChainService
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
@@ -94,7 +93,6 @@ class ProtonModule {
 		return Retrofit.Builder()
 			.baseUrl(context.getString(R.string.defaultProtonChainUrl))
 			.addConverterFactory(GsonConverterFactory.create(gson))
-			.addCallAdapterFactory(LiveDataCallAdapterFactory())
 			.client(httpClient.build())
 			.build()
 			.create(ProtonChainService::class.java)
