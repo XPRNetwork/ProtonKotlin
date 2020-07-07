@@ -24,8 +24,8 @@ data class ChainProvider(
 	@SerializedName("systemTokenSymbol") val systemTokenSymbol: String,
 	@SerializedName("systemTokenContract") val systemTokenContract: String,
 
-	@SerializedName("createAccountUrl") val createAccountUrl: String,
-	@SerializedName("updateAccountAvatarUrl") val updateAccountAvatarUrl: String,
-	@SerializedName("updateAccountNameUrl") val updateAccountNameUrl: String,
-	@SerializedName("exchangeRateUrl") val exchangeRateUrl: String
+	@SerializedName("createAccountPath") val createAccountPath: String,
+	@SerializedName("updateAccountAvatarPath") val updateAccountAvatarPath: String,
+	@SerializedName("updateAccountNamePath") val updateAccountNamePath: String,
+	@SerializedName("exchangeRatePath") val exchangeRatePath: String
 )

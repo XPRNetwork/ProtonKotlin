@@ -2,9 +2,11 @@ package com.metallicus.protonsdk.workers
 
 import android.content.Context
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.metallicus.protonsdk.R
 import com.metallicus.protonsdk.common.Prefs
+import com.metallicus.protonsdk.common.ProtonError
 import com.metallicus.protonsdk.model.AccountContact
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
@@ -28,6 +30,7 @@ class InitActiveAccountWorker
 	private val usersInfoTableCode = context.getString(R.string.protonChainUsersInfoTableCode)
 	private val usersInfoTableName = context.getString(R.string.protonChainUsersInfoTableName)
 
+	@Suppress("BlockingMethodInNonBlockingContext")
 	override suspend fun doWork(): Result {
 		return try {
 			val chainId = prefs.activeChainId
@@ -85,7 +88,12 @@ class InitActiveAccountWorker
 
 				Timber.d(errorMsg)
 
-				Result.failure()
+				val errorData = Data.Builder()
+					.putString(ProtonError.ERROR_MESSAGE_KEY, errorMsg)
+					.putInt(ProtonError.ERROR_CODE_KEY, ProtonError.ACCOUNT_NOT_FOUND)
+					.build()
+
+				Result.failure(errorData)
 			}
 		} catch (e: Exception) {
 			Timber.d(e)

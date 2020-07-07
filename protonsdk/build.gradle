@@ -21,8 +21,8 @@ android {
 		minSdkVersion 21
 		targetSdkVersion 30
 
-		versionCode 6
-		versionName "0.4.0"
+		versionCode 9
+		versionName "0.4.4"
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		consumerProguardFiles 'consumer-rules.pro'
@@ -100,7 +100,7 @@ project.afterEvaluate {
 			aar(MavenPublication) {
 				groupId = 'com.metallicus'
 				artifactId 'protonsdk'
-				version = '0.4.0'
+				version = android.defaultConfig.versionName
 
 				artifact bundleDebugAar
 

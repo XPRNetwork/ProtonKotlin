@@ -121,10 +121,10 @@ class ActionsModule {
 					msg
 				}
 
-				Resource.error(errorMsg, null)
+				Resource.error(errorMsg)
 			}
 		} catch (e: Exception) {
-			Resource.error(e.localizedMessage.orEmpty(), null)
+			Resource.error(e.localizedMessage.orEmpty())
 		}
 	}
 
@@ -232,7 +232,7 @@ class ActionsModule {
 							msg
 						}
 
-						Resource.error(errorMsg, null)
+						Resource.error(errorMsg)
 					}
 				} else {
 					val msg = jsonToBinResponse.errorBody()?.string()
@@ -242,7 +242,7 @@ class ActionsModule {
 						msg
 					}
 
-					Resource.error(errorMsg, null)
+					Resource.error(errorMsg)
 				}
 			} else {
 				val msg = jsonToBinResponse.errorBody()?.string()
@@ -252,10 +252,10 @@ class ActionsModule {
 					msg
 				}
 
-				Resource.error(errorMsg, null)
+				Resource.error(errorMsg)
 			}
 		} catch (e: Exception) {
-			Resource.error(e.localizedMessage.orEmpty(), null)
+			Resource.error(e.localizedMessage.orEmpty())
 		}
 	}
 }
