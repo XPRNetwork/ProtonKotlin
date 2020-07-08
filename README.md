@@ -31,26 +31,40 @@ dependencies {
 The main class that you will interface with is `Proton` which
 encapsulates all the needed functions.
 
-To initialize make sure you use an appropriate MainNet or
-TestNet chain provider url (normally during app startup).
+First you will need to initialize with either a MainNet or TestNet url.
+
+MainNet:
+```
+https://api.protonchain.com
+```
+
+TestNet:
+```
+https://api-dev.protonchain.com
+```
+
+The best place is during app startup:
 
 ```kotlin
 override fun onCreate() {
     super.onCreate()
     
-    Proton.getInstance(this).initialize(protonChainProviderUrl)
+    Proton.getInstance(this).initialize(protonChainUrl)
 }
 ```
 
-MainNet Chain Provider Url:
-```
-https://api-dev.protonchain.com/v1/chain/info
-```
+Once initialized you will be able to:
+- Fetch Chain Provider info
+- Fetch Token Contracts
+- Find Proton accounts given a public or private key
+- Generate and/or securely store a private key
+- Set and store an "active" account
 
-TestNet Chain Provider Url:
-```
-https://api-dev.protonchain.com/v1/chain/info
-```
+Once an active account has been set you can:
+- Fetch token balances (with exchange rates) for active account
+- Fetch transaction history for active account
+- Update account name and avatar
+- Transfer tokens from active account to another account
 
 # Credits
 

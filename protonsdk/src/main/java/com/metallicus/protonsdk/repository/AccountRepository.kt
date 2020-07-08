@@ -32,7 +32,7 @@ class AccountRepository @Inject constructor(
 
 	suspend fun updateAccountName(updateAccountNameUrl: String, accountName: String, signature: String, name: String): Response<JsonObject> {
 		val url = updateAccountNameUrl.replace("{{account}}", accountName)
-		return protonChainService.updateUserName(url, UserNameBody(signature, name))
+		return protonChainService.updateUserName(url, "Bearer $signature", UserNameBody(name))
 	}
 
 	suspend fun updateAccountAvatar(updateAccountAvatarUrl: String, accountName: String, signature: String, imageByteArray: ByteArray): Response<JsonObject> {
@@ -41,12 +41,11 @@ class AccountRepository @Inject constructor(
 		val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
 
 		builder
-			.addFormDataPart("signature", signature)
 			.addFormDataPart("img", "img.jpeg", imageByteArray.toRequestBody("image/jpeg".toMediaTypeOrNull()))
 
 		val multipartBody = builder.build()
 
-		return protonChainService.uploadUserAvatar(url, multipartBody)
+		return protonChainService.uploadUserAvatar(url, "Bearer $signature", multipartBody)
 	}
 
 	suspend fun getChainAccount(accountName: String): ChainAccount {

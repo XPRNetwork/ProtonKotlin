@@ -37,7 +37,7 @@ class WorkersModule {
 		const val UPDATE_RATES = "WORKER_UPDATE_RATES"
 	}
 
-	fun init(chainProviderUrl: String) {
+	fun init(protonChainUrl: String) {
 		workManager.pruneWork()
 
 		prefs.clearInit()
@@ -47,11 +47,11 @@ class WorkersModule {
 			.build()
 
 		val chainProviderInputData = Data.Builder()
-			.putString(InitChainProviderWorker.CHAIN_PROVIDER_URL, chainProviderUrl)
+			.putString(InitChainProviderWorker.PROTON_CHAIN_URL, protonChainUrl)
 			.build()
 
 		val initChainProvider = OneTimeWorkRequest.Builder(InitChainProviderWorker::class.java)
-			.setConstraints(constraints).setInitialDelay(10, TimeUnit.SECONDS).setInputData(chainProviderInputData).build()
+			.setConstraints(constraints).setInputData(chainProviderInputData).build()
 
 		val initTokenContracts = OneTimeWorkRequest.Builder(InitTokenContractsWorker::class.java)
 			.setConstraints(constraints).build()

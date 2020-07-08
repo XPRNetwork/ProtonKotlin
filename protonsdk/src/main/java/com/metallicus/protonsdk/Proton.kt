@@ -37,8 +37,8 @@ class Proton private constructor(context: Context) {
 
 	private val protonCoroutineScope = CoroutineScope(Dispatchers.Default)
 
-	fun initialize(chainProviderUrl: String) {
-		workersModule.init(chainProviderUrl)
+	fun initialize(protonChainUrl: String) {
+		workersModule.init(protonChainUrl)
 	}
 
 	private suspend fun getChainProviderAsync() = suspendCoroutine<ChainProvider> { continuation ->

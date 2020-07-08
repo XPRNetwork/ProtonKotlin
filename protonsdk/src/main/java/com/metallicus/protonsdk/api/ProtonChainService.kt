@@ -19,12 +19,12 @@ data class TableRowsBody(
 	val upper_bound: String = "",
 	val limit: Long = 1,
 	val json: Boolean = true)
-data class UserNameBody(val signature: String, val name: String)
+data class UserNameBody(val name: String)
 data class JsonToBinBody(val code: String, val action: String, val args: JsonElement)
 data class RequiredKeysBody(val transaction: SignedTransaction, val available_keys: List<String>)
 
 interface ProtonChainService {
-	@GET
+	@GET//("/v1/chain/info")
 	suspend fun getChainProvider(@Url url: String): Response<JsonObject>
 
 	@GET
@@ -33,11 +33,13 @@ interface ProtonChainService {
 	@PUT
 	suspend fun updateUserName(
 		@Url url: String,
+		@Header("Authorization") signature: String,
 		@Body body: UserNameBody): Response<JsonObject>
 
 	@PUT
 	suspend fun uploadUserAvatar(
 		@Url url: String,
+		@Header("Authorization") signature: String,
 		@Body body: MultipartBody): Response<JsonObject>
 
 	@GET//("/v2/state/get_key_accounts?public_key=")

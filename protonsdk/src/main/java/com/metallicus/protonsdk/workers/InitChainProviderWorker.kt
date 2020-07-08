@@ -21,15 +21,15 @@ class InitChainProviderWorker
 	private val chainProviderRepository: ChainProviderRepository
 ) : CoroutineWorker(context, params) {
 	companion object {
-		const val CHAIN_PROVIDER_URL = "chainProviderUrl"
+		const val PROTON_CHAIN_URL = "protonChainUrl"
 	}
 
 	@Suppress("BlockingMethodInNonBlockingContext")
 	override suspend fun doWork(): Result {
-		val chainProviderUrl = inputData.getString(CHAIN_PROVIDER_URL).orEmpty()
+		val protonChainUrl = inputData.getString(PROTON_CHAIN_URL).orEmpty()
 
 		return try {
-			val response = chainProviderRepository.fetchChainProvider(chainProviderUrl)
+			val response = chainProviderRepository.fetchChainProvider(protonChainUrl)
 			if (response.isSuccessful) {
 				chainProviderRepository.removeAll()
 
