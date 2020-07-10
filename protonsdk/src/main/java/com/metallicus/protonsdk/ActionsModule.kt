@@ -41,6 +41,9 @@ import com.metallicus.protonsdk.repository.ActionRepository
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Helper class used for [Action] based operations
+ */
 class ActionsModule {
 	@Inject
 	lateinit var context: Context

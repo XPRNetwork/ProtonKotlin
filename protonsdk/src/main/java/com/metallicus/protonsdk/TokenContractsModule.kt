@@ -29,6 +29,9 @@ import com.metallicus.protonsdk.repository.TokenContractRepository
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Helper class used for [TokenContract] based operations
+ */
 class TokenContractsModule {
 	@Inject
 	lateinit var context: Context

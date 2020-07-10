@@ -28,6 +28,9 @@ import com.metallicus.protonsdk.model.ChainProvider
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import javax.inject.Inject
 
+/**
+ * Helper class used for [ChainProvider] based operations
+ */
 class ChainProviderModule {
 	@Inject
 	lateinit var context: Context

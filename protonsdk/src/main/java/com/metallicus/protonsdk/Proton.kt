@@ -37,6 +37,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Main class used for handling Proton Chain operations
+ *
+ * @param	context	[Context] context used for construction
+ */
 class Proton private constructor(context: Context) {
 	init {
 		if (BuildConfig.DEBUG) {
@@ -58,6 +63,14 @@ class Proton private constructor(context: Context) {
 
 	private val protonCoroutineScope = CoroutineScope(Dispatchers.Default)
 
+	/**
+	 * Initialization for [Proton]
+	 *
+	 * This should be the first function called. This will start the process of retrieving
+	 * the [ChainProvider] and [TokenContract]s.
+	 *
+	 * @param	protonChainUrl	[String] Mainnet or Testnet Chain Url
+	 */
 	fun initialize(protonChainUrl: String) {
 		workersModule.init(protonChainUrl)
 	}

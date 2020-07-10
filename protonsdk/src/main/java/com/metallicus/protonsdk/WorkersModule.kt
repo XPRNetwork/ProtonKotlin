@@ -30,6 +30,9 @@ import com.metallicus.protonsdk.workers.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+/**
+ * Helper class used to facilitate WorkManager operations
+ */
 class WorkersModule {
 	@Inject
 	lateinit var context: Context

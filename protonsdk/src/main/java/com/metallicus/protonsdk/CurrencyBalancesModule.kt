@@ -22,13 +22,15 @@
 package com.metallicus.protonsdk
 
 import android.content.Context
-import com.google.gson.JsonArray
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.CurrencyBalanceRepository
 import javax.inject.Inject
 
+/**
+ * Helper class used for [CurrencyBalance] based operations
+ */
 class CurrencyBalancesModule {
 	@Inject
 	lateinit var context: Context

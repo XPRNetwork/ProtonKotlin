@@ -36,6 +36,9 @@ import timber.log.Timber
 import java.nio.charset.Charset
 import javax.inject.Inject
 
+/**
+ * Helper class used for [Account] based operations
+ */
 class AccountModule {
 	@Inject
 	lateinit var context: Context
