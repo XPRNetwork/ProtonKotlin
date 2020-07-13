@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2020 Proton Chain LLC, Delaware
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.metallicus.protonsdk
 
 import android.content.Context
@@ -9,6 +30,9 @@ import com.metallicus.protonsdk.workers.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+/**
+ * Helper class used to facilitate WorkManager operations
+ */
 class WorkersModule {
 	@Inject
 	lateinit var context: Context
@@ -37,7 +61,7 @@ class WorkersModule {
 		const val UPDATE_RATES = "WORKER_UPDATE_RATES"
 	}
 
-	fun init(chainProviderUrl: String) {
+	fun init(protonChainUrl: String) {
 		workManager.pruneWork()
 
 		prefs.clearInit()
@@ -47,11 +71,11 @@ class WorkersModule {
 			.build()
 
 		val chainProviderInputData = Data.Builder()
-			.putString(InitChainProviderWorker.CHAIN_PROVIDER_URL, chainProviderUrl)
+			.putString(InitChainProviderWorker.PROTON_CHAIN_URL, protonChainUrl)
 			.build()
 
 		val initChainProvider = OneTimeWorkRequest.Builder(InitChainProviderWorker::class.java)
-			.setConstraints(constraints).setInitialDelay(10, TimeUnit.SECONDS).setInputData(chainProviderInputData).build()
+			.setConstraints(constraints).setInputData(chainProviderInputData).build()
 
 		val initTokenContracts = OneTimeWorkRequest.Builder(InitTokenContractsWorker::class.java)
 			.setConstraints(constraints).build()

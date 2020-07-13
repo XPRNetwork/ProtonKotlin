@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2020 Proton Chain LLC, Delaware
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.metallicus.protonsdk.api
 
 import com.google.gson.JsonArray
@@ -19,12 +40,12 @@ data class TableRowsBody(
 	val upper_bound: String = "",
 	val limit: Long = 1,
 	val json: Boolean = true)
-data class UserNameBody(val signature: String, val name: String)
+data class UserNameBody(val name: String)
 data class JsonToBinBody(val code: String, val action: String, val args: JsonElement)
 data class RequiredKeysBody(val transaction: SignedTransaction, val available_keys: List<String>)
 
 interface ProtonChainService {
-	@GET
+	@GET//("/v1/chain/info")
 	suspend fun getChainProvider(@Url url: String): Response<JsonObject>
 
 	@GET
@@ -33,11 +54,13 @@ interface ProtonChainService {
 	@PUT
 	suspend fun updateUserName(
 		@Url url: String,
+		@Header("Authorization") signature: String,
 		@Body body: UserNameBody): Response<JsonObject>
 
 	@PUT
 	suspend fun uploadUserAvatar(
 		@Url url: String,
+		@Header("Authorization") signature: String,
 		@Body body: MultipartBody): Response<JsonObject>
 
 	@GET//("/v2/state/get_key_accounts?public_key=")
