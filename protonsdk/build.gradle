@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 
 android {
 	compileSdkVersion 30
@@ -21,8 +23,8 @@ android {
 		minSdkVersion 21
 		targetSdkVersion 30
 
-		versionCode 10
-		versionName "0.4.5"
+		versionCode 11
+		versionName "0.4.6"
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		consumerProguardFiles 'consumer-rules.pro'
@@ -37,7 +39,7 @@ android {
 }
 
 dependencies {
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 	// Unit Testing
 	testImplementation "junit:junit:4.13"

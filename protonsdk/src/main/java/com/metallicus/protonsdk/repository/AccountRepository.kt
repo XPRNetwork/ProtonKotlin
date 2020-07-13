@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2020 Proton Chain LLC, Delaware
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.metallicus.protonsdk.repository
 
 import com.google.gson.JsonObject
@@ -32,7 +53,7 @@ class AccountRepository @Inject constructor(
 
 	suspend fun updateAccountName(updateAccountNameUrl: String, accountName: String, signature: String, name: String): Response<JsonObject> {
 		val url = updateAccountNameUrl.replace("{{account}}", accountName)
-		return protonChainService.updateUserName(url, UserNameBody(signature, name))
+		return protonChainService.updateUserName(url, "Bearer $signature", UserNameBody(name))
 	}
 
 	suspend fun updateAccountAvatar(updateAccountAvatarUrl: String, accountName: String, signature: String, imageByteArray: ByteArray): Response<JsonObject> {
@@ -41,12 +62,11 @@ class AccountRepository @Inject constructor(
 		val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
 
 		builder
-			.addFormDataPart("signature", signature)
 			.addFormDataPart("img", "img.jpeg", imageByteArray.toRequestBody("image/jpeg".toMediaTypeOrNull()))
 
 		val multipartBody = builder.build()
 
-		return protonChainService.uploadUserAvatar(url, multipartBody)
+		return protonChainService.uploadUserAvatar(url, "Bearer $signature", multipartBody)
 	}
 
 	suspend fun getChainAccount(accountName: String): ChainAccount {

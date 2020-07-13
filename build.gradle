@@ -1,5 +1,6 @@
 buildscript {
-	ext.kotlinVersion = '1.3.72'
+	ext.kotlin_version = '1.3.72'
+	ext.dokka_version = '0.10.1'
 
 	repositories {
 		jcenter()
@@ -8,7 +9,10 @@ buildscript {
 
 	dependencies {
 		classpath 'com.android.tools.build:gradle:4.0.0'
-		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+		classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
+		classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 	}
 }
 
@@ -16,6 +20,36 @@ allprojects {
 	repositories {
 		jcenter()
 		google()
+	}
+
+	// Dokka
+	apply plugin: 'org.jetbrains.dokka'
+	dokka {
+		outputFormat = 'html'
+		outputDirectory = "$buildDir/dokka"
+
+		configuration {
+			perPackageOption {
+				prefix = "com.metallicus.protonsdk.api"
+				suppress = true
+			}
+			perPackageOption {
+				prefix = "com.metallicus.protonsdk.db"
+				suppress = true
+			}
+			perPackageOption {
+				prefix = "com.metallicus.protonsdk.di"
+				suppress = true
+			}
+			perPackageOption {
+				prefix = "com.metallicus.protonsdk.repository"
+				suppress = true
+			}
+			perPackageOption {
+				prefix = "com.metallicus.protonsdk.worker"
+				suppress = true
+			}
+		}
 	}
 }
 
