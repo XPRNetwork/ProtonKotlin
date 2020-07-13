@@ -67,9 +67,9 @@ class Proton private constructor(context: Context) {
 	 * Initialization for [Proton]
 	 *
 	 * This should be the first function called. This will start the process of retrieving
-	 * the [ChainProvider] and [TokenContract]s.
+	 * the [ChainProvider] and [TokenContract]s given a valid Proton Chain URL
 	 *
-	 * @param	protonChainUrl	[String] Mainnet or Testnet Chain Url
+	 * @param	protonChainUrl	Mainnet or Testnet Proton Chain Url
 	 */
 	fun initialize(protonChainUrl: String) {
 		workersModule.init(protonChainUrl)
@@ -87,6 +87,13 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
+	/**
+	 * Get the [ChainProvider] info
+	 *
+	 * This will return the [ChainProvider] info given the Proton Chain URl provided during initialization.
+	 *
+	 * @return	LiveData<Resource<[ChainProvider]>>
+	 */
 	fun getChainProvider(): LiveData<Resource<ChainProvider>> = liveData {
 		emit(Resource.loading())
 

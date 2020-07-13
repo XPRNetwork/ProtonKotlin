@@ -43,8 +43,7 @@ TestNet:
 https://api-dev.protonchain.com
 ```
 
-The best place is during app startup:
-
+This is recommended during app startup.
 ```kotlin
 override fun onCreate() {
     super.onCreate()
@@ -65,6 +64,27 @@ Once an active account has been set you can:
 - Fetch transaction history for active account
 - Update account name and avatar
 - Transfer tokens from active account to another account
+
+Most of these functions require network connectivity and will return a LiveData resource.  
+This LiveData can be observed and will emit the current state of the action.
+
+Here is an example of fetching Chain Provider info with the appropriate observable states:
+```kotlin
+Proton.getInstance(context).getChainProvider().observe(this, Observer { chainProviderResource ->
+    when (chainProviderResource?.status) {
+        Status.SUCCESS -> {
+            // Handle success state
+        }
+        Status.ERROR -> {
+            // Handle error state
+        }
+        Status.LOADING -> {
+            // Handle loading state
+        }
+    }
+})
+```
+You can follow this format for most of the functions called within `Proton`.
 
 # Credits
 
