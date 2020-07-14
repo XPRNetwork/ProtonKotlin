@@ -1,0 +1,89 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Resource - protonsdk</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">protonsdk</a>&nbsp;/&nbsp;<a href="../index.html">com.metallicus.protonsdk.common</a>&nbsp;/&nbsp;<a href="./index.html">Resource</a><br/>
+<br/>
+<h1>Resource</h1>
+<code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">Resource</span><span class="symbol">&lt;</span><span class="keyword">out</span>&nbsp;<span class="identifier">T</span><span class="symbol">&gt;</span></code>
+<p>A generic class that a loading status, data, and optional message.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="-init-.html">&lt;init&gt;</a></h4>
+</td>
+<td>
+<p>A generic class that a loading status, data, and optional message.</p>
+<code><span class="identifier">Resource</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.common.Resource$<init>(com.metallicus.protonsdk.common.Status, com.metallicus.protonsdk.common.Resource.T, kotlin.String, kotlin.Int)/status">status</span><span class="symbol">:</span>&nbsp;<a href="../-status/index.html"><span class="identifier">Status</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.common.Resource$<init>(com.metallicus.protonsdk.common.Status, com.metallicus.protonsdk.common.Resource.T, kotlin.String, kotlin.Int)/data">data</span><span class="symbol">:</span>&nbsp;<span class="identifier">T</span><span class="symbol">?</span><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.common.Resource$<init>(com.metallicus.protonsdk.common.Status, com.metallicus.protonsdk.common.Resource.T, kotlin.String, kotlin.Int)/message">message</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.common.Resource$<init>(com.metallicus.protonsdk.common.Status, com.metallicus.protonsdk.common.Resource.T, kotlin.String, kotlin.Int)/code">code</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">?</span><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="code.html">code</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">code</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="data.html">data</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">data</span><span class="symbol">: </span><span class="identifier">T</span><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="message.html">message</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">message</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="status.html">status</a></h4>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">status</span><span class="symbol">: </span><a href="../-status/index.html"><span class="identifier">Status</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Companion Object Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="error.html">error</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span> <span class="identifier">error</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.common.Resource.Companion$error(kotlin.String)/msg">msg</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span></code><br/>
+<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span> <span class="identifier">error</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.common.Resource.Companion$error(kotlin.String, kotlin.Int)/msg">msg</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.common.Resource.Companion$error(kotlin.String, kotlin.Int)/code">code</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span></code><br/>
+<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span> <span class="identifier">error</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.common.Resource.Companion$error(com.metallicus.protonsdk.common.ProtonError)/error">error</span><span class="symbol">:</span>&nbsp;<a href="../-proton-error/index.html"><span class="identifier">ProtonError</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span></code><br/>
+<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span> <span class="identifier">error</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.common.Resource.Companion$error(com.metallicus.protonsdk.common.ProtonException)/exception">exception</span><span class="symbol">:</span>&nbsp;<a href="../-proton-exception/index.html"><span class="identifier">ProtonException</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="loading.html">loading</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span> <span class="identifier">loading</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="success.html">success</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span> <span class="identifier">success</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.common.Resource.Companion$success(com.metallicus.protonsdk.common.Resource.Companion.success.T)/data">data</span><span class="symbol">:</span>&nbsp;<span class="identifier">T</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

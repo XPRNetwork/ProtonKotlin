@@ -1,0 +1,15 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>EcSignature.toCanonicalised - protonsdk</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">protonsdk</a>&nbsp;/&nbsp;<a href="../index.html">com.metallicus.protonsdk.eosio.commander.ec</a>&nbsp;/&nbsp;<a href="index.html">EcSignature</a>&nbsp;/&nbsp;<a href="./to-canonicalised.html">toCanonicalised</a><br/>
+<br/>
+<h1>toCanonicalised</h1>
+<a name="com.metallicus.protonsdk.eosio.commander.ec.EcSignature$toCanonicalised()"></a>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">toCanonicalised</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="index.html"><span class="identifier">EcSignature</span></a><span class="symbol">!</span></code>
+<p>Will automatically adjust the S component to be less than or equal to half the curve order, if necessary. This is required because for every signature (r,s) the signature (r, -s (mod N)) is a valid signature of the same message. However, we dislike the ability to modify the bits of a Bitcoin transaction after it's been signed, as that violates various assumed invariants. Thus in future only one of those forms will be considered legal and the other will be banned.</p>
+</BODY>
+</HTML>

@@ -1,0 +1,13 @@
+$dokka.format:html
+$dokka.linkExtension:html
+
+com.metallicus.protonsdk
+com.metallicus.protonsdk.common
+com.metallicus.protonsdk.eosio.commander
+com.metallicus.protonsdk.eosio.commander.digest
+com.metallicus.protonsdk.eosio.commander.ec
+com.metallicus.protonsdk.eosio.commander.model.chain
+com.metallicus.protonsdk.eosio.commander.model.types
+com.metallicus.protonsdk.model
+com.metallicus.protonsdk.securestorage
+com.metallicus.protonsdk.workers
