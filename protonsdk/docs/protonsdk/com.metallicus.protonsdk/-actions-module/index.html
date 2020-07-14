@@ -1,0 +1,86 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>ActionsModule - protonsdk</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">protonsdk</a>&nbsp;/&nbsp;<a href="../index.html">com.metallicus.protonsdk</a>&nbsp;/&nbsp;<a href="./index.html">ActionsModule</a><br/>
+<br/>
+<h1>ActionsModule</h1>
+<code><span class="keyword">class </span><span class="identifier">ActionsModule</span></code>
+<p>Helper class used for <a href="../../com.metallicus.protonsdk.eosio.commander.model.chain/-action/index.html">Action</a> based operations</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="-init-.html">&lt;init&gt;</a></h4>
+</td>
+<td>
+<p>Helper class used for <a href="../../com.metallicus.protonsdk.eosio.commander.model.chain/-action/index.html">Action</a> based operations</p>
+<code><span class="identifier">ActionsModule</span><span class="symbol">(</span><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="account-contact-repository.html">accountContactRepository</a></h4>
+</td>
+<td>
+<code><span class="keyword">lateinit</span> <span class="keyword">var </span><span class="identifier">accountContactRepository</span><span class="symbol">: </span><span class="identifier">AccountContactRepository</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="action-repository.html">actionRepository</a></h4>
+</td>
+<td>
+<code><span class="keyword">lateinit</span> <span class="keyword">var </span><span class="identifier">actionRepository</span><span class="symbol">: </span><span class="identifier">ActionRepository</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="context.html">context</a></h4>
+</td>
+<td>
+<code><span class="keyword">lateinit</span> <span class="keyword">var </span><span class="identifier">context</span><span class="symbol">: </span><a href="https://developer.android.com/reference/android/content/Context.html"><span class="identifier">Context</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="prefs.html">prefs</a></h4>
+</td>
+<td>
+<code><span class="keyword">lateinit</span> <span class="keyword">var </span><span class="identifier">prefs</span><span class="symbol">: </span><a href="../../com.metallicus.protonsdk.common/-prefs/index.html"><span class="identifier">Prefs</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="secure-keys.html">secureKeys</a></h4>
+</td>
+<td>
+<code><span class="keyword">lateinit</span> <span class="keyword">var </span><span class="identifier">secureKeys</span><span class="symbol">: </span><a href="../../com.metallicus.protonsdk.common/-secure-keys/index.html"><span class="identifier">SecureKeys</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="get-actions.html">getActions</a></h4>
+</td>
+<td>
+<code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">getActions</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$getActions(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/chainUrl">chainUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$getActions(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/hyperionHistoryUrl">hyperionHistoryUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$getActions(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/accountName">accountName</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$getActions(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/contract">contract</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$getActions(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/symbol">symbol</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-action/index.html"><span class="identifier">Action</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="transfer-tokens.html">transferTokens</a></h4>
+</td>
+<td>
+<code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">transferTokens</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/chainUrl">chainUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/pin">pin</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/contract">contract</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/from">from</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/to">to</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/quantity">quantity</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.ActionsModule$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/memo">memo</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><span class="identifier">JsonObject</span><span class="symbol">&gt;</span></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

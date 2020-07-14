@@ -1,0 +1,141 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Proton - protonsdk</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">protonsdk</a>&nbsp;/&nbsp;<a href="../index.html">com.metallicus.protonsdk</a>&nbsp;/&nbsp;<a href="./index.html">Proton</a><br/>
+<br/>
+<h1>Proton</h1>
+<code><span class="keyword">class </span><span class="identifier">Proton</span></code>
+<p>Main class used for handling Proton Chain operations</p>
+<h3>Parameters</h3>
+<p><a name="context"></a>
+<code>context</code> - <a href="https://developer.android.com/reference/android/content/Context.html">Context</a> context used for construction</p>
+<h3>Types</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="-companion.html">Companion</a></h4>
+</td>
+<td>
+<code><span class="keyword">companion</span> <span class="keyword">object </span><span class="identifier">Companion</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../../com.metallicus.protonsdk.common/-singleton-holder/index.html"><span class="identifier">SingletonHolder</span></a><span class="symbol">&lt;</span><a href="./index.html"><span class="identifier">Proton</span></a><span class="symbol">,</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Context.html"><span class="identifier">Context</span></a><span class="symbol">&gt;</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="find-accounts-for-private-key.html">findAccountsForPrivateKey</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">findAccountsForPrivateKey</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$findAccountsForPrivateKey(kotlin.String)/privateKeyStr">privateKeyStr</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-account/index.html"><span class="identifier">Account</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="find-accounts-for-public-key.html">findAccountsForPublicKey</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">findAccountsForPublicKey</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$findAccountsForPublicKey(kotlin.String)/publicKeyStr">publicKeyStr</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-account/index.html"><span class="identifier">Account</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="generate-private-key.html">generatePrivateKey</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">generatePrivateKey</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.metallicus.protonsdk.eosio.commander.ec/-eos-private-key/index.html"><span class="identifier">EosPrivateKey</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="get-active-account.html">getActiveAccount</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getActiveAccount</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-chain-account/index.html"><span class="identifier">ChainAccount</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="get-active-account-actions.html">getActiveAccountActions</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getActiveAccountActions</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$getActiveAccountActions(kotlin.String, kotlin.String)/contract">contract</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.Proton$getActiveAccountActions(kotlin.String, kotlin.String)/symbol">symbol</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-action/index.html"><span class="identifier">Action</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="get-active-account-token-balance.html">getActiveAccountTokenBalance</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getActiveAccountTokenBalance</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$getActiveAccountTokenBalance(kotlin.String)/tokenContractId">tokenContractId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-token-currency-balance/index.html"><span class="identifier">TokenCurrencyBalance</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="get-active-account-token-balances.html">getActiveAccountTokenBalances</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getActiveAccountTokenBalances</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-token-currency-balance/index.html"><span class="identifier">TokenCurrencyBalance</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="get-chain-provider.html">getChainProvider</a></h4>
+</td>
+<td>
+<p>Get the <a href="../../com.metallicus.protonsdk.model/-chain-provider/index.html">ChainProvider</a> info</p>
+<code><span class="keyword">fun </span><span class="identifier">getChainProvider</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-chain-provider/index.html"><span class="identifier">ChainProvider</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="get-token-contracts.html">getTokenContracts</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getTokenContracts</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-token-contract/index.html"><span class="identifier">TokenContract</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="initialize.html">initialize</a></h4>
+</td>
+<td>
+<p>Initialization for <a href="./index.html">Proton</a></p>
+<code><span class="keyword">fun </span><span class="identifier">initialize</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$initialize(kotlin.String)/protonChainUrl">protonChainUrl</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="refresh-active-account.html">refreshActiveAccount</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">refreshActiveAccount</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-chain-account/index.html"><span class="identifier">ChainAccount</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="set-active-account.html">setActiveAccount</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">setActiveAccount</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$setActiveAccount(com.metallicus.protonsdk.model.ActiveAccount)/activeAccount">activeAccount</span><span class="symbol">:</span>&nbsp;<a href="../../com.metallicus.protonsdk.model/-active-account/index.html"><span class="identifier">ActiveAccount</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-chain-account/index.html"><span class="identifier">ChainAccount</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="transfer-tokens.html">transferTokens</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">transferTokens</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/pin">pin</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.Proton$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/contract">contract</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.Proton$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/toAccount">toAccount</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.Proton$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/amount">amount</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.Proton$transferTokens(kotlin.String, kotlin.String, kotlin.String, kotlin.String, kotlin.String)/memo">memo</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><span class="identifier">JsonObject</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="update-account-avatar.html">updateAccountAvatar</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">updateAccountAvatar</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$updateAccountAvatar(kotlin.String, kotlin.ByteArray)/pin">pin</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.Proton$updateAccountAvatar(kotlin.String, kotlin.ByteArray)/byteArray">byteArray</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-chain-account/index.html"><span class="identifier">ChainAccount</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="update-account-name.html">updateAccountName</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">updateAccountName</span><span class="symbol">(</span><span class="identifier" id="com.metallicus.protonsdk.Proton$updateAccountName(kotlin.String, kotlin.String)/pin">pin</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.metallicus.protonsdk.Proton$updateAccountName(kotlin.String, kotlin.String)/name">name</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">LiveData</span><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.common/-resource/index.html"><span class="identifier">Resource</span></a><span class="symbol">&lt;</span><a href="../../com.metallicus.protonsdk.model/-chain-account/index.html"><span class="identifier">ChainAccount</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
