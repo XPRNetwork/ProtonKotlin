@@ -1,0 +1,13 @@
+site:
+  about:
+    siteName: Proton Kotlin SDK
+    siteDescription: Kotlin library for handling Proton Chain operations.
+Editorial:
+  primaryColor: '#582ACB'
+  social:
+    github: 'username/project'
+    metaComponents: # this is the replacement for the deprecated automatic search addition
+      - type: 'orchidSearch'
+kotlindoc:
+  sourceDirs:
+    - './../../../../protonsdk/src/main/java'
