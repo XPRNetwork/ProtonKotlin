@@ -1,4 +1,0 @@
-rootProject.name = 'Proton Kotlin SDK'
-
-include ':protonsdk'
-include ':docs'
