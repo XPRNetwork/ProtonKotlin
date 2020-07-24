@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 buildscript {
 	repositories {
 		google()
@@ -28,6 +30,7 @@ dependencies {
 	orchidRuntimeOnly(Libraries.orchidDocs)
 	orchidRuntimeOnly(Libraries.orchidKotlindoc)
 	orchidRuntimeOnly(Libraries.orchidPluginDocs)
+	orchidRuntimeOnly(Libraries.orchidGithub)
 }
 
 orchid {
@@ -36,4 +39,6 @@ orchid {
 	srcDir  = "protonsdk/src/orchid/resources"
 	destDir = "protonsdk/build/docs/orchid"
 	baseUrl = "https://protonprotocol.github.io/ProtonKotlin"
+
+	githubToken = gradleLocalProperties(rootDir).getProperty("github.token")
 }

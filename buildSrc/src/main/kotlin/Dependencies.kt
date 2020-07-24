@@ -98,6 +98,7 @@ object Libraries {
     const val orchidDocs = "io.github.javaeden.orchid:OrchidDocs:$orchidVersion"
     const val orchidKotlindoc = "io.github.javaeden.orchid:OrchidKotlindoc:$orchidVersion"
     const val orchidPluginDocs = "io.github.javaeden.orchid:OrchidPluginDocs:$orchidVersion"
+    const val orchidGithub = "io.github.javaeden.orchid:OrchidGithub:$orchidVersion"
 
     // Greymass ESR
     //implementation "com.greymass:esrsdk:1.0.1"
