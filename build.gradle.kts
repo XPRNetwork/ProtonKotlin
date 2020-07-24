@@ -2,34 +2,35 @@ buildscript {
 	repositories {
 		google()
 		jcenter()
-
-//		maven("https://dl.bintray.com/kotlin/kotlin-eap")
 	}
 
 	dependencies {
 		classpath(BuildPlugins.androidGradlePlugin)
-		classpath(BuildPlugins.kotlinGradlePlugin)
-
-//		classpath("org.jetbrains.dokka:dokka-gradle-plugin:0.10.1")
-//		classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
-//		classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
 	}
 }
 
 plugins {
-	id("org.jetbrains.dokka") version "0.10.1"
-//	id("com.eden.orchidPlugin") version "0.21.0"
+	kotlin("jvm") version kotlinVersion
+	id(BuildPlugins.dokka) version BuildPlugins.Versions.dokka
+	id(BuildPlugins.orchid) version orchidVersion
+	`maven-publish`
+	id(BuildPlugins.bintray) version BuildPlugins.Versions.bintray
 }
 
 allprojects {
 	repositories {
 		google()
 		jcenter()
-//		maven("https://dl.bintray.com/kotlin/kotlin-eap")
-//		maven("https://kotlin.bintray.com/kotlinx")
 	}
 }
 
-tasks.register("clean").configure {
-	delete("build")
+dependencies {
+	orchidRuntimeOnly(Libraries.orchid)
+}
+
+orchid {
+	theme = "Editorial"
+	version = ProtonSdk.versionName
+	srcDir  = "protonsdk/src/orchid/resources"
+	destDir = "protonsdk/build/docs/orchid"
 }

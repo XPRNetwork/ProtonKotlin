@@ -1,4 +1,4 @@
-rootProject.name = "Proton Kotlin SDK"
+rootProject.name = "ProtonKotlinSDK"
 
 include(":protonsdk")
 

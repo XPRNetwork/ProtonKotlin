@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
@@ -7,23 +8,21 @@ plugins {
 	kotlin(BuildPlugins.kotlinKapt)
 	id(BuildPlugins.mavenPublish)
 	id(BuildPlugins.dokka)
-
-	//apply plugin: 'com.jfrog.bintray'
-	//apply plugin: 'com.github.dcendents.android-maven'
+	id(BuildPlugins.bintray)
 }
 
 android {
-	compileSdkVersion(AndroidSdk.compile)
-	buildToolsVersion("30.0.1")
+	compileSdkVersion(Android.compileSdk)
+	buildToolsVersion(Android.buildTools)
 
 	defaultConfig {
-		//applicationId = "com.gradle.kotlindsl"
-		minSdkVersion(AndroidSdk.min)
-		targetSdkVersion(AndroidSdk.target)
-		versionCode = AndroidSdk.versionCode
-		versionName = AndroidSdk.versionName
-		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-		consumerProguardFiles("consumer-rules.pro")
+		//applicationId = "com.metallicus.protonsdk"
+		minSdkVersion(Android.minSdk)
+		targetSdkVersion(Android.targetSdk)
+		versionCode = ProtonSdk.versionCode
+		versionName = ProtonSdk.versionName
+		testInstrumentationRunner = TestLibraries.testRunner
+		consumerProguardFiles(Android.Progaurd.consumeFile)
 	}
 
 	compileOptions {
@@ -38,7 +37,7 @@ android {
 	buildTypes {
 		getByName("release") {
 			isMinifyEnabled = false
-			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+			proguardFiles(getDefaultProguardFile(Android.Progaurd.optimizeFile), Android.Progaurd.rulesFile)
 		}
 	}
 }
@@ -130,151 +129,146 @@ tasks {
 	}
 }
 
-//ext {
-//	bintrayRepo = "ProtonKotlin"
-//	bintrayName = "com.metallicus.protonsdk"
-//	userOrganization = "protonprotocol"
-//
-//	libraryName = "protonsdk"
-//
-//	publishedGroupId = "com.metallicus"
-//	artifact = "protonsdk"
-//	libraryVersion = android.defaultConfig.versionName
-//
-//	libraryDescription = "Kotlin library for handling Proton Chain operations"
-//	siteUrl = "https://github.com/ProtonProtocol/ProtonKotlin"
-//	gitUrl = "https://github.com/ProtonProtocol/ProtonKotlin.git"
-//	developerId = "joey-harward"
-//	developerName = "Metallicus Inc."
-//	developerEmail = "joey@metalpay.co"
-//	licenseName = "MIT License"
-//	licenseUrl = "https://opensource.org/licenses/MIT"
-//	allLicenses = ["MIT"]
-//}
-//
-//group = publishedGroupId
-//version = libraryVersion
-//
-//task sourcesJar(type: Jar) {
-//	archiveClassifier.set('sources')
-//	from android.sourceSets.main.java.srcDirs
-//}
-//
-//def pomConfig = {
-//	licenses {
-//		license {
-//			name licenseName
-//			url licenseUrl
-//		}
-//	}
-//	developers {
-//		developer {
-//			id developerId
-//			name developerName
-//			email developerEmail
-//		}
-//	}
-//	scm {
-//		connection gitUrl
-//		developerConnection gitUrl
-//		url siteUrl
-//	}
-//}
-//
-//project.afterEvaluate {
-//	publishing {
-//		publications {
-//			ProtonSDKDebug(MavenPublication) {
-//				groupId = 'com.metallicus'
-//				artifactId = "${project.getName()}-debug"
-//				version = android.defaultConfig.versionName
-//
-//				artifact bundleDebugAar
-//
-//				pom.withXml {
-//					def root = asNode()
-//					root.appendNode('name', libraryName)
-//					root.appendNode('description', libraryDescription)
-//					root.appendNode('url', siteUrl)
-//					root.children().last() + pomConfig
-//
-//					def dependenciesNode = root.appendNode('dependencies')
-//					configurations.implementation.allDependencies.each {
-//						if (it.group != null && it.name != null && it.version != null &&
-//							it.name != 'unspecified' && it.version != 'unspecified') {
-//							def dependencyNode = dependenciesNode.appendNode('dependency')
-//							dependencyNode.appendNode('groupId', it.group)
-//							dependencyNode.appendNode('artifactId', it.name)
-//							dependencyNode.appendNode('version', it.version)
-//						}
-//					}
-//				}
-//			}
-//
-//			ProtonSDKRelease(MavenPublication) {
-//				groupId = 'com.metallicus'
-//				artifactId project.getName()
-//				version = android.defaultConfig.versionName
-//
-//				artifact bundleReleaseAar
-//				artifact sourcesJar
-//
-//				pom.withXml {
-//					def root = asNode()
-//					root.appendNode('name', libraryName)
-//					root.appendNode('description', libraryDescription)
-//					root.appendNode('url', siteUrl)
-//					root.children().last() + pomConfig
-//
-//					def dependenciesNode = root.appendNode('dependencies')
-//					configurations.implementation.allDependencies.each {
-//						if (it.group != null && it.name != null && it.version != null &&
-//							it.name != 'unspecified' && it.version != 'unspecified') {
-//							def dependencyNode = dependenciesNode.appendNode('dependency')
-//							dependencyNode.appendNode('groupId', it.group)
-//							dependencyNode.appendNode('artifactId', it.name)
-//							dependencyNode.appendNode('version', it.version)
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-//}
-//
-//project.afterEvaluate {
-//	bintray {
-//		if (project.rootProject.file('local.properties').exists()) {
-//			Properties properties = new Properties()
-//			properties.load(project.rootProject.file('local.properties').newDataInputStream())
-//
-//			user = properties.getProperty("bintray.user")
-//			key = properties.getProperty("bintray.apikey")
-//
-//			publications = ['ProtonSDKRelease']
-//
-//			pkg {
-//				repo = bintrayRepo
-//				name = bintrayName
-//				userOrg = userOrganization
-//				desc = libraryDescription
-//				websiteUrl = siteUrl
-//				vcsUrl = gitUrl
-//				licenses = allLicenses
-//				publish = true
-//				publicDownloadNumbers = true
-//				version {
-//					name = libraryVersion
-//					desc = libraryDescription
-//					released = new Date()
-//
-////					gpg {
-////						sign = true //Determines whether to GPG sign the files. The default is false
-////						passphrase = properties.getProperty("bintray.gpg.password")
-////						//Optional. The passphrase for GPG signing'
-////					}
-//				}
-//			}
-//		}
-//	}
-//}
+group = Publishing.publishedGroupId
+version = Publishing.libraryVersion
+
+val sourcesJar by tasks.creating(Jar::class) {
+	archiveClassifier.set("sources")
+	from(android.sourceSets["main"].java.srcDirs)
+}
+
+afterEvaluate {
+	publishing {
+		publications {
+			create<MavenPublication>(Publishing.Publications.debug) {
+				groupId = "com.metallicus"
+				artifactId = "${Publishing.libraryName}-debug"
+				version = Publishing.libraryVersion
+
+				//artifact(buildOutputs["debug"].outputFile)
+				artifact("$buildDir/outputs/aar/protonsdk-debug.aar")
+				artifact(sourcesJar)
+
+				pom {
+					name.set(Publishing.libraryName)
+					description.set(Publishing.libraryDescription)
+					url.set(Publishing.siteUrl)
+
+					licenses {
+						license {
+							name.set(Publishing.licenseName)
+							url.set(Publishing.licenseUrl)
+						}
+					}
+
+					developers {
+						developer {
+							id.set(Publishing.developerId)
+							name.set(Publishing.developerName)
+							email.set(Publishing.developerEmail)
+						}
+					}
+
+					scm {
+						connection.set(Publishing.gitUrl)
+						developerConnection.set(Publishing.gitUrl)
+						url.set(Publishing.siteUrl)
+					}
+
+					pom.withXml {
+						val dependenciesNode = asNode().appendNode("dependencies")
+						configurations.implementation.get().allDependencies.forEach {
+							if (it.group != null && it.version != null &&
+								it.name != "unspecified" && it.version != "unspecified") {
+								dependenciesNode.appendNode("dependency").apply {
+									appendNode("groupId", it.group)
+									appendNode("artifactId", it.name)
+									appendNode("version", it.version)
+								}
+							}
+						}
+					}
+				}
+			}
+
+			create<MavenPublication>(Publishing.Publications.release) {
+				groupId = "com.metallicus"
+				artifactId = Publishing.libraryName
+				version = Publishing.libraryVersion
+
+				//artifact(buildOutputs["release"].outputFile)
+				artifact("$buildDir/outputs/aar/protonsdk-release.aar")
+				artifact(sourcesJar)
+
+				pom {
+					name.set(Publishing.libraryName)
+					description.set(Publishing.libraryDescription)
+					url.set(Publishing.siteUrl)
+
+					licenses {
+						license {
+							name.set(Publishing.licenseName)
+							url.set(Publishing.licenseUrl)
+						}
+					}
+
+					developers {
+						developer {
+							id.set(Publishing.developerId)
+							name.set(Publishing.developerName)
+							email.set(Publishing.developerEmail)
+						}
+					}
+
+					scm {
+						connection.set(Publishing.gitUrl)
+						developerConnection.set(Publishing.gitUrl)
+						url.set(Publishing.siteUrl)
+					}
+
+					pom.withXml {
+						val dependenciesNode = asNode().appendNode("dependencies")
+						configurations.implementation.get().allDependencies.forEach {
+							if (it.group != null && it.version != null &&
+								it.name != "unspecified" && it.version != "unspecified"
+							) {
+								dependenciesNode.appendNode("dependency").apply {
+									appendNode("groupId", it.group)
+									appendNode("artifactId", it.name)
+									appendNode("version", it.version)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	bintray {
+		user = gradleLocalProperties(rootDir).getProperty("bintray.user")
+		key = gradleLocalProperties(rootDir).getProperty("bintray.apikey")
+		publish = true
+
+		setPublications(Publishing.Publications.release)
+
+		pkg.apply {
+			repo = Publishing.bintrayRepo
+			name = Publishing.bintrayName
+			userOrg = Publishing.userOrganization
+			desc = Publishing.libraryDescription
+			websiteUrl = Publishing.siteUrl
+			vcsUrl = Publishing.gitUrl
+			setLicenses(Publishing.allLicenses)
+			publish = true
+			publicDownloadNumbers = true
+
+			version.apply {
+				name = Publishing.libraryVersion
+				desc = Publishing.libraryDescription
+//				gpg.sign = true
+//				gpg.passphrase = gradleLocalProperties(rootDir).getProperty("bintray.gpg.password")
+			}
+		}
+	}
+}
