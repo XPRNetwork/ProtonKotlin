@@ -25,7 +25,9 @@ allprojects {
 }
 
 dependencies {
-	orchidRuntimeOnly(Libraries.orchid)
+	orchidRuntimeOnly(Libraries.orchidDocs)
+	orchidRuntimeOnly(Libraries.orchidKotlindoc)
+	orchidRuntimeOnly(Libraries.orchidPluginDocs)
 }
 
 orchid {
@@ -33,4 +35,5 @@ orchid {
 	version = ProtonSdk.versionName
 	srcDir  = "protonsdk/src/orchid/resources"
 	destDir = "protonsdk/build/docs/orchid"
+	baseUrl = "https://protonprotocol.github.io/ProtonKotlin"
 }

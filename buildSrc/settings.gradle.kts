@@ -1,1 +1,1 @@
-rootProject.name = "ProtonKotlinSDK DSL"
+rootProject.name = "DSL"

@@ -95,7 +95,9 @@ object Libraries {
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
     const val gson = "com.google.code.gson:gson:${Versions.gson}"
     const val guava = "com.google.guava:guava:${Versions.guava}"
-    const val orchid = "io.github.javaeden.orchid:OrchidAll:$orchidVersion"
+    const val orchidDocs = "io.github.javaeden.orchid:OrchidDocs:$orchidVersion"
+    const val orchidKotlindoc = "io.github.javaeden.orchid:OrchidKotlindoc:$orchidVersion"
+    const val orchidPluginDocs = "io.github.javaeden.orchid:OrchidPluginDocs:$orchidVersion"
 
     // Greymass ESR
     //implementation "com.greymass:esrsdk:1.0.1"
