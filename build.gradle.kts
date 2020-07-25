@@ -42,3 +42,7 @@ orchid {
 
 	githubToken = gradleLocalProperties(rootDir).getProperty("github.token")
 }
+
+tasks.register("cleanProton").configure {
+	delete("build", "buildSrc/build", "protonsdk/build")
+}

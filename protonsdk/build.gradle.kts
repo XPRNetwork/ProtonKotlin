@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.dokka.gradle.DokkaTask
+import com.jfrog.bintray.gradle.tasks.BintrayUploadTask
 
 plugins {
 	id(BuildPlugins.androidLibrary)
@@ -126,6 +127,14 @@ tasks {
 				suppress = true
 			}
 		}
+	}
+
+	withType<PublishToMavenLocal> {
+		dependsOn(assemble)
+	}
+
+	withType<BintrayUploadTask> {
+		dependsOn(publishToMavenLocal)
 	}
 }
 
