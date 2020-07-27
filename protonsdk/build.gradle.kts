@@ -101,6 +101,7 @@ dependencies {
 
 // Dokka
 tasks {
+	// Dokka Task
 	val dokka by getting(DokkaTask::class) {
 		outputFormat = "html"
 		outputDirectory = "$buildDir/dokka"
@@ -129,10 +130,12 @@ tasks {
 		}
 	}
 
+	// publishing depends on build
 	withType<PublishToMavenLocal> {
-		dependsOn(assemble)
+		dependsOn(build)
 	}
 
+	// uploading to Bintray depends on publications
 	withType<BintrayUploadTask> {
 		dependsOn(publishToMavenLocal)
 	}
@@ -257,7 +260,6 @@ afterEvaluate {
 	bintray {
 		user = gradleLocalProperties(rootDir).getProperty("bintray.user")
 		key = gradleLocalProperties(rootDir).getProperty("bintray.apikey")
-		publish = true
 
 		setPublications(Publishing.Publications.release)
 
