@@ -1,0 +1,42 @@
+site:
+  about:
+    siteName: Proton Kotlin SDK
+    siteDescription: Kotlin library for handling Proton Chain operations.
+
+Editorial:
+  primaryColor: '#582ACB'
+  legacySearch: false
+  social:
+    github: 'ProtonProtocol/ProtonKotlin'
+  metaComponents: # this is the replacement for the deprecated automatic search addition
+    - type: 'orchidSearch'
+  menu:
+    - type: 'separator'
+      title: 'API Docs'
+    - type: 'sourcedocPages'
+      moduleType: 'kotlindoc'
+      node: 'classes'
+      asSubmenu: true
+      submenuTitle: 'Classes'
+    - type: 'sourcedocPages'
+      moduleType: 'kotlindoc'
+      node: 'packages'
+      asSubmenu: true
+      submenuTitle: 'Packages'
+
+kotlindoc:
+  sourceDirs:
+    - './../../../../protonsdk/src/main/java'
+  sourcePages:
+    menu:
+      - type: 'sourcedocPageLinks'
+        moduleType: 'kotlindoc'
+        itemTitleType: 'SIGNATURE'
+        includeItems: true
+
+services:
+  publications:
+    stages:
+      - type: 'githubPages'
+        username: 'joey-harward'
+        repo: 'ProtonProtocol/ProtonKotlin'
