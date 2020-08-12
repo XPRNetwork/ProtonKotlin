@@ -23,6 +23,9 @@ package com.metallicus.protonsdk.model
 
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 
+//fun activeAccount(accountName: String, builder: ActiveAccount.Builder.() -> Unit): ActiveAccount =
+//	ActiveAccount.Builder(accountName).apply(builder).create()
+
 class ActiveAccount(builder: Builder) {
 	val accountName: String = builder.accountName
 	val publicKey: String = builder.publicKey
