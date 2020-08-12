@@ -29,6 +29,7 @@ import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.common.SingletonHolder
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.di.ProtonModule
+import com.metallicus.protonsdk.eosio.commander.digest.Sha256
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.model.*
 import kotlinx.coroutines.*
@@ -136,6 +137,28 @@ class Proton private constructor(context: Context) {
 		return EosPrivateKey()
 	}
 
+	fun signWithPrivateKey(privateKeyStr: String, valueToSign: String): String {
+		return try {
+			val privateKey = EosPrivateKey(privateKeyStr)
+			val sha256 = Sha256.from(valueToSign.toByteArray())
+			privateKey.sign(sha256).toString()
+		} catch (e: Exception) { "" }
+	}
+
+	fun accountAvailable(accountName: String): LiveData<Resource<Boolean>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val chainProvider = getChainProviderAsync()
+
+			emit(Resource.success(accountModule.accountAvailable(chainProvider.chainUrl, accountName)))
+		} catch (e: ProtonException) {
+			emit(Resource.error(e))
+		} catch (e: Exception) {
+			emit(Resource.error(e.localizedMessage.orEmpty()))
+		}
+	}
+
 	private suspend fun findAccounts(publicKeyStr: String): Resource<List<Account>> {
 		return try {
 			val chainProvider = getChainProviderAsync()
@@ -172,6 +195,10 @@ class Proton private constructor(context: Context) {
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
+	}
+
+	fun hasActiveAccount(): Boolean {
+		return accountModule.hasActiveAccount()
 	}
 
 	fun setActiveAccount(activeAccount: ActiveAccount): LiveData<Resource<ChainAccount>> = liveData {

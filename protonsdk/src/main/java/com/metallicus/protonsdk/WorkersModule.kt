@@ -83,11 +83,18 @@ class WorkersModule {
 		val initActiveAccount = OneTimeWorkRequest.Builder(InitActiveAccountWorker::class.java)
 			.setConstraints(constraints).build()
 
-		workManager
-			.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
-			.then(initTokenContracts)
-			.then(initActiveAccount)
-			.enqueue()
+		if (prefs.getActiveAccountName().isNotEmpty()) {
+			workManager
+				.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
+				.then(initTokenContracts)
+				.then(initActiveAccount)
+				.enqueue()
+		} else {
+			workManager
+				.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
+				.then(initTokenContracts)
+				.enqueue()
+		}
 
 		// start periodic worker to update exchange rates
 		val updateTokenContractRates = PeriodicWorkRequest.Builder(UpdateTokenContractRatesWorker::class.java, 15L, TimeUnit.MINUTES)

@@ -31,7 +31,6 @@ import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
-import com.metallicus.protonsdk.repository.ChainProviderRepository
 import timber.log.Timber
 import java.nio.charset.Charset
 import javax.inject.Inject
@@ -42,9 +41,6 @@ import javax.inject.Inject
 class AccountModule {
 	@Inject
 	lateinit var context: Context
-
-	@Inject
-	lateinit var chainProviderRepository: ChainProviderRepository
 
 	@Inject
 	lateinit var accountRepository: AccountRepository
@@ -64,6 +60,16 @@ class AccountModule {
 
 	fun hasActiveAccount(): Boolean {
 		return prefs.getActiveAccountName().isNotEmpty()
+	}
+
+	suspend fun accountAvailable(chainUrl: String, accountName: String): Boolean {
+		val response = accountRepository.fetchAccount(chainUrl, accountName)
+		return if (response.isSuccessful) {
+			false
+		} else {
+			// TODO: check for network errors
+			true
+		}
 	}
 
 	suspend fun fetchAccountsForKey(chainId: String, chainUrl: String, hyperionHistoryUrl: String, publicKey: String): Resource<List<Account>> {
