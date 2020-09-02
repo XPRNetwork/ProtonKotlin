@@ -249,9 +249,9 @@ class ActionsModule {
 					if (pushTransactionResponse.isSuccessful) {
 						Resource.success(pushTransactionResponse.body())
 					} else {
-						val msg = jsonToBinResponse.errorBody()?.string()
+						val msg = pushTransactionResponse.errorBody()?.string()
 						val errorMsg = if (msg.isNullOrEmpty()) {
-							jsonToBinResponse.message()
+							pushTransactionResponse.message()
 						} else {
 							msg
 						}
@@ -259,9 +259,9 @@ class ActionsModule {
 						Resource.error(errorMsg)
 					}
 				} else {
-					val msg = jsonToBinResponse.errorBody()?.string()
+					val msg = chainInfoResponse.errorBody()?.string()
 					val errorMsg = if (msg.isNullOrEmpty()) {
-						jsonToBinResponse.message()
+						chainInfoResponse.message()
 					} else {
 						msg
 					}

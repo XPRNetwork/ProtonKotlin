@@ -370,16 +370,18 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun transferTokens(pin: String, contract: String, toAccount: String, amount: String, memo: String): LiveData<Resource<JsonObject>> = liveData {
+	fun transferTokens(pin: String, tokenContractId: String, toAccount: String, amount: String, memo: String): LiveData<Resource<JsonObject>> = liveData {
 		emit(Resource.loading())
 
 		try {
 			val activeAccount = getActiveAccountAsync()
 
+			val tokenContract = tokenContractsModule.getTokenContract(tokenContractId)
+
 			emit(actionsModule.transferTokens(
 				activeAccount.chainProvider.chainUrl,
 				pin,
-				contract,
+				tokenContract.contract,
 				activeAccount.account.accountName,
 				toAccount,
 				amount,
