@@ -145,6 +145,10 @@ class Proton private constructor(context: Context) {
 		} catch (e: Exception) { "" }
 	}
 
+	fun resetPrivateKeys(oldPin: String, newPin: String): Boolean {
+		return accountModule.resetPrivateKeys(oldPin, newPin)
+	}
+
 	fun accountAvailable(accountName: String): LiveData<Resource<Boolean>> = liveData {
 		emit(Resource.loading())
 
@@ -197,8 +201,12 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
+	fun getActiveAccountName(): String {
+		return accountModule.getActiveAccountName()
+	}
+
 	fun hasActiveAccount(): Boolean {
-		return accountModule.hasActiveAccount()
+		return getActiveAccountName().isNotEmpty()
 	}
 
 	fun setActiveAccount(activeAccount: ActiveAccount): LiveData<Resource<ChainAccount>> = liveData {
@@ -212,6 +220,10 @@ class Proton private constructor(context: Context) {
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
+	}
+
+	fun getActiveAccountPrivateKey(pin: String): String {
+		return accountModule.getActiveAccountPrivateKey(pin)
 	}
 
 	private suspend fun getActiveAccountAsync() = suspendCoroutine<ChainAccount> { continuation ->
@@ -268,7 +280,7 @@ class Proton private constructor(context: Context) {
 			}
 
 			val exchangeRateUrl =
-				activeAccount.chainProvider.chainUrl + activeAccount.chainProvider.exchangeRatePath
+				activeAccount.chainProvider.chainApiUrl + activeAccount.chainProvider.exchangeRatePath
 
 			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
 

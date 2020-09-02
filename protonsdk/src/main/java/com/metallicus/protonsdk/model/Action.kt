@@ -53,34 +53,12 @@ data class Action(
 
 	lateinit var accountContact: AccountContact
 
-	enum class IconType { AVATAR, SEND, RECEIVE, STAKE, UNSTAKE, BUY_RAM }
-
 	fun isTransfer(): Boolean {
 		return (actionTrace.act.name == "transfer")
 	}
 
 	fun isSender(): Boolean {
 		return (accountName == actionTrace.act.data?.from && actionTrace.act.data.from != actionTrace.act.data.to)
-	}
-
-	fun getIconType(): IconType {
-		return IconType.AVATAR
-
-//		return if (accountContact.isLynxChain) {
-//			IconType.AVATAR
-//		} else {
-//			if (actionTrace.act.data?.to == "eosio.ramfee" || actionTrace.act.data?.to == "eosio.ram") {
-//				IconType.BUY_RAM
-//			} else if (actionTrace.act.data?.to == "eosio.stake") {
-//				IconType.STAKE
-//			} else if (actionTrace.act.data?.from == "eosio.stake") {
-//				IconType.UNSTAKE
-//			} else if (!isSender()) {
-//				IconType.RECEIVE
-//			} else {
-//				IconType.SEND
-//			}
-//		}
 	}
 
 	fun getDisplayName(): String {

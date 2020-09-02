@@ -39,6 +39,24 @@ class SecureKeys(private val context: Context) {
 		return securePrefs.all.isNotEmpty()
 	}
 
+	fun resetKeys(oldPin: String, newPin: String): Boolean {
+		return try {
+			SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
+			val securePrefs = SecurePreferences.getSharedPreferences(context)
+			securePrefs.all.forEach { secureKey ->
+				val publicKey = secureKey.key
+				val privateKey = SecurePreferences.getStringValue(context, publicKey, oldPin, "")
+				privateKey?.let {
+					SecurePreferences.setValue(context, publicKey, it, newPin)
+				}
+			}
+			true
+		} catch (e: SecureStorageException) {
+			Timber.d(e)
+			false
+		}
+	}
+
 	fun keyExists(publicKey: String): Boolean {
 		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 		return SecurePreferences.contains(context, publicKey)

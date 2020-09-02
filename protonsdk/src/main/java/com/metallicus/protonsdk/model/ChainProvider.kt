@@ -49,4 +49,6 @@ data class ChainProvider(
 	@SerializedName("updateAccountAvatarPath") val updateAccountAvatarPath: String,
 	@SerializedName("updateAccountNamePath") val updateAccountNamePath: String,
 	@SerializedName("exchangeRatePath") val exchangeRatePath: String
-)
+) {
+	lateinit var chainApiUrl: String
+}

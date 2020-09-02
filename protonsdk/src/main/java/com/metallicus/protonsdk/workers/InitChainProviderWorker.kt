@@ -55,6 +55,7 @@ class InitChainProviderWorker
 				chainProviderRepository.removeAll()
 
 				val chainProvider = Gson().fromJson(response.body(), ChainProvider::class.java)
+				chainProvider.chainApiUrl = protonChainUrl
 
 				chainProviderRepository.addChainProvider(chainProvider)
 
