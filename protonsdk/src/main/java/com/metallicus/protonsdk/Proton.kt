@@ -145,8 +145,16 @@ class Proton private constructor(context: Context) {
 		} catch (e: Exception) { "" }
 	}
 
+	fun hasPrivateKeys(): Boolean {
+		return accountModule.hasPrivateKeys()
+	}
+
 	fun resetPrivateKeys(oldPin: String, newPin: String): Boolean {
 		return accountModule.resetPrivateKeys(oldPin, newPin)
+	}
+
+	fun isPinValid(pin: String): Boolean {
+		return accountModule.isPinValid(pin)
 	}
 
 	fun accountAvailable(accountName: String): LiveData<Resource<Boolean>> = liveData {

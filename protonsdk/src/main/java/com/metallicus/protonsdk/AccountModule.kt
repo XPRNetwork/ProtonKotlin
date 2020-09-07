@@ -106,8 +106,16 @@ class AccountModule {
 		}
 	}
 
+	fun hasPrivateKeys(): Boolean {
+		return secureKeys.hasKeys()
+	}
+
 	fun resetPrivateKeys(oldPin: String, newPin: String): Boolean {
 		return secureKeys.resetKeys(oldPin, newPin)
+	}
+
+	fun isPinValid(pin: String): Boolean {
+		return secureKeys.checkPin(pin)
 	}
 
 	private suspend fun fetchAccountContact(chainUrl: String, accountName: String): AccountContact {
