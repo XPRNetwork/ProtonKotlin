@@ -145,6 +145,18 @@ class Proton private constructor(context: Context) {
 		} catch (e: Exception) { "" }
 	}
 
+	fun hasPrivateKeys(): Boolean {
+		return accountModule.hasPrivateKeys()
+	}
+
+	fun resetPrivateKeys(oldPin: String, newPin: String): Boolean {
+		return accountModule.resetPrivateKeys(oldPin, newPin)
+	}
+
+	fun isPinValid(pin: String): Boolean {
+		return accountModule.isPinValid(pin)
+	}
+
 	fun accountAvailable(accountName: String): LiveData<Resource<Boolean>> = liveData {
 		emit(Resource.loading())
 
@@ -197,8 +209,12 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
+	fun getActiveAccountName(): String {
+		return accountModule.getActiveAccountName()
+	}
+
 	fun hasActiveAccount(): Boolean {
-		return accountModule.hasActiveAccount()
+		return getActiveAccountName().isNotEmpty()
 	}
 
 	fun setActiveAccount(activeAccount: ActiveAccount): LiveData<Resource<ChainAccount>> = liveData {
@@ -212,6 +228,10 @@ class Proton private constructor(context: Context) {
 		} catch (e: Exception) {
 			emit(Resource.error(e.localizedMessage.orEmpty()))
 		}
+	}
+
+	fun getActiveAccountPrivateKey(pin: String): String {
+		return accountModule.getActiveAccountPrivateKey(pin)
 	}
 
 	private suspend fun getActiveAccountAsync() = suspendCoroutine<ChainAccount> { continuation ->
@@ -268,7 +288,7 @@ class Proton private constructor(context: Context) {
 			}
 
 			val exchangeRateUrl =
-				activeAccount.chainProvider.chainUrl + activeAccount.chainProvider.exchangeRatePath
+				activeAccount.chainProvider.chainApiUrl + activeAccount.chainProvider.exchangeRatePath
 
 			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
 
@@ -358,16 +378,18 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun transferTokens(pin: String, contract: String, toAccount: String, amount: String, memo: String): LiveData<Resource<JsonObject>> = liveData {
+	fun transferTokens(pin: String, tokenContractId: String, toAccount: String, amount: String, memo: String): LiveData<Resource<JsonObject>> = liveData {
 		emit(Resource.loading())
 
 		try {
 			val activeAccount = getActiveAccountAsync()
 
+			val tokenContract = tokenContractsModule.getTokenContract(tokenContractId)
+
 			emit(actionsModule.transferTokens(
 				activeAccount.chainProvider.chainUrl,
 				pin,
-				contract,
+				tokenContract.contract,
 				activeAccount.account.accountName,
 				toAccount,
 				amount,

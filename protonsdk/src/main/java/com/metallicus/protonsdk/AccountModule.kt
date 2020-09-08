@@ -22,6 +22,7 @@
 package com.metallicus.protonsdk
 
 import android.content.Context
+import android.util.Base64
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
@@ -58,8 +59,8 @@ class AccountModule {
 		DaggerInjector.component.inject(this)
 	}
 
-	fun hasActiveAccount(): Boolean {
-		return prefs.getActiveAccountName().isNotEmpty()
+	fun getActiveAccountName(): String {
+		return prefs.getActiveAccountName()
 	}
 
 	suspend fun accountAvailable(chainUrl: String, accountName: String): Boolean {
@@ -103,6 +104,18 @@ class AccountModule {
 
 			Resource.error(e.localizedMessage.orEmpty())
 		}
+	}
+
+	fun hasPrivateKeys(): Boolean {
+		return secureKeys.hasKeys()
+	}
+
+	fun resetPrivateKeys(oldPin: String, newPin: String): Boolean {
+		return secureKeys.resetKeys(oldPin, newPin)
+	}
+
+	fun isPinValid(pin: String): Boolean {
+		return secureKeys.checkPin(pin)
 	}
 
 	private suspend fun fetchAccountContact(chainUrl: String, accountName: String): AccountContact {
@@ -216,6 +229,11 @@ class AccountModule {
 		}
 	}
 
+	fun getActiveAccountPrivateKey(pin: String): String {
+		val publicKey = prefs.getActivePublicKey()
+		return secureKeys.getPrivateKey(publicKey, pin).orEmpty()
+	}
+
 	private fun getActiveAccountSignature(pin: String): String {
 		val accountName = prefs.getActiveAccountName()
 		val publicKey = prefs.getActivePublicKey()
@@ -233,7 +251,7 @@ class AccountModule {
 		val accountName = chainAccount.account.accountName
 
 		val updateAccountNameUrl =
-			chainAccount.chainProvider.chainUrl + chainAccount.chainProvider.updateAccountNamePath
+			chainAccount.chainProvider.chainApiUrl + chainAccount.chainProvider.updateAccountNamePath
 
 		val response = accountRepository.updateAccountName(
 			updateAccountNameUrl,
@@ -264,7 +282,7 @@ class AccountModule {
 		val accountName = chainAccount.account.accountName
 
 		val updateAccountAvatarUrl =
-			chainAccount.chainProvider.chainUrl + chainAccount.chainProvider.updateAccountAvatarPath
+			chainAccount.chainProvider.chainApiUrl + chainAccount.chainProvider.updateAccountAvatarPath
 
 		val response = accountRepository.updateAccountAvatar(
 			updateAccountAvatarUrl,
@@ -274,7 +292,7 @@ class AccountModule {
 
 		return if (response.isSuccessful) {
 			val account = chainAccount.account
-			account.accountContact.avatar = imageByteArray.toString(Charset.defaultCharset())
+			account.accountContact.avatar = Base64.encodeToString(imageByteArray, Base64.DEFAULT)
 			accountRepository.updateAccount(account)
 
 			Resource.success(chainAccount)

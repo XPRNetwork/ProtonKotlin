@@ -61,7 +61,7 @@ class ActionRepository @Inject constructor(
 	}
 
 	suspend fun getChainInfo(chainUrl: String): Response<ChainInfo> {
-		return protonChainService.getChainInfo(chainUrl)
+		return protonChainService.getChainInfo("$chainUrl/v1/chain/get_info")
 	}
 
 	suspend fun getRequiredKeys(chainUrl: String, requiredKeysBody: RequiredKeysBody): Response<RequiredKeysResponse> {

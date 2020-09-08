@@ -22,6 +22,7 @@
 package com.metallicus.protonsdk.common
 
 import android.content.Context
+import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.securestorage.SecurePreferences
 import com.metallicus.protonsdk.securestorage.SecureStorageException
 import timber.log.Timber
@@ -37,6 +38,41 @@ class SecureKeys(private val context: Context) {
 		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 		val securePrefs = SecurePreferences.getSharedPreferences(context)
 		return securePrefs.all.isNotEmpty()
+	}
+
+	fun checkPin(pin: String): Boolean {
+		var isValid = false
+		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
+		val securePrefs = SecurePreferences.getSharedPreferences(context)
+		if (securePrefs.all.isNotEmpty()) {
+			isValid = try {
+				val firstAccount = securePrefs.all.entries.iterator().next()
+				val publicKey = firstAccount.key
+				val privateKey = SecurePreferences.getStringValue(context, publicKey, pin, "")
+				EosPrivateKey(privateKey).publicKey.toString() == publicKey
+			} catch (e: Exception) {
+				false
+			}
+		}
+		return isValid
+	}
+
+	fun resetKeys(oldPin: String, newPin: String): Boolean {
+		return try {
+			SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
+			val securePrefs = SecurePreferences.getSharedPreferences(context)
+			securePrefs.all.forEach { secureKey ->
+				val publicKey = secureKey.key
+				val privateKey = SecurePreferences.getStringValue(context, publicKey, oldPin, "")
+				privateKey?.let {
+					SecurePreferences.setValue(context, publicKey, it, newPin)
+				}
+			}
+			true
+		} catch (e: SecureStorageException) {
+			Timber.d(e)
+			false
+		}
 	}
 
 	fun keyExists(publicKey: String): Boolean {

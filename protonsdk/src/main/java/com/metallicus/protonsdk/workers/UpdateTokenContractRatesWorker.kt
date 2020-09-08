@@ -52,7 +52,7 @@ class UpdateTokenContractRatesWorker
 				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
 			}
 
-			val exchangeRateUrl = chainProvider.chainUrl + chainProvider.exchangeRatePath
+			val exchangeRateUrl = chainProvider.chainApiUrl + chainProvider.exchangeRatePath
 
 			val exchangeRatesResponse = tokenContractRepository.fetchExchangeRates(exchangeRateUrl)
 			if (exchangeRatesResponse.isSuccessful) {
