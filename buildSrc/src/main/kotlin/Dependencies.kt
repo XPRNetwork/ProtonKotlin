@@ -19,12 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const val kotlinVersion = "1.3.72"
+const val kotlinVersion = "1.4.10"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-    const val versionCode = 16
-    const val versionName = "0.5.4"
+    const val versionCode = 17
+    const val versionName = "0.5.5"
 }
 
 object BuildPlugins {
@@ -60,13 +60,13 @@ object Android {
 
 object Libraries {
     private object Versions {
-        const val ktx = "1.5.0-alpha01"
+        const val ktx = "1.5.0-alpha02"
         const val lifecycleLiveData = "2.3.0-alpha05"
         const val room = "2.2.5"
-        const val workManager = "2.3.4"
-        const val okhttp3 = "4.8.0"
+        const val workManager = "2.4.0"
+        const val okhttp3 = "4.8.1"
         const val retrofit = "2.9.0"
-        const val dagger = "2.28.1"
+        const val dagger = "2.28.3"
         const val daggerAssistedInject = "0.5.2"
         const val coroutines = "1.3.4"
         const val timber = "4.7.1"
@@ -107,8 +107,8 @@ object Libraries {
 object TestLibraries {
     private object Versions {
         const val junit = "4.13"
-        const val testExt = "1.1.1"
-        const val espresso = "3.2.0"
+        const val testExt = "1.1.2"
+        const val espresso = "3.3.0"
     }
     const val junit = "junit:junit:${Versions.junit}"
     const val testExt = "androidx.test.ext:junit:${Versions.testExt}"
