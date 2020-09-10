@@ -102,9 +102,11 @@ class Proton private constructor(context: Context) {
 			val chainProvider = getChainProviderAsync()
 			emit(Resource.success(chainProvider))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<ChainProvider> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<ChainProvider> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -127,9 +129,11 @@ class Proton private constructor(context: Context) {
 			val tokenContracts = getTokenContractsAsync()
 			emit(Resource.success(tokenContracts))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<List<TokenContract>> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<List<TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -165,9 +169,11 @@ class Proton private constructor(context: Context) {
 
 			emit(Resource.success(accountModule.accountAvailable(chainProvider.chainUrl, accountName)))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<Boolean> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<Boolean> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -203,9 +209,11 @@ class Proton private constructor(context: Context) {
 			val accounts = findAccounts(publicKeyStr)
 			emit(accounts)
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<List<Account>> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<List<Account>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -224,9 +232,11 @@ class Proton private constructor(context: Context) {
 			val chainProvider = getChainProviderAsync()
 			emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<ChainAccount> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<ChainAccount> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -253,9 +263,11 @@ class Proton private constructor(context: Context) {
 			val activeAccount = getActiveAccountAsync()
 			emit(Resource.success(activeAccount))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<ChainAccount> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<ChainAccount> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -269,9 +281,11 @@ class Proton private constructor(context: Context) {
 					activeAccount.chainProvider.chainUrl,
 					activeAccount.account.accountName))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<ChainAccount> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<ChainAccount> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -300,9 +314,11 @@ class Proton private constructor(context: Context) {
 
 			emit(tokenBalances)
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<List<TokenCurrencyBalance>> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<List<TokenCurrencyBalance>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -322,9 +338,11 @@ class Proton private constructor(context: Context) {
 
 			emit(tokenBalance)
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<TokenCurrencyBalance> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<TokenCurrencyBalance> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -344,9 +362,11 @@ class Proton private constructor(context: Context) {
 
 			emit(actions)
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<List<Action>> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<List<Action>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -358,9 +378,11 @@ class Proton private constructor(context: Context) {
 
 			emit(accountModule.updateAccountName(activeAccount, pin, name))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<ChainAccount> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<ChainAccount> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -372,9 +394,11 @@ class Proton private constructor(context: Context) {
 
 			emit(accountModule.updateAccountAvatar(activeAccount, pin, byteArray))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<ChainAccount> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<ChainAccount> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 
@@ -395,9 +419,11 @@ class Proton private constructor(context: Context) {
 				amount,
 				memo))
 		} catch (e: ProtonException) {
-			emit(Resource.error(e))
+			val error: Resource<JsonObject> = Resource.error(e)
+			emit(error)
 		} catch (e: Exception) {
-			emit(Resource.error(e.localizedMessage.orEmpty()))
+			val error: Resource<JsonObject> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
 		}
 	}
 }

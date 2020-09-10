@@ -55,22 +55,22 @@ class TokenContractsModule {
 	}
 
 	suspend fun updateExchangeRates(exchangeRatesUrl: String, tokenContractsMap: Map<String, String>) {
-		val exchangeRatesResponse = tokenContractRepository.fetchExchangeRates(exchangeRatesUrl)
-		if (exchangeRatesResponse.isSuccessful) {
-			val exchangeRatesJsonArray = exchangeRatesResponse.body()
-			exchangeRatesJsonArray?.forEach {
-				val exchangeRate = it.asJsonObject
-				val contract = exchangeRate.get("contract").asString
-				val symbol = exchangeRate.get("symbol").asString
-				val rates = exchangeRate.get("rates").asJsonObject
+		try {
+			val exchangeRatesResponse = tokenContractRepository.fetchExchangeRates(exchangeRatesUrl)
+			if (exchangeRatesResponse.isSuccessful) {
+				val exchangeRatesJsonArray = exchangeRatesResponse.body()
+				exchangeRatesJsonArray?.forEach {
+					val exchangeRate = it.asJsonObject
+					val contract = exchangeRate.get("contract").asString
+					val symbol = exchangeRate.get("symbol").asString
+					val rates = exchangeRate.get("rates").asJsonObject
 
-				try {
 					val tokenContractId = tokenContractsMap.getValue("$contract:$symbol")
 					tokenContractRepository.updateRates(tokenContractId, rates.toString())
-				} catch (e: Exception) {
-					Timber.d(e.localizedMessage)
 				}
 			}
+		} catch (e: Exception) {
+			Timber.d(e.localizedMessage)
 		}
 	}
 }
