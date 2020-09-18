@@ -31,6 +31,7 @@ import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.di.ProtonModule
 import com.metallicus.protonsdk.eosio.commander.digest.Sha256
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
+import com.metallicus.protonsdk.eosio.commander.model.chain.Action as ChainAction
 import com.metallicus.protonsdk.model.*
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -402,7 +403,7 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun transferTokens(pin: String, tokenContractId: String, toAccount: String, amount: String, memo: String): LiveData<Resource<JsonObject>> = liveData {
+	fun transferTokensByTokenContractId(pin: String, tokenContractId: String, toAccount: String, amount: String, memo: String): LiveData<Resource<JsonObject>> = liveData {
 		emit(Resource.loading())
 
 		try {
@@ -418,6 +419,67 @@ class Proton private constructor(context: Context) {
 				toAccount,
 				amount,
 				memo))
+		} catch (e: ProtonException) {
+			val error: Resource<JsonObject> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<JsonObject> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun transferTokensByContract(pin: String, contract: String, toAccount: String, amount: String, memo: String): LiveData<Resource<JsonObject>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			emit(actionsModule.transferTokens(
+				activeAccount.chainProvider.chainUrl,
+				pin,
+				contract,
+				activeAccount.account.accountName,
+				toAccount,
+				amount,
+				memo))
+		} catch (e: ProtonException) {
+			val error: Resource<JsonObject> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<JsonObject> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	/*fun pushTransaction(pin: String, action: ChainAction): LiveData<Resource<JsonObject>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			emit(actionsModule.pushTransaction(
+				activeAccount.chainProvider.chainUrl,
+				pin,
+				action))
+		} catch (e: ProtonException) {
+			val error: Resource<JsonObject> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<JsonObject> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}*/
+
+	fun pushTransactions(pin: String, actions: List<ChainAction>): LiveData<Resource<JsonObject>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			emit(actionsModule.pushTransactions(
+				activeAccount.chainProvider.chainUrl,
+				pin,
+				actions))
 		} catch (e: ProtonException) {
 			val error: Resource<JsonObject> = Resource.error(e)
 			emit(error)
