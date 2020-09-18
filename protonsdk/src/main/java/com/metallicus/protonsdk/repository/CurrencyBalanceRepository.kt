@@ -46,8 +46,8 @@ class CurrencyBalanceRepository @Inject constructor(
 		return protonChainService.getCurrencyBalances("$chainUrl/v2/state/get_tokens", accountName)
 	}
 
-	suspend fun getTokenCurrencyBalance(tokenContractId: String): TokenCurrencyBalance {
-		return currencyBalanceDao.findByTokenContract(tokenContractId)
+	suspend fun getTokenCurrencyBalance(accountName: String, tokenContractId: String): TokenCurrencyBalance {
+		return currencyBalanceDao.findByTokenContract(accountName, tokenContractId)
 	}
 
 	suspend fun getTokenCurrencyBalances(accountName: String): List<TokenCurrencyBalance> {

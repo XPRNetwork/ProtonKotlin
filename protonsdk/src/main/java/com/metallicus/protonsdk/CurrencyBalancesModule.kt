@@ -71,7 +71,7 @@ class CurrencyBalancesModule {
 					currencyBalanceRepository.addCurrencyBalance(currencyBalance)
 				}
 
-				val tokenCurrencyBalances = currencyBalanceRepository.getTokenCurrencyBalance(tokenContractId)
+				val tokenCurrencyBalances = currencyBalanceRepository.getTokenCurrencyBalance(accountName, tokenContractId)
 
 				Resource.success(tokenCurrencyBalances)
 			} else {

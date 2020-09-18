@@ -36,11 +36,9 @@ interface CurrencyBalanceDao {
 	@Query("UPDATE currencyBalance SET amount = :amount WHERE accountName = :accountName AND contract = :contract AND symbol = :symbol")
 	suspend fun updateAmount(accountName: String, contract: String, symbol: String, amount: String)
 
-	@Transaction
-	@Query("SELECT * FROM currencyBalance WHERE tokenContractId = :tokenContractId")
-	suspend fun findByTokenContract(tokenContractId: String): TokenCurrencyBalance
+	@Query("SELECT * FROM currencyBalance WHERE accountName = :accountName AND tokenContractId = :tokenContractId")
+	suspend fun findByTokenContract(accountName: String, tokenContractId: String): TokenCurrencyBalance
 
-	@Transaction
 	@Query("SELECT * FROM currencyBalance WHERE accountName = :accountName")
 	suspend fun findByAccountName(accountName: String): List<TokenCurrencyBalance>
 
