@@ -45,7 +45,7 @@ class TokenContractRepository @Inject constructor(
 	}
 
 	suspend fun fetchTokenContracts(chainUrl: String, tokensTableScope: String, tokensTableCode: String, tokensTableName: String): Response<JsonObject> {
-		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(tokensTableScope, tokensTableCode, tokensTableName))
+		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(tokensTableScope, tokensTableCode, tokensTableName, "", "", 100))
 	}
 
 	suspend fun getTokenContract(tokenContractId: String): TokenContract {

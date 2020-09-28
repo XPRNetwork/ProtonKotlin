@@ -36,6 +36,7 @@ interface AccountDao {
 	@Update
 	suspend fun update(account: Account)
 
+	@Transaction
 	@Query("SELECT * FROM account WHERE accountName = :accountName")
 	suspend fun findByAccountName(accountName: String): ChainAccount
 

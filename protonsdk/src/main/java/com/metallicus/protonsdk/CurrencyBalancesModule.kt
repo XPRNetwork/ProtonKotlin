@@ -105,13 +105,15 @@ class CurrencyBalancesModule {
 					val symbol = token.get("symbol").asString
 					val amount = token.get("amount").asString
 
-					val tokenContractId = tokenContractsMap.getValue("$code:$symbol")
+					if (tokenContractsMap.containsKey("$code:$symbol")) {
+						val tokenContractId = tokenContractsMap.getValue("$code:$symbol")
 
-					val currencyBalance = CurrencyBalance(code, symbol, amount)
-					currencyBalance.tokenContractId = tokenContractId
-					currencyBalance.accountName = accountName
+						val currencyBalance = CurrencyBalance(code, symbol, amount)
+						currencyBalance.tokenContractId = tokenContractId
+						currencyBalance.accountName = accountName
 
-					currencyBalanceRepository.addCurrencyBalance(currencyBalance)
+						currencyBalanceRepository.addCurrencyBalance(currencyBalance)
+					}
 				}
 
 				val tokenCurrencyBalances = currencyBalanceRepository.getTokenCurrencyBalances(accountName)
