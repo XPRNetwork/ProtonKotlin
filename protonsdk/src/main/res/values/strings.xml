@@ -2,13 +2,21 @@
 	<string name="defaultProtonChainId" translatable="false">384da888112027f0321850a169f737c33e53b388aad48b5adace4bab97f437e0</string>
 	<string name="defaultProtonChainUrl" translatable="false">https://proton.cryptolions.io/</string>
 
-	<string name="protonChainUsersInfoTableScope" translatable="false">eosio.proton</string>
-	<string name="protonChainUsersInfoTableCode" translatable="false">eosio.proton</string>
-	<string name="protonChainUsersInfoTableName" translatable="false">usersinfo</string>
+	<string name="votersXPRInfoTableScope" translatable="false">eosio</string>
+	<string name="votersXPRInfoTableCode" translatable="false">eosio</string>
+	<string name="votersXPRInfoTableName" translatable="false">votersxpr</string>
 
-	<string name="protonChainTokensTableScope" translatable="false">token.proton</string>
-	<string name="protonChainTokensTableCode" translatable="false">token.proton</string>
-	<string name="protonChainTokensTableName" translatable="false">tokens</string>
+	<!--string name="refundsXPRInfoTableScope" translatable="false">eosio</string-->
+	<string name="refundsXPRInfoTableCode" translatable="false">eosio</string>
+	<string name="refundsXPRInfoTableName" translatable="false">refundsxpr</string>
+
+	<string name="usersInfoTableScope" translatable="false">eosio.proton</string>
+	<string name="usersInfoTableCode" translatable="false">eosio.proton</string>
+	<string name="usersInfoTableName" translatable="false">usersinfo</string>
+
+	<string name="tokensTableScope" translatable="false">token.proton</string>
+	<string name="tokensTableCode" translatable="false">token.proton</string>
+	<string name="tokensTableName" translatable="false">tokens</string>
 
 	<string name="secureStorageKeyPairAlreadyExists">KeyPair already exists!</string>
 	<string name="secureStorageKeyPairDoesNotExist">KeyPair does not exist in Keystore</string>

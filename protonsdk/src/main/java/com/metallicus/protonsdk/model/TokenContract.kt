@@ -39,7 +39,8 @@ data class TokenContract(
 	@SerializedName("desc") val description: String,
 	@SerializedName("iconurl") val iconUrl: String,
 	@SerializedName("symbol") val precisionSymbol: String,
-	@SerializedName("blisted") val blacklisted: Int
+	@SerializedName("blisted") val blacklisted: Int,
+	var isSystemToken: Boolean = false
 ) {
 	lateinit var rates: Map<String, Double>
 

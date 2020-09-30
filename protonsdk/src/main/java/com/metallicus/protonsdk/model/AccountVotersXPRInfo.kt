@@ -21,23 +21,23 @@
  */
 package com.metallicus.protonsdk.model
 
-import androidx.room.*
 import com.google.gson.annotations.SerializedName
-import com.metallicus.protonsdk.db.DefaultTypeConverters
+import com.metallicus.protonsdk.eosio.commander.model.types.TypeAsset
+import com.metallicus.protonsdk.eosio.commander.model.types.TypeSymbol
 
-@Entity(
-	indices = [(Index("tokenContractId", "accountName", "contract", "symbol"))],
-	primaryKeys = ["tokenContractId", "accountName"])
-@TypeConverters(DefaultTypeConverters::class)
-data class CurrencyBalance(
-	@SerializedName("contract") val contract: String,
-	@SerializedName("symbol") val symbol: String,
-	@SerializedName("amount") val amount: String
+data class AccountVotersXPRInfo(
+	@SerializedName("owner") val owner: String? = "",
+	@SerializedName("staked") val staked: Long? = 0,
+	@SerializedName("isqualified") val isQualified: Long? = 0,
+	@SerializedName("claimamount") val claimAmount: Long? = 0,
+	@SerializedName("lastclaim") val lastClaim: String? = ""
 ) {
-	lateinit var tokenContractId: String
-	lateinit var accountName: String
-
-	fun getAmountDouble(): Double {
-		return amount.toDouble()
+	fun getStakedAmount(): Double {
+		var stakedAmount = 0.0
+		if (staked != null) {
+			val stakedAsset = TypeAsset(staked, TypeSymbol.fromString("4,XPR"))
+			stakedAmount = stakedAsset.toString().substringBefore(" ").toDouble()
+		}
+		return stakedAmount
 	}
 }

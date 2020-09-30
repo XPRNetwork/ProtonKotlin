@@ -25,6 +25,8 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.metallicus.protonsdk.model.AccountContact
+import com.metallicus.protonsdk.model.AccountRefundsXPRInfo
+import com.metallicus.protonsdk.model.AccountVotersXPRInfo
 
 object ProtonTypeConverters {
 	@TypeConverter
@@ -39,5 +41,33 @@ object ProtonTypeConverters {
 	fun accountContactToString(accountContact: AccountContact): String {
 		val type = object : TypeToken<AccountContact>() {}.type
 		return Gson().toJson(accountContact, type)
+	}
+
+	@TypeConverter
+	@JvmStatic
+	fun stringToAccountVotersXPRInfo(value: String?): AccountVotersXPRInfo? {
+		val type = object : TypeToken<AccountVotersXPRInfo>() {}.type
+		return Gson().fromJson(value, type)
+	}
+
+	@TypeConverter
+	@JvmStatic
+	fun accountVotersXPRInfoToString(accountVotersXPRInfo: AccountVotersXPRInfo): String {
+		val type = object : TypeToken<AccountVotersXPRInfo>() {}.type
+		return Gson().toJson(accountVotersXPRInfo, type)
+	}
+
+	@TypeConverter
+	@JvmStatic
+	fun stringToAccountRefundsXPRInfo(value: String?): AccountRefundsXPRInfo? {
+		val type = object : TypeToken<AccountRefundsXPRInfo>() {}.type
+		return Gson().fromJson(value, type)
+	}
+
+	@TypeConverter
+	@JvmStatic
+	fun accountRefundsXPRInfoToString(accountRefundsXPRInfo: AccountRefundsXPRInfo): String {
+		val type = object : TypeToken<AccountRefundsXPRInfo>() {}.type
+		return Gson().toJson(accountRefundsXPRInfo, type)
 	}
 }

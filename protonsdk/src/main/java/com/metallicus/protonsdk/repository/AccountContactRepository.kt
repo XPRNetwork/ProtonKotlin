@@ -50,4 +50,12 @@ class AccountContactRepository @Inject constructor(
 	suspend fun fetchAccountContact(chainUrl: String, accountName: String, usersInfoTableScope: String, usersInfoTableCode: String, usersInfoTableName: String): Response<JsonObject> {
 		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(usersInfoTableScope, usersInfoTableCode, usersInfoTableName, accountName, accountName))
 	}
+
+	suspend fun fetchAccountVotersXPRInfo(chainUrl: String, accountName: String, votersXPRInfoTableScope: String, votersXPRInfoTableCode: String, votersXPRInfoTableName: String): Response<JsonObject> {
+		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(votersXPRInfoTableScope, votersXPRInfoTableCode, votersXPRInfoTableName, accountName, accountName))
+	}
+
+	suspend fun fetchAccountRefundsXPRInfo(chainUrl: String, accountName: String, refundsXPRInfoTableScope: String, refundsXPRInfoTableCode: String, refundsXPRInfoTableName: String): Response<JsonObject> {
+		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(refundsXPRInfoTableScope, refundsXPRInfoTableCode, refundsXPRInfoTableName, accountName, accountName))
+	}
 }
