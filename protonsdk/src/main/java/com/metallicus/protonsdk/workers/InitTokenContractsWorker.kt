@@ -46,9 +46,9 @@ class InitTokenContractsWorker
 	private val tokenContractRepository: TokenContractRepository
 ) : CoroutineWorker(context, params) {
 
-	private val protonChainTokensTableScope = context.getString(R.string.protonChainTokensTableScope)
-	private val protonChainTokensTableCode = context.getString(R.string.protonChainTokensTableCode)
-	private val protonChainTokensTableName = context.getString(R.string.protonChainTokensTableName)
+	private val protonChainTokensTableScope = context.getString(R.string.tokensTableScope)
+	private val protonChainTokensTableCode = context.getString(R.string.tokensTableCode)
+	private val protonChainTokensTableName = context.getString(R.string.tokensTableName)
 
 	@Suppress("BlockingMethodInNonBlockingContext")
 	override suspend fun doWork(): Result {
@@ -72,6 +72,10 @@ class InitTokenContractsWorker
 
 					val tokenContract = gson.fromJson(tokenContractJsonObject, TokenContract::class.java)
 					tokenContract.rates = mapOf(Pair("USD", 0.0))
+
+					if (chainProvider.systemTokenSymbol == tokenContract.getSymbol()) {
+						tokenContract.isSystemToken = true
+					}
 
 					// TODO: add supply, maxSupply, and issuer from get_currency_stats
 

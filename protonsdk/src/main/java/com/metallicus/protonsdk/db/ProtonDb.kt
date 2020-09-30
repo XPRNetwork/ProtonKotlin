@@ -33,7 +33,7 @@ import com.metallicus.protonsdk.model.*
 		AccountContact::class,
 		CurrencyBalance::class,
 		Action::class],
-	version = 17,
+	version = 19,
 	exportSchema = false
 )
 abstract class ProtonDb : RoomDatabase() {

@@ -95,9 +95,9 @@ class ActionsModule {
 							accountContactRepository.addAccountContact(accountContact)
 						}
 
-						val usersInfoTableScope = context.getString(R.string.protonChainUsersInfoTableScope)
-						val usersInfoTableCode = context.getString(R.string.protonChainUsersInfoTableCode)
-						val usersInfoTableName = context.getString(R.string.protonChainUsersInfoTableName)
+						val usersInfoTableScope = context.getString(R.string.usersInfoTableScope)
+						val usersInfoTableCode = context.getString(R.string.usersInfoTableCode)
+						val usersInfoTableName = context.getString(R.string.usersInfoTableName)
 
 						val accountContactResponse = accountContactRepository.fetchAccountContact(chainUrl, accountContactId, usersInfoTableScope, usersInfoTableCode, usersInfoTableName)
 						if (accountContactResponse.isSuccessful) {

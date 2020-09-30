@@ -21,23 +21,18 @@
  */
 package com.metallicus.protonsdk.model
 
-import androidx.room.*
 import com.google.gson.annotations.SerializedName
-import com.metallicus.protonsdk.db.DefaultTypeConverters
 
-@Entity(
-	indices = [(Index("tokenContractId", "accountName", "contract", "symbol"))],
-	primaryKeys = ["tokenContractId", "accountName"])
-@TypeConverters(DefaultTypeConverters::class)
-data class CurrencyBalance(
-	@SerializedName("contract") val contract: String,
-	@SerializedName("symbol") val symbol: String,
-	@SerializedName("amount") val amount: String
+data class AccountRefundsXPRInfo(
+	@SerializedName("owner") val owner: String? = "",
+	@SerializedName("quantity") val quantity: String? = "",
+	@SerializedName("request_time") val requestTime: String? = ""
 ) {
-	lateinit var tokenContractId: String
-	lateinit var accountName: String
-
-	fun getAmountDouble(): Double {
-		return amount.toDouble()
+	fun quantityToDouble(): Double {
+		var quantityDouble = 0.0
+		if (quantity != "") {
+			quantityDouble = quantity?.substringBefore(" ")?.toDouble() ?: 0.0
+		}
+		return quantityDouble
 	}
 }

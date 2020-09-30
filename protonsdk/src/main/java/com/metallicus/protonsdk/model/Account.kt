@@ -65,6 +65,10 @@ data class Account(
 
 	lateinit var accountContact: AccountContact
 
+	lateinit var votersXPRInfo: AccountVotersXPRInfo
+
+	lateinit var refundsXPRInfo: AccountRefundsXPRInfo
+
 	fun getBalance(): String {
 		return coreLiquidBalance ?: "0"
 	}
@@ -94,5 +98,13 @@ data class Account(
 				selfDelegatedBandwidth.cpuWeightToDouble() + selfDelegatedBandwidth.netWeightToDouble()
 		}
 		return selfDelegatedResources
+	}
+
+	fun getStakedXPR(): Double {
+		return votersXPRInfo.getStakedAmount()
+	}
+
+	fun getRefundsXPR(): Double {
+		return refundsXPRInfo.quantityToDouble()
 	}
 }

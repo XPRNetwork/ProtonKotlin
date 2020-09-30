@@ -36,28 +36,24 @@ data class TokenCurrencyBalance(
 	)
 	val tokenContract: TokenContract
 ) {
-	private fun getBalanceDouble(selfDelegatedResources: Double): Double {
-		return if (selfDelegatedResources > 0.0) {
-			currencyBalance.amount.toDouble() + selfDelegatedResources
-		} else {
-			currencyBalance.amount.toDouble()
-		}
+	fun isSystemToken(): Boolean {
+		return (tokenContract.isSystemToken)
 	}
 
-	fun formatBalance(selfDelegatedResources: Double): String {
-		val balance = getBalanceDouble(selfDelegatedResources)
+	private fun getBalanceDouble(adjustments: Double = 0.0): Double {
+		return currencyBalance.getAmountDouble() + adjustments
+	}
+
+	fun formatBalance(adjustments: Double = 0.0): String {
+		val balance = getBalanceDouble(adjustments)
 		val nf = NumberFormat.getNumberInstance(Locale.US)
 		nf.minimumFractionDigits = tokenContract.getPrecision()
 		nf.maximumFractionDigits = tokenContract.getPrecision()
 		return nf.format(balance)
 	}
 
-	fun formatBalance(): String {
-		return formatBalance(-1.0)
-	}
-
-	fun getBalanceForCurrencyDouble(currency: String, selfDelegatedResources: Double): Double {
-		val amount = getBalanceDouble(selfDelegatedResources)
+	fun getBalanceForCurrencyDouble(currency: String, adjustments: Double = 0.0): Double {
+		val amount = getBalanceDouble(adjustments)
 		val rate = if (tokenContract.rates.containsKey(currency)) {
 			tokenContract.rates.getValue(currency)
 		} else {
@@ -66,18 +62,10 @@ data class TokenCurrencyBalance(
 		return amount.times(rate)
 	}
 
-	fun getBalanceForCurrencyDouble(currency: String): Double {
-		return getBalanceForCurrencyDouble(currency, -1.0)
-	}
-
-	fun formatBalanceForCurrency(currency: String, selfDelegatedResources: Double): String {
-		val amountCurrency = getBalanceForCurrencyDouble(currency, selfDelegatedResources)
+	fun formatBalanceForCurrency(currency: String, adjustments: Double = 0.0): String {
+		val amountCurrency = getBalanceForCurrencyDouble(currency, adjustments)
 
 		val nf = NumberFormat.getCurrencyInstance(Locale.US)
 		return nf.format(amountCurrency)
-	}
-
-	fun formatBalanceForCurrency(currency: String): String {
-		return formatBalanceForCurrency(currency, -1.0)
 	}
 }

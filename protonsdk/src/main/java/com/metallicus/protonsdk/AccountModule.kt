@@ -23,6 +23,8 @@ package com.metallicus.protonsdk
 
 import android.content.Context
 import android.util.Base64
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
@@ -33,7 +35,6 @@ import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
 import timber.log.Timber
-import java.nio.charset.Charset
 import javax.inject.Inject
 
 /**
@@ -122,16 +123,16 @@ class AccountModule {
 		val accountContact = AccountContact(accountName)
 		accountContact.accountName = accountName
 
-		val usersInfoTableScope = context.getString(R.string.protonChainUsersInfoTableScope)
-		val usersInfoTableCode = context.getString(R.string.protonChainUsersInfoTableCode)
-		val usersInfoTableName = context.getString(R.string.protonChainUsersInfoTableName)
+		val usersInfoTableScope = context.getString(R.string.usersInfoTableScope)
+		val usersInfoTableCode = context.getString(R.string.usersInfoTableCode)
+		val usersInfoTableName = context.getString(R.string.usersInfoTableName)
 
 		val response = accountContactRepository.fetchAccountContact(
 			chainUrl, accountName, usersInfoTableScope, usersInfoTableCode, usersInfoTableName)
 		if (response.isSuccessful) {
-			val userInfoJsonObject = response.body()
+			val userInfoRows = response.body()
 
-			val rows = userInfoJsonObject?.getAsJsonArray("rows")
+			val rows = userInfoRows?.getAsJsonArray("rows")
 			val size = rows?.size() ?: 0
 			if (size > 0) {
 				val userInfo = rows?.get(0)?.asJsonObject
@@ -152,6 +153,80 @@ class AccountModule {
 		return accountContact
 	}
 
+	private suspend fun fetchAccountVotersXPRInfo(chainUrl: String, accountName: String): AccountVotersXPRInfo {
+		var accountVotersXPRInfo = AccountVotersXPRInfo()
+
+		val votersXPRInfoTableScope = context.getString(R.string.votersXPRInfoTableScope)
+		val votersXPRInfoTableCode = context.getString(R.string.votersXPRInfoTableCode)
+		val votersXPRInfoTableName = context.getString(R.string.votersXPRInfoTableName)
+
+		val response = accountContactRepository.fetchAccountVotersXPRInfo(
+			chainUrl, accountName, votersXPRInfoTableScope, votersXPRInfoTableCode, votersXPRInfoTableName)
+		if (response.isSuccessful) {
+			val votersXPRInfoRows = response.body()
+
+			val rows = votersXPRInfoRows?.getAsJsonArray("rows")
+			val size = rows?.size() ?: 0
+			if (size > 0) {
+				val votersXPRInfo = rows?.get(0)?.asJsonObject
+
+				try {
+					accountVotersXPRInfo = Gson().fromJson(votersXPRInfo, AccountVotersXPRInfo::class.java)
+				} catch(e: JsonSyntaxException) {
+					Timber.e(e)
+				}
+			}
+		} else {
+			val msg = response.errorBody()?.string()
+			val errorMsg = if (msg.isNullOrEmpty()) {
+				response.message()
+			} else {
+				msg
+			}
+
+			Timber.e(errorMsg)
+		}
+
+		return accountVotersXPRInfo
+	}
+
+	private suspend fun fetchAccountRefundsXPRInfo(chainUrl: String, accountName: String): AccountRefundsXPRInfo {
+		var accountRefundsXPRInfo = AccountRefundsXPRInfo()
+
+		val refundsXPRInfoTableScope = accountName
+		val refundsXPRInfoTableCode = context.getString(R.string.refundsXPRInfoTableCode)
+		val refundsXPRInfoTableName = context.getString(R.string.refundsXPRInfoTableName)
+
+		val response = accountContactRepository.fetchAccountRefundsXPRInfo(
+			chainUrl, accountName, refundsXPRInfoTableScope, refundsXPRInfoTableCode, refundsXPRInfoTableName)
+		if (response.isSuccessful) {
+			val refundsXPRInfoRows = response.body()
+
+			val rows = refundsXPRInfoRows?.getAsJsonArray("rows")
+			val size = rows?.size() ?: 0
+			if (size > 0) {
+				val refundsXPRInfo = rows?.get(0)?.asJsonObject
+
+				try {
+					accountRefundsXPRInfo = Gson().fromJson(refundsXPRInfo, AccountRefundsXPRInfo::class.java)
+				} catch(e: JsonSyntaxException) {
+					Timber.e(e)
+				}
+			}
+		} else {
+			val msg = response.errorBody()?.string()
+			val errorMsg = if (msg.isNullOrEmpty()) {
+				response.message()
+			} else {
+				msg
+			}
+
+			Timber.d(errorMsg)
+		}
+
+		return accountRefundsXPRInfo
+	}
+
 	private suspend fun fetchAccount(chainId: String, chainUrl: String, accountName: String): Account? {
 		var account: Account? = null
 
@@ -159,7 +234,15 @@ class AccountModule {
 		if (response.isSuccessful) {
 			response.body()?.let { it ->
 				it.accountChainId = chainId
+
+				// fetch contact info
 				it.accountContact = fetchAccountContact(chainUrl, accountName)
+
+				// fetch voter info
+				it.votersXPRInfo = fetchAccountVotersXPRInfo(chainUrl, accountName)
+
+				// fetch refund info
+				it.refundsXPRInfo = fetchAccountRefundsXPRInfo(chainUrl, accountName)
 
 				account = it
 			}
