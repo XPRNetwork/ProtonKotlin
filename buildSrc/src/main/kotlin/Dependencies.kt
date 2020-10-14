@@ -23,120 +23,120 @@ const val kotlinVersion = "1.4.10"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-    const val versionCode = 21
-    const val versionName = "0.6.0"
+	const val versionCode = 22
+	const val versionName = "0.6.1"
 }
 
 object BuildPlugins {
-    object Versions {
-        const val gradle = "4.0.1"
-        const val dokka = "0.10.1"
-        const val bintray = "1.8.5"
-    }
+	object Versions {
+		const val gradle = "4.1.0"
+		const val dokka = "0.10.1"
+		const val bintray = "1.8.5"
+	}
 
-    const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.gradle}"
-    const val androidLibrary = "com.android.library"
-    const val kotlinAndroid = "android"
-    const val kotlinAndroidExtensions = "android.extensions"
-    const val kotlinKapt = "kapt"
-    const val mavenPublish = "maven-publish"
-    const val dokka = "org.jetbrains.dokka"
-    const val orchid = "com.eden.orchidPlugin"
-    const val bintray = "com.jfrog.bintray"
+	const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.gradle}"
+	const val androidLibrary = "com.android.library"
+	const val kotlinAndroid = "android"
+	const val kotlinAndroidExtensions = "android.extensions"
+	const val kotlinKapt = "kapt"
+	const val mavenPublish = "maven-publish"
+	const val dokka = "org.jetbrains.dokka"
+	const val orchid = "com.eden.orchidPlugin"
+	const val bintray = "com.jfrog.bintray"
 }
 
 object Android {
-    const val minSdk = 21
-    const val compileSdk = 30
-    const val targetSdk = compileSdk
-    const val buildTools = "30.0.1"
+	const val minSdk = 21
+	const val compileSdk = 30
+	const val targetSdk = compileSdk
+	const val buildTools = "30.0.1"
 
-    object Progaurd {
-        const val consumeFile = "consumer-rules.pro"
-        const val optimizeFile = "proguard-android-optimize.txt"
-        const val rulesFile = "proguard-rules.pro"
-    }
+	object Progaurd {
+		const val consumeFile = "consumer-rules.pro"
+		const val optimizeFile = "proguard-android-optimize.txt"
+		const val rulesFile = "proguard-rules.pro"
+	}
 }
 
 object Libraries {
-    private object Versions {
-        const val ktx = "1.5.0-alpha02"
-        const val lifecycleLiveData = "2.3.0-alpha05"
-        const val room = "2.2.5"
-        const val workManager = "2.4.0"
-        const val okhttp3 = "4.8.1"
-        const val retrofit = "2.9.0"
-        const val dagger = "2.28.3"
-        const val daggerAssistedInject = "0.5.2"
-        const val coroutines = "1.3.4"
-        const val timber = "4.7.1"
-        const val gson = "2.8.6"
-        const val guava = "29.0-jre"
-    }
+	private object Versions {
+		const val ktx = "1.5.0-alpha04"
+		const val lifecycleLiveData = "2.3.0-beta01"
+		const val room = "2.2.5"
+		const val workManager = "2.4.0"
+		const val okhttp3 = "4.9.0"
+		const val retrofit = "2.9.0"
+		const val dagger = "2.29.1"
+		const val daggerAssistedInject = "0.6.0"
+		const val coroutines = "1.4.0-M1"
+		const val timber = "4.7.1"
+		const val gson = "2.8.6"
+		const val guava = "29.0-jre"
+	}
 
-    const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    const val ktxCore = "androidx.core:core-ktx:${Versions.ktx}"
-    const val lifeCycleLiveData = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycleLiveData}"
-    const val roomKtx = "androidx.room:room-ktx:${Versions.room}"
-    const val roomCompiler = "androidx.room:room-compiler:${Versions.room}"
-    const val workManagerKtx = "androidx.work:work-runtime-ktx:${Versions.workManager}"
-    const val okhttp3 = "com.squareup.okhttp3:okhttp:${Versions.okhttp3}"
-    const val okhttp3Logging = "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp3}"
-    const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
-    const val retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-    const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
-    const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:${Versions.dagger}"
-    const val daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:${Versions.dagger}"
-    const val daggerAndroidCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
-    const val daggerAssistedInjectAnnotations = "com.squareup.inject:assisted-inject-annotations-dagger2:${Versions.daggerAssistedInject}"
-    const val daggerAssistedInjectProcessor = "com.squareup.inject:assisted-inject-processor-dagger2:${Versions.daggerAssistedInject}"
-    const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
-    const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
-    const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
-    const val gson = "com.google.code.gson:gson:${Versions.gson}"
-    const val guava = "com.google.guava:guava:${Versions.guava}"
-    const val orchidDocs = "io.github.javaeden.orchid:OrchidDocs:$orchidVersion"
-    const val orchidKotlindoc = "io.github.javaeden.orchid:OrchidKotlindoc:$orchidVersion"
-    const val orchidPluginDocs = "io.github.javaeden.orchid:OrchidPluginDocs:$orchidVersion"
-    const val orchidGithub = "io.github.javaeden.orchid:OrchidGithub:$orchidVersion"
+	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+	const val ktxCore = "androidx.core:core-ktx:${Versions.ktx}"
+	const val lifeCycleLiveData = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycleLiveData}"
+	const val roomKtx = "androidx.room:room-ktx:${Versions.room}"
+	const val roomCompiler = "androidx.room:room-compiler:${Versions.room}"
+	const val workManagerKtx = "androidx.work:work-runtime-ktx:${Versions.workManager}"
+	const val okhttp3 = "com.squareup.okhttp3:okhttp:${Versions.okhttp3}"
+	const val okhttp3Logging = "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp3}"
+	const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
+	const val retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
+	const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
+	const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:${Versions.dagger}"
+	const val daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:${Versions.dagger}"
+	const val daggerAndroidCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
+	const val daggerAssistedInjectAnnotations = "com.squareup.inject:assisted-inject-annotations-dagger2:${Versions.daggerAssistedInject}"
+	const val daggerAssistedInjectProcessor = "com.squareup.inject:assisted-inject-processor-dagger2:${Versions.daggerAssistedInject}"
+	const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+	const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
+	const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
+	const val gson = "com.google.code.gson:gson:${Versions.gson}"
+	const val guava = "com.google.guava:guava:${Versions.guava}"
+	const val orchidDocs = "io.github.javaeden.orchid:OrchidDocs:$orchidVersion"
+	const val orchidKotlindoc = "io.github.javaeden.orchid:OrchidKotlindoc:$orchidVersion"
+	const val orchidPluginDocs = "io.github.javaeden.orchid:OrchidPluginDocs:$orchidVersion"
+	const val orchidGithub = "io.github.javaeden.orchid:OrchidGithub:$orchidVersion"
 
-    // Greymass ESR
-    //implementation "com.greymass:esrsdk:1.0.1"
+	// Greymass ESR
+	//implementation "com.greymass:esrsdk:1.0.1"
 }
 
 object TestLibraries {
-    private object Versions {
-        const val junit = "4.13"
-        const val testExt = "1.1.2"
-        const val espresso = "3.3.0"
-    }
-    const val junit = "junit:junit:${Versions.junit}"
-    const val testExt = "androidx.test.ext:junit:${Versions.testExt}"
-    const val espresso = "androidx.test.espresso:espresso-core:${Versions.espresso}"
-    const val testRunner = "androidx.test.runner.AndroidJUnitRunner"
+	private object Versions {
+		const val junit = "4.13"
+		const val testExt = "1.1.2"
+		const val espresso = "3.3.0"
+	}
+	const val junit = "junit:junit:${Versions.junit}"
+	const val testExt = "androidx.test.ext:junit:${Versions.testExt}"
+	const val espresso = "androidx.test.espresso:espresso-core:${Versions.espresso}"
+	const val testRunner = "androidx.test.runner.AndroidJUnitRunner"
 }
 
 object Publishing {
-    object Publications {
-        const val debug = "ProtonSDKDebug"
-        const val release = "ProtonSDKRelease"
-    }
-    const val bintrayRepo = "ProtonKotlin"
-    const val bintrayName = "com.metallicus.protonsdk"
-    const val userOrganization = "protonprotocol"
+	object Publications {
+		const val debug = "ProtonSDKDebug"
+		const val release = "ProtonSDKRelease"
+	}
+	const val bintrayRepo = "ProtonKotlin"
+	const val bintrayName = "com.metallicus.protonsdk"
+	const val userOrganization = "protonprotocol"
 
-    const val libraryName = "protonsdk"
-    const val libraryVersion = ProtonSdk.versionName
+	const val libraryName = "protonsdk"
+	const val libraryVersion = ProtonSdk.versionName
 
-    const val publishedGroupId = "com.metallicus"
+	const val publishedGroupId = "com.metallicus"
 
-    const val libraryDescription = "Kotlin library for handling Proton Chain operations"
-    const val siteUrl = "https://github.com/ProtonProtocol/ProtonKotlin"
-    const val gitUrl = "https://github.com/ProtonProtocol/ProtonKotlin.git"
-    const val developerId = "joey-harward"
-    const val developerName = "Metallicus Inc."
-    const val developerEmail = "joey@metalpay.co"
-    const val licenseName = "MIT License"
-    const val licenseUrl = "https://opensource.org/licenses/MIT"
-    const val allLicenses = "MIT"
+	const val libraryDescription = "Kotlin library for handling Proton Chain operations"
+	const val siteUrl = "https://github.com/ProtonProtocol/ProtonKotlin"
+	const val gitUrl = "https://github.com/ProtonProtocol/ProtonKotlin.git"
+	const val developerId = "joey-harward"
+	const val developerName = "Metallicus Inc."
+	const val developerEmail = "joey@metalpay.co"
+	const val licenseName = "MIT License"
+	const val licenseUrl = "https://opensource.org/licenses/MIT"
+	const val allLicenses = "MIT"
 }
