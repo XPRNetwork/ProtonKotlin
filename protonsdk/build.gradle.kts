@@ -96,7 +96,7 @@ dependencies {
 	implementation(Libraries.guava)
 
 	// Greymass ESR
-	//implementation "com.greymass:esrsdk:1.0.1"
+	implementation(Libraries.greymassESR)
 }
 
 // Dokka

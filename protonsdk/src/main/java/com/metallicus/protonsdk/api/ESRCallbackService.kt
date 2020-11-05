@@ -19,39 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.repository
+package com.metallicus.protonsdk.api
 
 import com.google.gson.JsonObject
-import com.metallicus.protonsdk.api.AccountBody
-import com.metallicus.protonsdk.api.ProtonChainService
-import com.metallicus.protonsdk.db.ChainProviderDao
-import com.metallicus.protonsdk.model.ChainProvider
 import retrofit2.Response
-import javax.inject.Inject
-import javax.inject.Singleton
+import retrofit2.http.*
 
-@Singleton
-class ChainProviderRepository @Inject constructor(
-	private val chainProviderDao: ChainProviderDao,
-	private val protonChainService: ProtonChainService
-) {
-	suspend fun removeAll() {
-		chainProviderDao.removeAll()
-	}
+data class CancelAuthorizeESRBody(val error: String)
+data class AuthorizeESRBody(val error: String)
 
-	suspend fun addChainProvider(chainProvider: ChainProvider) {
-		chainProviderDao.insert(chainProvider)
-	}
+interface ESRCallbackService {
+	@POST
+	suspend fun cancelAuthorizeESR(
+		@Url url: String,
+		@Body body: CancelAuthorizeESRBody): Response<String>
 
-	suspend fun fetchChainProvider(protonChainUrl: String): Response<JsonObject> {
-		return protonChainService.getChainProvider("$protonChainUrl/v1/chain/info")
-	}
-
-	suspend fun getChainProvider(id: String): ChainProvider {
-		return chainProviderDao.findById(id)
-	}
-
-	fun getAbi(chainUrl: String, accountName: String): Response<JsonObject> {
-		return protonChainService.getAbi("$chainUrl/v1/get_abi", AccountBody(accountName))
-	}
+	@POST
+	suspend fun authorizeESR(
+		@Url url: String,
+		@Body body: AuthorizeESRBody): Response<JsonObject>
 }

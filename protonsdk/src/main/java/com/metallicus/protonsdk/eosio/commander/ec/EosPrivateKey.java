@@ -26,11 +26,15 @@ package com.metallicus.protonsdk.eosio.commander.ec;
 
 import android.annotation.SuppressLint;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import com.metallicus.protonsdk.eosio.commander.Base58;
 import com.metallicus.protonsdk.eosio.commander.digest.Sha256;
+import com.metallicus.protonsdk.eosio.commander.digest.Sha512;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 
 /**
@@ -119,6 +123,26 @@ public class EosPrivateKey {
 		mPublicKey = new EosPublicKey(findPubKey(mPrivateKey), mCurveParam);
 	}
 
+	public byte[] getSharedSecret(EosPublicKey eosPublicKey, long nonce) {
+		byte[] r = getBytes();
+		byte[] publicKeyBytes = eosPublicKey.getBytes();
+		CurveParam param = EcTools.getCurveParam(CurveParam.SECP256_K1);
+		EcPoint publicKeyPoint = param.getCurve().decodePoint(publicKeyBytes);
+		EcPoint p = EcTools.multiply(publicKeyPoint, toUnsignedBigInteger(r));
+		byte[] encodedx = p.getX().toBigInteger().toByteArray();
+		if (encodedx.length > 32) {
+			encodedx = Arrays.copyOfRange(encodedx, 1, encodedx.length);
+		}
+
+		byte [] retval = encodedx;
+		if (nonce != 0L) {
+			byte[] nonceBytes = Longs.toByteArray(nonce);
+			retval = Bytes.concat(nonceBytes, encodedx);
+		}
+
+		Sha512 sha512 = Sha512.from(retval);
+		return sha512.getBytes();
+	}
 
 	public void clear() {
 		mPrivateKey.multiply(BigInteger.ZERO);

@@ -22,36 +22,20 @@
 package com.metallicus.protonsdk.repository
 
 import com.google.gson.JsonObject
-import com.metallicus.protonsdk.api.AccountBody
-import com.metallicus.protonsdk.api.ProtonChainService
-import com.metallicus.protonsdk.db.ChainProviderDao
-import com.metallicus.protonsdk.model.ChainProvider
+import com.metallicus.protonsdk.api.*
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ChainProviderRepository @Inject constructor(
-	private val chainProviderDao: ChainProviderDao,
-	private val protonChainService: ProtonChainService
+class ESRRepository @Inject constructor(
+	private val esrCallbackService: ESRCallbackService
 ) {
-	suspend fun removeAll() {
-		chainProviderDao.removeAll()
+	suspend fun cancelAuthorizeESR(url: String, error: String): Response<String> {
+		return esrCallbackService.cancelAuthorizeESR(url, CancelAuthorizeESRBody(error))
 	}
 
-	suspend fun addChainProvider(chainProvider: ChainProvider) {
-		chainProviderDao.insert(chainProvider)
-	}
-
-	suspend fun fetchChainProvider(protonChainUrl: String): Response<JsonObject> {
-		return protonChainService.getChainProvider("$protonChainUrl/v1/chain/info")
-	}
-
-	suspend fun getChainProvider(id: String): ChainProvider {
-		return chainProviderDao.findById(id)
-	}
-
-	fun getAbi(chainUrl: String, accountName: String): Response<JsonObject> {
-		return protonChainService.getAbi("$chainUrl/v1/get_abi", AccountBody(accountName))
+	suspend fun authorizeESR(url: String, error: String): Response<JsonObject> {
+		return esrCallbackService.authorizeESR(url, AuthorizeESRBody(error))
 	}
 }

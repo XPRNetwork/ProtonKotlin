@@ -23,8 +23,8 @@ const val kotlinVersion = "1.4.10"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 22
-	const val versionName = "0.6.1"
+	const val versionCode = 23
+	const val versionName = "0.7.0"
 }
 
 object BuildPlugins {
@@ -49,7 +49,7 @@ object Android {
 	const val minSdk = 21
 	const val compileSdk = 30
 	const val targetSdk = compileSdk
-	const val buildTools = "30.0.1"
+	const val buildTools = "30.0.2"
 
 	object Progaurd {
 		const val consumeFile = "consumer-rules.pro"
@@ -72,6 +72,7 @@ object Libraries {
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
 		const val guava = "29.0-jre"
+		const val esr = "1.0.1"
 	}
 
 	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -99,9 +100,7 @@ object Libraries {
 	const val orchidKotlindoc = "io.github.javaeden.orchid:OrchidKotlindoc:$orchidVersion"
 	const val orchidPluginDocs = "io.github.javaeden.orchid:OrchidPluginDocs:$orchidVersion"
 	const val orchidGithub = "io.github.javaeden.orchid:OrchidGithub:$orchidVersion"
-
-	// Greymass ESR
-	//implementation "com.greymass:esrsdk:1.0.1"
+	const val greymassESR = "com.greymass:esrsdk:${Versions.esr}"
 }
 
 object TestLibraries {
