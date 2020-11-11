@@ -35,7 +35,8 @@ import com.metallicus.protonsdk.db.DefaultTypeConverters
 data class AccountContact(
 	val id: String, // accountName
 	var name: String = "",
-	var avatar: String = ""
+	var avatar: String = "",
+	var verified: Boolean = false
 ) {
 	lateinit var accountName: String // owner accountName
 

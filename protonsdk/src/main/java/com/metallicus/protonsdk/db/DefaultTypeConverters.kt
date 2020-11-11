@@ -24,7 +24,6 @@ package com.metallicus.protonsdk.db
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.metallicus.protonsdk.model.AccountContact
 import timber.log.Timber
 
 object DefaultTypeConverters {
