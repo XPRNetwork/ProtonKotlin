@@ -72,7 +72,7 @@ object Libraries {
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
 		const val guava = "29.0-jre"
-		const val esr = "1.0.1"
+		const val esr = "1.0.2"
 	}
 
 	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
