@@ -19,28 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.db
+package com.metallicus.protonsdk.api
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.metallicus.protonsdk.model.*
+import com.google.gson.JsonObject
+import retrofit2.Response
+import retrofit2.http.*
 
-@Database(
-	entities = [
-		ChainProvider::class,
-		TokenContract::class,
-		Account::class,
-		AccountContact::class,
-		CurrencyBalance::class,
-		Action::class],
-	version = 20,
-	exportSchema = false
-)
-abstract class ProtonDb : RoomDatabase() {
-	abstract fun chainProviderDao(): ChainProviderDao
-	abstract fun tokenContractDao(): TokenContractDao
-	abstract fun accountDao(): AccountDao
-	abstract fun currencyBalanceDao(): CurrencyBalanceDao
-	abstract fun accountContactDao(): AccountContactDao
-	abstract fun actionDao(): ActionDao
+data class CancelAuthorizeESRBody(val error: String)
+data class AuthorizeESRBody(val error: String)
+
+interface ESRCallbackService {
+	@POST
+	suspend fun cancelAuthorizeESR(
+		@Url url: String,
+		@Body body: CancelAuthorizeESRBody): Response<String>
+
+	@POST
+	suspend fun authorizeESR(
+		@Url url: String,
+		@Body body: AuthorizeESRBody): Response<JsonObject>
 }

@@ -23,9 +23,9 @@ package com.metallicus.protonsdk.di
 
 import android.content.Context
 import androidx.room.Room
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.metallicus.protonsdk.R
+import com.metallicus.protonsdk.api.ESRCallbackService
 import com.metallicus.protonsdk.api.ProtonChainService
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
@@ -33,7 +33,8 @@ import com.metallicus.protonsdk.db.*
 import com.metallicus.protonsdk.eosio.commander.GsonEosTypeAdapterFactory
 import dagger.Module
 import dagger.Provides
-import okhttp3.OkHttpClient
+import okhttp3.*
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -41,17 +42,6 @@ import javax.inject.Singleton
 
 @Module
 class ProtonModule {
-	@Singleton
-	@Provides
-	fun provideGson(): Gson {
-		return GsonBuilder()
-			.registerTypeAdapterFactory(GsonEosTypeAdapterFactory())
-//			.registerTypeAdapter(ActionTraceAct::class.java, ActionTraceActTypeAdapter())
-			.serializeNulls()
-//			.excludeFieldsWithoutExposeAnnotation()
-			.create()
-	}
-
 	@Singleton
 	@Provides
 	fun provideDb(context: Context): ProtonDb {
@@ -99,17 +89,22 @@ class ProtonModule {
 
 	@Singleton
 	@Provides
-	fun provideProtonChainService(context: Context, gson: Gson): ProtonChainService {
+	fun provideProtonChainService(context: Context): ProtonChainService {
 //		val logging = HttpLoggingInterceptor()
 //		logging.level = HttpLoggingInterceptor.Level.BODY
-//		val httpClient = OkHttpClient.Builder()
-//		httpClient.addInterceptor(logging)
 
 		val httpClient = OkHttpClient.Builder()
 			.callTimeout(30, TimeUnit.SECONDS)
 			.connectTimeout(30, TimeUnit.SECONDS)
 			.readTimeout(30, TimeUnit.SECONDS)
 			.writeTimeout(30, TimeUnit.SECONDS)
+//			.addInterceptor(logging)
+
+		val gson = GsonBuilder()
+			.registerTypeAdapterFactory(GsonEosTypeAdapterFactory())
+			.serializeNulls()
+//			.excludeFieldsWithoutExposeAnnotation()
+			.create()
 
 		return Retrofit.Builder()
 			.baseUrl(context.getString(R.string.defaultProtonChainUrl))
@@ -117,6 +112,32 @@ class ProtonModule {
 			.client(httpClient.build())
 			.build()
 			.create(ProtonChainService::class.java)
+	}
+
+	@Singleton
+	@Provides
+	fun provideESRCallbackService(context: Context): ESRCallbackService {
+		val logging = HttpLoggingInterceptor()
+		logging.level = HttpLoggingInterceptor.Level.BODY
+
+		val httpClient = OkHttpClient.Builder()
+			.callTimeout(30, TimeUnit.SECONDS)
+			.connectTimeout(30, TimeUnit.SECONDS)
+			.readTimeout(30, TimeUnit.SECONDS)
+			.writeTimeout(30, TimeUnit.SECONDS)
+			.addInterceptor(logging)
+
+		val gson = GsonBuilder()
+			.setLenient()
+			.serializeNulls()
+			.create()
+
+		return Retrofit.Builder()
+			.baseUrl(context.getString(R.string.defaultESRCallbackUrl))
+			.addConverterFactory(GsonConverterFactory.create(gson))
+			.client(httpClient.build())
+			.build()
+			.create(ESRCallbackService::class.java)
 	}
 
 	@Singleton

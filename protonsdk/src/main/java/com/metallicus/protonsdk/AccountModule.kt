@@ -23,8 +23,9 @@ package com.metallicus.protonsdk
 
 import android.content.Context
 import android.util.Base64
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
+import com.google.gson.*
+import com.greymass.esr.ESR
+import com.greymass.esr.SigningRequest
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
@@ -34,6 +35,8 @@ import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
+import com.metallicus.protonsdk.repository.ChainProviderRepository
+import com.metallicus.protonsdk.repository.ESRRepository
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,7 +51,13 @@ class AccountModule {
 	lateinit var accountRepository: AccountRepository
 
 	@Inject
+	lateinit var chainProviderRepository: ChainProviderRepository
+
+	@Inject
 	lateinit var accountContactRepository: AccountContactRepository
+
+	@Inject
+	lateinit var esrRepository: ESRRepository
 
 	@Inject
 	lateinit var prefs: Prefs
@@ -138,6 +147,8 @@ class AccountModule {
 				val userInfo = rows?.get(0)?.asJsonObject
 				accountContact.name = userInfo?.get("name")?.asString.orEmpty()
 				accountContact.avatar = userInfo?.get("avatar")?.asString.orEmpty()
+				val verifiedInt = userInfo?.get("verified")?.asInt ?: 0
+				accountContact.verified = verifiedInt == 1
 			}
 		} else {
 			val msg = response.errorBody()?.string()
@@ -387,6 +398,102 @@ class AccountModule {
 				msg
 			}
 			Resource.error(errorMsg)
+		}
+	}
+
+	suspend fun decodeESR(chainAccount: ChainAccount, originalESRUrl: String): ProtonESR {
+		val originalESRUrlScheme = originalESRUrl.substringBefore(":")
+		val esrUrl = "esr:" + originalESRUrl.substringAfter(":")
+
+		val chainId = chainAccount.chainProvider.chainId
+		val chainUrl = chainAccount.chainProvider.chainUrl
+
+		val esr = ESR(context) { account ->
+			val response = chainProviderRepository.getAbi(chainUrl, account)
+			if (response.isSuccessful) {
+				response.body()?.toString()
+			} else {
+				response.errorBody()?.toString()
+			}
+		}
+
+		val signingRequest = SigningRequest(esr)
+		signingRequest.load(esrUrl)
+
+		// TODO: need chainId original string from esr request
+		//val esrChainId = signingRequest.chainId.toVariant()
+		//if (esrChainId == chainAccount.chainProvider.chainId) {
+
+		val requestAccountName = signingRequest.info["req_account"].orEmpty()
+
+		val requestKey = ""
+		if (signingRequest.isIdentity) {
+			val linkStr = signingRequest.info["link"]
+
+			// TODO: deserialize link as LinkCreate obj
+		}
+
+		val returnPath = signingRequest.info["return_path"].orEmpty()
+
+		val requestAccount: Account? = if (requestAccountName.isNotEmpty()) {
+			fetchAccount(chainId, chainUrl, requestAccountName)
+		} else {
+			null
+		}
+
+		return ProtonESR(
+			requestKey,
+			chainAccount,
+			signingRequest,
+			originalESRUrlScheme,
+			requestAccount,
+			returnPath
+		)
+	}
+
+	suspend fun cancelAuthorizeESR(protonESR: ProtonESR): Resource<String> {
+		return try {
+			val callback = protonESR.signingRequest.callback
+
+			val response =
+				esrRepository.cancelAuthorizeESR(callback, "User canceled request")
+			if (response.isSuccessful) {
+				Resource.success(response.body())
+			} else {
+				val msg = response.errorBody()?.string()
+				val errorMsg = if (msg.isNullOrEmpty()) {
+					response.message()
+				} else {
+					msg
+				}
+
+				Resource.error(errorMsg)
+			}
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty())
+		}
+	}
+
+	suspend fun authorizeESR(protonESR: ProtonESR): Resource<JsonObject> {
+		return try {
+			val callback = protonESR.signingRequest.callback
+
+			val response =
+				esrRepository.authorizeESR(callback, "")
+			if (response.isSuccessful) {
+				Resource.success(response.body())
+			} else {
+				val msg = response.errorBody()?.string()
+				val errorMsg = if (msg.isNullOrEmpty()) {
+					response.message()
+				} else {
+					msg
+				}
+
+				Resource.error(errorMsg)
+			}
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty())
 		}
 	}
 }

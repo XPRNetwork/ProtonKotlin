@@ -488,4 +488,48 @@ class Proton private constructor(context: Context) {
 			emit(error)
 		}
 	}
+
+	fun decodeESR(esrUri: String): LiveData<Resource<ProtonESR>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			emit(Resource.success(accountModule.decodeESR(activeAccount, esrUri)))
+		} catch (e: ProtonException) {
+			val error: Resource<ProtonESR> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<ProtonESR> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun cancelAuthorizeESR(protonESR: ProtonESR): LiveData<Resource<String>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			emit(accountModule.cancelAuthorizeESR(protonESR))
+		} catch (e: ProtonException) {
+			val error: Resource<String> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<String> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun authorizeESR(protonESR: ProtonESR): LiveData<Resource<JsonObject>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			emit(accountModule.authorizeESR(protonESR))
+		} catch (e: ProtonException) {
+			val error: Resource<JsonObject> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<JsonObject> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
 }

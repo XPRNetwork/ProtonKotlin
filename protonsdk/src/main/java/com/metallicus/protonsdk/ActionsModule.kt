@@ -109,6 +109,8 @@ class ActionsModule {
 								val userInfo = rows?.get(0)?.asJsonObject
 								accountContact.name = userInfo?.get("name")?.asString.orEmpty()
 								accountContact.avatar = userInfo?.get("avatar")?.asString.orEmpty()
+								val verifiedInt = userInfo?.get("verified")?.asInt ?: 0
+								accountContact.verified = verifiedInt == 1
 							}
 						} else {
 							val msg = response.errorBody()?.string()

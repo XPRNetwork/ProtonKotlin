@@ -75,6 +75,12 @@ interface ProtonChainService {
 		@Body body: AccountBody
 	): Response<Account>
 
+	@POST//("/v1/chain/get_abi")
+	fun getAbi(
+		@Url url: String,
+		@Body body: AccountBody
+	): Response<JsonObject>
+
 	@GET//("/v2/state/get_tokens?account=")
 	suspend fun getCurrencyBalances(
 		@Url url: String,

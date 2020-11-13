@@ -19,28 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.db
+package com.metallicus.protonsdk.model
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.metallicus.protonsdk.model.*
+import com.greymass.esr.ResolvedSigningRequest
+import com.greymass.esr.SigningRequest
 
-@Database(
-	entities = [
-		ChainProvider::class,
-		TokenContract::class,
-		Account::class,
-		AccountContact::class,
-		CurrencyBalance::class,
-		Action::class],
-	version = 20,
-	exportSchema = false
-)
-abstract class ProtonDb : RoomDatabase() {
-	abstract fun chainProviderDao(): ChainProviderDao
-	abstract fun tokenContractDao(): TokenContractDao
-	abstract fun accountDao(): AccountDao
-	abstract fun currencyBalanceDao(): CurrencyBalanceDao
-	abstract fun accountContactDao(): AccountContactDao
-	abstract fun actionDao(): ActionDao
+class ProtonESR(
+	val requestKey: String,
+	val signingAccount: ChainAccount,
+	val signingRequest: SigningRequest,
+	val originESRUrlScheme: String,
+	val requestAccount: Account? = null,
+	val returnPath: String? = "",
+	val resolvedSigningRequest: ResolvedSigningRequest? = null//,
+	//val actions: List<ProtonESRAction>
+) {
+	fun getRequestAccountDisplayName(): String {
+		return requestAccount?.accountContact?.getDisplayName() ?: "Unknown Requester"
+	}
 }

@@ -19,28 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.db
+package com.metallicus.protonsdk.repository
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.metallicus.protonsdk.model.*
+import com.google.gson.JsonObject
+import com.metallicus.protonsdk.api.*
+import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
-@Database(
-	entities = [
-		ChainProvider::class,
-		TokenContract::class,
-		Account::class,
-		AccountContact::class,
-		CurrencyBalance::class,
-		Action::class],
-	version = 20,
-	exportSchema = false
-)
-abstract class ProtonDb : RoomDatabase() {
-	abstract fun chainProviderDao(): ChainProviderDao
-	abstract fun tokenContractDao(): TokenContractDao
-	abstract fun accountDao(): AccountDao
-	abstract fun currencyBalanceDao(): CurrencyBalanceDao
-	abstract fun accountContactDao(): AccountContactDao
-	abstract fun actionDao(): ActionDao
+@Singleton
+class ESRRepository @Inject constructor(
+	private val esrCallbackService: ESRCallbackService
+) {
+	suspend fun cancelAuthorizeESR(url: String, error: String): Response<String> {
+		return esrCallbackService.cancelAuthorizeESR(url, CancelAuthorizeESRBody(error))
+	}
+
+	suspend fun authorizeESR(url: String, error: String): Response<JsonObject> {
+		return esrCallbackService.authorizeESR(url, AuthorizeESRBody(error))
+	}
 }
