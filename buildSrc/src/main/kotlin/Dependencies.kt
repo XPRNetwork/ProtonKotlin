@@ -29,8 +29,8 @@ object ProtonSdk {
 
 object BuildPlugins {
 	object Versions {
-		const val gradle = "4.1.0"
-		const val dokka = "0.10.1"
+		const val gradle = "4.1.1"
+		const val dokka = "0.10.1" // TODO: 1.4.0
 		const val bintray = "1.8.5"
 	}
 
