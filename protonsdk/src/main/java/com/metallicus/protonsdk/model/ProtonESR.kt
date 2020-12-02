@@ -31,7 +31,7 @@ class ProtonESR(
 	val originESRUrlScheme: String,
 	val requestAccount: Account? = null,
 	val returnPath: String? = "",
-	val resolvedSigningRequest: ResolvedSigningRequest? = null//,
+	var resolvedSigningRequest: ResolvedSigningRequest? = null//,
 	//val actions: List<ProtonESRAction>
 ) {
 	fun getRequestAccountDisplayName(): String {
