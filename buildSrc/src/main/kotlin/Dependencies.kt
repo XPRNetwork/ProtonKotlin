@@ -19,12 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const val kotlinVersion = "1.4.10"
+const val kotlinVersion = "1.4.10" // TODO: 1.4.20
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 23
-	const val versionName = "0.7.0"
+	const val versionCode = 24
+	const val versionName = "0.7.1"
 }
 
 object BuildPlugins {
@@ -66,13 +66,13 @@ object Libraries {
 		const val workManager = "2.4.0"
 		const val okhttp3 = "4.9.0"
 		const val retrofit = "2.9.0"
-		const val dagger = "2.29.1"
+		const val dagger = "2.30.1"
 		const val daggerAssistedInject = "0.6.0"
 		const val coroutines = "1.4.0-M1"
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
 		const val guava = "29.0-jre"
-		const val esr = "1.0.2"
+		const val esr = "1.0.4"
 	}
 
 	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"

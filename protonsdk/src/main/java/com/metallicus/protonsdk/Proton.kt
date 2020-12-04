@@ -519,16 +519,16 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun authorizeESR(protonESR: ProtonESR): LiveData<Resource<JsonObject>> = liveData {
+	fun authorizeESR(pin: String, protonESR: ProtonESR): LiveData<Resource<String>> = liveData {
 		emit(Resource.loading())
 
 		try {
-			emit(accountModule.authorizeESR(protonESR))
+			emit(accountModule.authorizeESR(pin, protonESR))
 		} catch (e: ProtonException) {
-			val error: Resource<JsonObject> = Resource.error(e)
+			val error: Resource<String> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
-			val error: Resource<JsonObject> = Resource.error(e.localizedMessage.orEmpty())
+			val error: Resource<String> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}

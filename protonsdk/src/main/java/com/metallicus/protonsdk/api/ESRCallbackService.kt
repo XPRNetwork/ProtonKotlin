@@ -21,12 +21,10 @@
  */
 package com.metallicus.protonsdk.api
 
-import com.google.gson.JsonObject
 import retrofit2.Response
 import retrofit2.http.*
 
-data class CancelAuthorizeESRBody(val error: String)
-data class AuthorizeESRBody(val error: String)
+data class CancelAuthorizeESRBody(val rejected: String)
 
 interface ESRCallbackService {
 	@POST
@@ -37,5 +35,5 @@ interface ESRCallbackService {
 	@POST
 	suspend fun authorizeESR(
 		@Url url: String,
-		@Body body: AuthorizeESRBody): Response<JsonObject>
+		@Body body: Map<String, String>): Response<String>
 }

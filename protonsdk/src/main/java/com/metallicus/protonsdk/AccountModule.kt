@@ -22,22 +22,27 @@
 package com.metallicus.protonsdk
 
 import android.content.Context
+import android.net.Uri
 import android.util.Base64
 import com.google.gson.*
 import com.greymass.esr.ESR
 import com.greymass.esr.SigningRequest
+import com.greymass.esr.models.PermissionLevel
+import com.greymass.esr.models.TransactionContext
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.eosio.commander.digest.Sha256
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
+import com.metallicus.protonsdk.eosio.commander.model.types.TypeChainId
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.metallicus.protonsdk.repository.ESRRepository
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -328,19 +333,25 @@ class AccountModule {
 		return secureKeys.getPrivateKey(publicKey, pin).orEmpty()
 	}
 
-	private fun getActiveAccountSignature(pin: String): String {
+	private fun signActiveAccountName(pin: String): String {
 		val accountName = prefs.getActiveAccountName()
-		val publicKey = prefs.getActivePublicKey()
+		return signWithActiveKey(pin, accountName)
+	}
 
+	private fun signWithActiveKey(pin: String, data: String): String {
+		return signWithActiveKey(pin, data.toByteArray())
+	}
+
+	private fun signWithActiveKey(pin: String, data: ByteArray): String {
+		val publicKey = prefs.getActivePublicKey()
 		val privateKeyStr = secureKeys.getPrivateKey(publicKey, pin)
 		val privateKey = EosPrivateKey(privateKeyStr)
-		val sha256 = Sha256.from(accountName.toByteArray())
-		val signature = privateKey.sign(sha256).toString()
-		return signature
+		val sha256 = Sha256.from(data)
+		return privateKey.sign(sha256).toString()
 	}
 
 	suspend fun updateAccountName(chainAccount: ChainAccount, pin: String, name: String): Resource<ChainAccount> {
-		val signature = getActiveAccountSignature(pin)
+		val signature = signActiveAccountName(pin)
 
 		val accountName = chainAccount.account.accountName
 
@@ -371,7 +382,7 @@ class AccountModule {
 	}
 
 	suspend fun updateAccountAvatar(chainAccount: ChainAccount, pin: String, imageByteArray: ByteArray): Resource<ChainAccount> {
-		val signature = getActiveAccountSignature(pin)
+		val signature = signActiveAccountName(pin)
 
 		val accountName = chainAccount.account.accountName
 
@@ -426,11 +437,14 @@ class AccountModule {
 
 		val requestAccountName = signingRequest.info["req_account"].orEmpty()
 
-		val requestKey = ""
+		var requestKey = ""
 		if (signingRequest.isIdentity) {
-			val linkStr = signingRequest.info["link"]
+			val linkHexValue = signingRequest.infoPairs.find {
+				it.key == "link"
+			}?.hexValue.orEmpty()
 
-			// TODO: deserialize link as LinkCreate obj
+			val linkCreate = signingRequest.decodeLinkCreate(linkHexValue)
+			requestKey = linkCreate.requestKey
 		}
 
 		val returnPath = signingRequest.info["return_path"].orEmpty()
@@ -474,12 +488,59 @@ class AccountModule {
 		}
 	}
 
-	suspend fun authorizeESR(protonESR: ProtonESR): Resource<JsonObject> {
-		return try {
-			val callback = protonESR.signingRequest.callback
+	fun getAppName(): String {
+		val applicationInfo = context.applicationInfo
+		val stringId = applicationInfo.labelRes
+		return if (stringId == 0) {
+			applicationInfo.nonLocalizedLabel.toString()
+		} else {
+			context.getString(stringId)
+		}
+	}
 
-			val response =
-				esrRepository.authorizeESR(callback, "")
+	suspend fun authorizeESR(pin: String, protonESR: ProtonESR): Resource<String> {
+		return try {
+			val resolvedSigningRequest =
+				protonESR.signingRequest.resolve(
+					PermissionLevel(protonESR.signingAccount.account.accountName, "active"), TransactionContext())
+
+			protonESR.resolvedSigningRequest = resolvedSigningRequest
+
+			val chainIdStr = protonESR.signingAccount.chainProvider.chainId
+			val chainIdByteArray = TypeChainId(chainIdStr).bytes
+
+			val transactionByteArray = resolvedSigningRequest.serializedTransaction
+
+			val trailingByteArray = ByteArray(32)
+
+			val unsignedTransactionDigest = chainIdByteArray + transactionByteArray + trailingByteArray
+
+			val signature = signWithActiveKey(pin, unsignedTransactionDigest)
+
+			val callback = resolvedSigningRequest.getCallback(listOf(signature))
+
+			val sessionKey = EosPrivateKey()
+
+			val sessionChannel = Uri.Builder()
+				.scheme("https")
+				.authority("cb.anchor.link")
+				.appendPath(UUID.randomUUID().toString())
+				.build()
+
+			val linkName = getAppName()
+
+			val authParams = callback.payload
+			authParams["link_key"] = sessionKey.publicKey.toString()
+			authParams["link_ch"] = sessionChannel.toString()
+			authParams["link_name"] = linkName
+			//authParams.remove("SIG")
+			authParams["sig"] = signature
+
+			val originalESRUrlScheme = protonESR.originESRUrlScheme + ":"
+			val req = authParams["req"]?.replace("esr:", originalESRUrlScheme)
+			authParams["req"] = req
+
+			val response = esrRepository.authorizeESR(callback.url, authParams)
 			if (response.isSuccessful) {
 				Resource.success(response.body())
 			} else {

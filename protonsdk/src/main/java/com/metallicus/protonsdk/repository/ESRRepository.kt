@@ -21,7 +21,6 @@
  */
 package com.metallicus.protonsdk.repository
 
-import com.google.gson.JsonObject
 import com.metallicus.protonsdk.api.*
 import retrofit2.Response
 import javax.inject.Inject
@@ -35,7 +34,7 @@ class ESRRepository @Inject constructor(
 		return esrCallbackService.cancelAuthorizeESR(url, CancelAuthorizeESRBody(error))
 	}
 
-	suspend fun authorizeESR(url: String, error: String): Response<JsonObject> {
-		return esrCallbackService.authorizeESR(url, AuthorizeESRBody(error))
+	suspend fun authorizeESR(url: String, params: Map<String, String>): Response<String> {
+		return esrCallbackService.authorizeESR(url, params)
 	}
 }
