@@ -24,6 +24,7 @@ package com.metallicus.protonsdk
 import android.content.Context
 import androidx.lifecycle.*
 import com.google.gson.JsonObject
+import com.metallicus.protonsdk.common.ESRSessionResource
 import com.metallicus.protonsdk.common.ProtonException
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.common.SingletonHolder
@@ -34,7 +35,11 @@ import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.eosio.commander.model.chain.Action as ChainAction
 import com.metallicus.protonsdk.model.*
 import kotlinx.coroutines.*
+import okhttp3.*
+import okhttp3.logging.HttpLoggingInterceptor
+import okio.ByteString
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -529,6 +534,117 @@ class Proton private constructor(context: Context) {
 			emit(error)
 		} catch (e: Exception) {
 			val error: Resource<String> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	private class ESRSessionListener(
+		val onOpenCallback: (String, Int) -> Unit,
+		val onMessageCallback: (String) -> Unit,
+		val onClosingCallback: (String, Int) -> Unit,
+		val onClosedCallback: (String, Int) -> Unit,
+		val onFailureCallback: (String, Int) -> Unit
+	): WebSocketListener() {
+		override fun onOpen(webSocket: WebSocket, response: Response) {
+			super.onOpen(webSocket, response)
+			Timber.d("ESRWebSocketListener onOpen - ${response.message}")
+			onOpenCallback(response.message, response.code)
+		}
+
+		override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+			super.onMessage(webSocket, bytes)
+			val text = bytes.hex()
+			Timber.d("ESRWebSocketListener onMessage - $text")
+			onMessageCallback(text)
+		}
+
+		override fun onMessage(webSocket: WebSocket, text: String) {
+			super.onMessage(webSocket, text)
+			Timber.d("ESRWebSocketListener onMessage - $text")
+			onMessageCallback(text)
+		}
+
+		override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+			super.onClosing(webSocket, code, reason)
+			Timber.d("ESRWebSocketListener onClosing - $reason")
+			onClosingCallback(reason, code)
+		}
+
+		override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+			super.onClosed(webSocket, code, reason)
+			Timber.d("ESRWebSocketListener onClosed - $reason")
+			onClosedCallback(reason, code)
+		}
+
+		override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+			super.onFailure(webSocket, t, response)
+			Timber.d("ESRWebSocketListener onFailure - ${response?.message.orEmpty()}")
+			onFailureCallback(response?.message.orEmpty(), response?.code ?: 0)
+		}
+	}
+
+	val esrSessions = MutableLiveData<ESRSessionResource>()
+	fun initESRSessions() = protonCoroutineScope.launch {
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			val esrSessionList = accountModule.getESRSessions(/*activeAccount*/)
+			esrSessionList.forEach { esrSession ->
+				val request = Request.Builder().url(esrSession.receiveChannelUrl).build()
+
+				val logging = HttpLoggingInterceptor()
+				logging.level = HttpLoggingInterceptor.Level.BODY
+
+				val httpClient = OkHttpClient.Builder()
+					.callTimeout(30, TimeUnit.SECONDS)
+					.connectTimeout(30, TimeUnit.SECONDS)
+					.readTimeout(30, TimeUnit.SECONDS)
+					.writeTimeout(30, TimeUnit.SECONDS)
+					.addInterceptor(logging)
+					.build()
+
+				val esrSessionListener = ESRSessionListener(
+					onOpenCallback = { message, code ->
+						Timber.d("ESR Listener onOpen - $message")
+						esrSessions.postValue(ESRSessionResource.onConnected(esrSession, message, code))
+					},
+					onMessageCallback = { message ->
+						Timber.d("ESR Listener onMessage - $message")
+						esrSessions.postValue(ESRSessionResource.onMessage(esrSession, message))
+					},
+					onClosingCallback = { reason, code ->
+						Timber.d("ESR Listener onClosing - $reason")
+						esrSessions.postValue(ESRSessionResource.onClosing(esrSession, reason, code))
+					},
+					onClosedCallback = { reason, code ->
+						Timber.d("ESR Listener onClosed - $reason")
+						esrSessions.postValue(ESRSessionResource.onClosed(esrSession, reason, code))
+					},
+					onFailureCallback = { message, code ->
+						Timber.d("ESR Listener onFailure - $message")
+						esrSessions.postValue(ESRSessionResource.onFailure(esrSession, message, code))
+					}
+				)
+
+				httpClient.newWebSocket(request, esrSessionListener)
+			}
+		} catch (e: Exception) {
+			Timber.e(e)
+		}
+	}
+
+	fun decodeESRSessionMessage(esrSession: ESRSession, message: String): LiveData<Resource<ProtonESR>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			emit(Resource.success(accountModule.decodeESRSessionMessage(activeAccount, esrSession, message)))
+		} catch (e: ProtonException) {
+			val error: Resource<ProtonESR> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<ProtonESR> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}

@@ -19,41 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.repository
+package com.metallicus.protonsdk.common
 
-import com.metallicus.protonsdk.api.*
-import com.metallicus.protonsdk.db.ESRSessionDao
-import com.metallicus.protonsdk.model.ESRSession
-import retrofit2.Response
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class ESRRepository @Inject constructor(
-	private val esrCallbackService: ESRCallbackService,
-	private val esrSessionDao: ESRSessionDao
-) {
-	suspend fun cancelAuthorizeESR(url: String, error: String): Response<String> {
-		return esrCallbackService.cancelAuthorizeESR(url, CancelAuthorizeESRBody(error))
-	}
-
-	suspend fun authorizeESR(url: String, params: Map<String, String>): Response<String> {
-		return esrCallbackService.authorizeESR(url, params)
-	}
-
-	suspend fun getESRSessions(): List<ESRSession> {
-		return esrSessionDao.findAll()
-	}
-
-	suspend fun addSession(esrSession: ESRSession) {
-		esrSessionDao.insert(esrSession)
-	}
-
-	suspend fun updateSession(esrSession: ESRSession) {
-		esrSessionDao.update(esrSession)
-	}
-
-	suspend fun removeSessions() {
-		esrSessionDao.removeAll()
-	}
+enum class ESRSessionStatus {
+	CONNECTED,
+	MESSAGE,
+	CLOSING,
+	CLOSED,
+	FAILURE
 }

@@ -32,8 +32,9 @@ import com.metallicus.protonsdk.model.*
 		Account::class,
 		AccountContact::class,
 		CurrencyBalance::class,
-		Action::class],
-	version = 20,
+		Action::class,
+		ESRSession::class],
+	version = 21,
 	exportSchema = false
 )
 abstract class ProtonDb : RoomDatabase() {
@@ -43,4 +44,5 @@ abstract class ProtonDb : RoomDatabase() {
 	abstract fun currencyBalanceDao(): CurrencyBalanceDao
 	abstract fun accountContactDao(): AccountContactDao
 	abstract fun actionDao(): ActionDao
+	abstract fun esrSessionDao(): ESRSessionDao
 }

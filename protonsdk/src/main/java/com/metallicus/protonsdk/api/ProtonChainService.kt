@@ -76,7 +76,7 @@ interface ProtonChainService {
 	): Response<Account>
 
 	@POST//("/v1/chain/get_abi")
-	fun getAbi(
+	suspend fun getAbi(
 		@Url url: String,
 		@Body body: AccountBody
 	): Response<JsonObject>

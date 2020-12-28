@@ -89,16 +89,22 @@ class ProtonModule {
 
 	@Singleton
 	@Provides
+	fun provideESRSessionDao(db: ProtonDb): ESRSessionDao {
+		return db.esrSessionDao()
+	}
+
+	@Singleton
+	@Provides
 	fun provideProtonChainService(context: Context): ProtonChainService {
-//		val logging = HttpLoggingInterceptor()
-//		logging.level = HttpLoggingInterceptor.Level.BODY
+		val logging = HttpLoggingInterceptor()
+		logging.level = HttpLoggingInterceptor.Level.BODY
 
 		val httpClient = OkHttpClient.Builder()
 			.callTimeout(30, TimeUnit.SECONDS)
 			.connectTimeout(30, TimeUnit.SECONDS)
 			.readTimeout(30, TimeUnit.SECONDS)
 			.writeTimeout(30, TimeUnit.SECONDS)
-//			.addInterceptor(logging)
+			.addInterceptor(logging)
 
 		val gson = GsonBuilder()
 			.registerTypeAdapterFactory(GsonEosTypeAdapterFactory())

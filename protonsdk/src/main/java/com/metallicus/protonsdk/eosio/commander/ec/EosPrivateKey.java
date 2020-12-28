@@ -123,7 +123,7 @@ public class EosPrivateKey {
 		mPublicKey = new EosPublicKey(findPubKey(mPrivateKey), mCurveParam);
 	}
 
-	public byte[] getSharedSecret(EosPublicKey eosPublicKey, long nonce) {
+	public byte[] getSharedSecret(EosPublicKey eosPublicKey) {
 		byte[] r = getBytes();
 		byte[] publicKeyBytes = eosPublicKey.getBytes();
 		CurveParam param = EcTools.getCurveParam(CurveParam.SECP256_K1);
@@ -133,14 +133,7 @@ public class EosPrivateKey {
 		if (encodedx.length > 32) {
 			encodedx = Arrays.copyOfRange(encodedx, 1, encodedx.length);
 		}
-
-		byte [] retval = encodedx;
-		if (nonce != 0L) {
-			byte[] nonceBytes = Longs.toByteArray(nonce);
-			retval = Bytes.concat(nonceBytes, encodedx);
-		}
-
-		Sha512 sha512 = Sha512.from(retval);
+		Sha512 sha512 = Sha512.from(encodedx);
 		return sha512.getBytes();
 	}
 

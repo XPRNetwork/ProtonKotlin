@@ -19,41 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.repository
+package com.metallicus.protonsdk.model
 
-import com.metallicus.protonsdk.api.*
-import com.metallicus.protonsdk.db.ESRSessionDao
-import com.metallicus.protonsdk.model.ESRSession
-import retrofit2.Response
-import javax.inject.Inject
-import javax.inject.Singleton
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-@Singleton
-class ESRRepository @Inject constructor(
-	private val esrCallbackService: ESRCallbackService,
-	private val esrSessionDao: ESRSessionDao
-) {
-	suspend fun cancelAuthorizeESR(url: String, error: String): Response<String> {
-		return esrCallbackService.cancelAuthorizeESR(url, CancelAuthorizeESRBody(error))
-	}
+@Entity
+class ESRSession(
+	@PrimaryKey
+	@SerializedName("id")
+	var id: String,
+	@SerializedName("signer")
+	var signer: String,
+	@SerializedName("callbackUrl")
+	var callbackUrl: String,
+	@SerializedName("receiveKey")
+	var receiveKey: String,
+	@SerializedName("receiveChannelUrl")
+	var receiveChannelUrl: String,
+	@SerializedName("createdAt")
+	var createdAt: Long,
+	@SerializedName("updatedAt")
+	var updatedAt: Long,
 
-	suspend fun authorizeESR(url: String, params: Map<String, String>): Response<String> {
-		return esrCallbackService.authorizeESR(url, params)
-	}
-
-	suspend fun getESRSessions(): List<ESRSession> {
-		return esrSessionDao.findAll()
-	}
-
-	suspend fun addSession(esrSession: ESRSession) {
-		esrSessionDao.insert(esrSession)
-	}
-
-	suspend fun updateSession(esrSession: ESRSession) {
-		esrSessionDao.update(esrSession)
-	}
-
-	suspend fun removeSessions() {
-		esrSessionDao.removeAll()
-	}
-}
+	@SerializedName("requester")
+	@Embedded(prefix = "requester_")
+	var requester: Account? = null
+)
