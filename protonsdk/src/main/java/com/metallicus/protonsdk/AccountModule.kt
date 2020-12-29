@@ -442,7 +442,7 @@ class AccountModule {
 		return SigningRequest(esr)
 	}
 
-	suspend fun decodeESR(chainAccount: ChainAccount, originalESRUrl: String, esrSession: ESRSession?=null): ProtonESR {
+	suspend fun decodeESR(chainAccount: ChainAccount, tokenContractMap: Map<String, TokenContract>, originalESRUrl: String, esrSession: ESRSession?=null): ProtonESR {
 		val originalESRUrlScheme = originalESRUrl.substringBefore(":")
 		val esrUrl = "esr:" + originalESRUrl.substringAfter(":")
 
@@ -466,7 +466,7 @@ class AccountModule {
 			requestKey = esrSession.id
 		}
 
-		var actions = listOf<Action>()
+		val actions = mutableListOf<ESRAction>()
 		if (signingRequest.isIdentity) {
 			val requestAccountName = signingRequest.info["req_account"].orEmpty()
 
@@ -479,7 +479,26 @@ class AccountModule {
 			val linkCreate = signingRequest.decodeLinkCreate(linkHexValue)
 			requestKey = linkCreate.requestKey
 		} else {
-			actions = signingRequest.resolveActions()
+			val resolvedActions = signingRequest.resolveActions()
+			resolvedActions.forEach {
+				val name = it.name.name
+				val accountName = it.account.name
+				val data = it.data.data
+
+				val type = if (name == "transfer") Type.TRANSFER else Type.CUSTOM
+
+				val tokenContract = if (type==Type.TRANSFER) {
+					val quantity = data["quantity"] as String
+					if (quantity.isNotEmpty()) {
+						val symbol = quantity.split(" ")[1]
+
+						tokenContractMap["$accountName:$symbol"]
+					} else { null }
+				} else { null }
+
+				val esrAction = ESRAction(type, name, accountName, data, tokenContract)
+				actions.add(esrAction)
+			}
 		}
 
 		return ProtonESR(
@@ -610,12 +629,8 @@ class AccountModule {
 	}
 
 	@Throws(IllegalArgumentException::class)
-	suspend fun decodeESRSessionMessage(
-		chainAccount: ChainAccount,
-		esrSession: ESRSession,
-		message: String
-	): ProtonESR {
-		val chainId = chainAccount.chainProvider.chainId
+	suspend fun decodeESRSessionMessage(chainAccount: ChainAccount, tokenContractMap: Map<String, TokenContract>, esrSession: ESRSession, message: String): ProtonESR {
+		//val chainId = chainAccount.chainProvider.chainId
 		val chainUrl = chainAccount.chainProvider.chainUrl
 
 		val sealedMessageSigningRequest = newSigningRequest(chainUrl)
@@ -647,7 +662,7 @@ class AccountModule {
 
 		val esrUrl = String(esrByteArray)
 
-		val protonESR = decodeESR(chainAccount, esrUrl, esrSession)
+		val protonESR = decodeESR(chainAccount, tokenContractMap, esrUrl, esrSession)
 
 		return protonESR
 	}

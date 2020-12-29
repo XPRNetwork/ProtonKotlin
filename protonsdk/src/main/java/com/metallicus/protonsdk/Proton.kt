@@ -500,7 +500,10 @@ class Proton private constructor(context: Context) {
 		try {
 			val activeAccount = getActiveAccountAsync()
 
-			emit(Resource.success(accountModule.decodeESR(activeAccount, esrUri)))
+			val tokenContracts = getTokenContractsAsync()
+			val tokenContractMap = tokenContracts.associateBy { "${it.contract}:${it.getSymbol()}" }
+
+			emit(Resource.success(accountModule.decodeESR(activeAccount, tokenContractMap, esrUri)))
 		} catch (e: ProtonException) {
 			val error: Resource<ProtonESR> = Resource.error(e)
 			emit(error)
@@ -639,7 +642,10 @@ class Proton private constructor(context: Context) {
 		try {
 			val activeAccount = getActiveAccountAsync()
 
-			emit(Resource.success(accountModule.decodeESRSessionMessage(activeAccount, esrSession, message)))
+			val tokenContracts = getTokenContractsAsync()
+			val tokenContractMap = tokenContracts.associateBy { "${it.contract}:${it.getSymbol()}" }
+
+			emit(Resource.success(accountModule.decodeESRSessionMessage(activeAccount, tokenContractMap, esrSession, message)))
 		} catch (e: ProtonException) {
 			val error: Resource<ProtonESR> = Resource.error(e)
 			emit(error)

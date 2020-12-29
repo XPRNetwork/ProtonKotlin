@@ -21,20 +21,41 @@
  */
 package com.metallicus.protonsdk.model
 
-import com.greymass.esr.ResolvedSigningRequest
-import com.greymass.esr.SigningRequest
+enum class Type {
+	TRANSFER,
+	CUSTOM
+}
 
-class ProtonESR(
-	val signingAccount: ChainAccount,
-	val signingRequest: SigningRequest,
-	val originESRUrlScheme: String,
-	val requestAccount: Account? = null,
-	val returnPath: String? = "",
-	val requestKey: String? = "",
-	val actions: List<ESRAction> = emptyList(),
-	var resolvedSigningRequest: ResolvedSigningRequest? = null
+class ESRAction(
+	val type: Type,
+	val name: String,
+	val accountName: String,
+	val data: Map<String, Any>?,
+	private val tokenContract: TokenContract?=null
 ) {
-	fun getRequestAccountDisplayName(): String {
-		return requestAccount?.accountContact?.getDisplayName() ?: "Unknown Requester"
+	fun isTransfer(): Boolean {
+		return (type==Type.TRANSFER)
+	}
+
+	fun getActionName(): String {
+		return if (isTransfer()) "Transfer" else name
+	}
+
+	fun getIconUrl(): String {
+		return tokenContract?.iconUrl.orEmpty()
+	}
+
+	fun getTransferQuantity(): String? {
+		return data?.get("quantity") as String?
+	}
+
+	fun getTransferQuantityAmount(): String {
+		val transferQuantity = getTransferQuantity()
+		return transferQuantity?.split(" ")?.get(0).orEmpty()
+	}
+
+	fun getTransferQuantitySymbol(): String {
+		val transferQuantity = getTransferQuantity()
+		return transferQuantity?.split(" ")?.get(1).orEmpty()
 	}
 }
