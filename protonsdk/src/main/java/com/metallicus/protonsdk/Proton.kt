@@ -589,8 +589,6 @@ class Proton private constructor(context: Context) {
 	val esrSessions = MutableLiveData<ESRSessionResource>()
 	fun initESRSessions() = protonCoroutineScope.launch {
 		try {
-			val activeAccount = getActiveAccountAsync()
-
 			val esrSessionList = accountModule.getESRSessions(/*activeAccount*/)
 			esrSessionList.forEach { esrSession ->
 				val request = Request.Builder().url(esrSession.receiveChannelUrl).build()
@@ -651,6 +649,20 @@ class Proton private constructor(context: Context) {
 			emit(error)
 		} catch (e: Exception) {
 			val error: Resource<ProtonESR> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun authorizeESRActions(pin: String, protonESR: ProtonESR): LiveData<Resource<String>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			emit(accountModule.authorizeESRActions(pin, protonESR))
+		} catch (e: ProtonException) {
+			val error: Resource<String> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<String> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}

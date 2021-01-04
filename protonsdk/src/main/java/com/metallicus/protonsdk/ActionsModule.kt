@@ -39,6 +39,7 @@ import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.model.Action as AccountAction
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.ActionRepository
+import com.metallicus.protonsdk.repository.ChainProviderRepository
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,6 +49,9 @@ import javax.inject.Inject
 class ActionsModule {
 	@Inject
 	lateinit var context: Context
+
+	@Inject
+	lateinit var chainProviderRepository: ChainProviderRepository
 
 	@Inject
 	lateinit var actionRepository: ActionRepository
@@ -286,7 +290,7 @@ class ActionsModule {
 
 	private suspend fun signAndPushTransaction(chainUrl: String, pin: String, signedTransaction: SignedTransaction): Resource<JsonObject> {
 		return try {
-			val chainInfoResponse = actionRepository.getChainInfo(chainUrl)
+			val chainInfoResponse = chainProviderRepository.getChainInfo(chainUrl)
 			if (chainInfoResponse.isSuccessful) {
 				val chainInfo = chainInfoResponse.body()
 

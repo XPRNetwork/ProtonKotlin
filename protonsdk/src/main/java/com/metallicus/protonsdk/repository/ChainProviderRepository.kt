@@ -25,6 +25,7 @@ import com.google.gson.JsonObject
 import com.metallicus.protonsdk.api.AccountBody
 import com.metallicus.protonsdk.api.ProtonChainService
 import com.metallicus.protonsdk.db.ChainProviderDao
+import com.metallicus.protonsdk.model.ChainInfo
 import com.metallicus.protonsdk.model.ChainProvider
 import retrofit2.Response
 import javax.inject.Inject
@@ -49,6 +50,10 @@ class ChainProviderRepository @Inject constructor(
 
 	suspend fun getChainProvider(id: String): ChainProvider {
 		return chainProviderDao.findById(id)
+	}
+
+	suspend fun getChainInfo(chainUrl: String): Response<ChainInfo> {
+		return protonChainService.getChainInfo("$chainUrl/v1/chain/get_info")
 	}
 
 	suspend fun getAbi(chainUrl: String, accountName: String): Response<JsonObject> {

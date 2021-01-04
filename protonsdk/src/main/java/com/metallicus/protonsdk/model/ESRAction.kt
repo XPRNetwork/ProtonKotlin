@@ -41,6 +41,10 @@ class ESRAction(
 		return if (isTransfer()) "Transfer" else name
 	}
 
+	fun getActionAccountName(): String {
+		return if (isTransfer()) tokenContract?.name.orEmpty() else "@$accountName"
+	}
+
 	fun getIconUrl(): String {
 		return tokenContract?.iconUrl.orEmpty()
 	}

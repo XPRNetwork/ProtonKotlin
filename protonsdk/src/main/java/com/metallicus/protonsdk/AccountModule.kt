@@ -36,6 +36,8 @@ import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.di.DaggerInjector
+import com.metallicus.protonsdk.eosio.commander.BitUtils
+import com.metallicus.protonsdk.eosio.commander.HexUtils
 import com.metallicus.protonsdk.eosio.commander.digest.Sha256
 import com.metallicus.protonsdk.eosio.commander.digest.Sha512
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
@@ -48,6 +50,7 @@ import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.metallicus.protonsdk.repository.ESRRepository
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import java.math.BigInteger
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
@@ -553,7 +556,7 @@ class AccountModule {
 				protonESR.signingRequest.resolve(
 					PermissionLevel(protonESR.signingAccount.account.accountName, "active"), TransactionContext())
 
-			protonESR.resolvedSigningRequest = resolvedSigningRequest
+//			protonESR.resolvedSigningRequest = resolvedSigningRequest
 
 			val chainIdStr = protonESR.signingAccount.chainProvider.chainId
 			val chainIdByteArray = TypeChainId(chainIdStr).bytes
@@ -665,6 +668,83 @@ class AccountModule {
 		val protonESR = decodeESR(chainAccount, tokenContractMap, esrUrl, esrSession)
 
 		return protonESR
+	}
+
+	suspend fun authorizeESRActions(pin: String, protonESR: ProtonESR): Resource<String> {
+		return try {
+			requireNotNull(protonESR.requestKey)
+
+			val chainUrl = protonESR.signingAccount.chainProvider.chainUrl
+
+			val chainInfoResponse = chainProviderRepository.getChainInfo(chainUrl)
+			if (chainInfoResponse.isSuccessful) {
+				chainInfoResponse.body()?.let {
+					val transactionContext = TransactionContext()
+					val lastIrreversibleBlockNumLong = it.lastIrreversibleBlockNum.toLong()
+					transactionContext.refBlockNum = BigInteger(1, HexUtils.toBytes(it.lastIrreversibleBlockId.substring(0, 8))).toLong().and(0xFFFF)
+					transactionContext.refBlockPrefix = BitUtils.uint32ToLong(HexUtils.toBytes(it.lastIrreversibleBlockId.substring(16, 24)), 0).and(0xFFFFFFFF)
+					transactionContext.expiration = it.getTimeAfterHeadBlockTime(60000)
+
+					val resolvedSigningRequest =
+						protonESR.signingRequest.resolve(
+							PermissionLevel(protonESR.signingAccount.account.accountName, "active"), transactionContext)
+
+					val chainIdStr = protonESR.signingAccount.chainProvider.chainId
+					val chainIdByteArray = TypeChainId(chainIdStr).bytes
+
+					val transactionByteArray = resolvedSigningRequest.serializedTransaction
+
+					val trailingByteArray = ByteArray(32)
+
+					val unsignedTransactionDigest = chainIdByteArray + transactionByteArray + trailingByteArray
+
+					val signature = signWithActiveKey(pin, unsignedTransactionDigest)
+
+					val callback = resolvedSigningRequest.getCallback(listOf(signature))
+
+					val esrSession = esrRepository.getESRSession(protonESR.requestKey)
+
+					val authParams = callback.payload
+					authParams["link_key"] = EosPrivateKey(esrSession.receiveKey).publicKey.toString()
+					authParams["link_ch"] = esrSession.receiveChannelUrl
+					authParams["link_name"] = getAppName()
+					//authParams.remove("SIG")
+					authParams["sig"] = signature
+
+					val originalESRUrlScheme = protonESR.originESRUrlScheme + ":"
+					val req = authParams["req"]?.replace("esr:", originalESRUrlScheme)
+					authParams["req"] = req
+
+					val response = esrRepository.authorizeESR(callback.url, authParams)
+					if (response.isSuccessful) {
+						esrSession.updatedAt = Date().time
+						esrRepository.updateSession(esrSession)
+
+						Resource.success(response.body())
+					} else {
+						val msg = response.errorBody()?.string()
+						val errorMsg = if (msg.isNullOrEmpty()) {
+							response.message()
+						} else {
+							msg
+						}
+
+						Resource.error(errorMsg)
+					}
+				} ?: Resource.error("No Chain Info")
+			} else {
+				val msg = chainInfoResponse.errorBody()?.string()
+				val errorMsg = if (msg.isNullOrEmpty()) {
+					chainInfoResponse.message()
+				} else {
+					msg
+				}
+
+				Resource.error(errorMsg)
+			}
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty())
+		}
 	}
 
 	private fun String.hexStringToByteArray(): ByteArray {

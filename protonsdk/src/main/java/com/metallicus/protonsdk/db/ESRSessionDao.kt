@@ -14,6 +14,9 @@ interface ESRSessionDao {
 	@Update
 	suspend fun update(esrSession: ESRSession)
 
+	@Query("SELECT * FROM esrSession WHERE id = :id")
+	suspend fun findById(id: String): ESRSession
+
 	@Query("SELECT * FROM esrSession")
 	suspend fun findAll(): List<ESRSession>
 

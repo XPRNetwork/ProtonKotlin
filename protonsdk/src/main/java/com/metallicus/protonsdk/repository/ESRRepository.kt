@@ -41,6 +41,10 @@ class ESRRepository @Inject constructor(
 		return esrCallbackService.authorizeESR(url, params)
 	}
 
+	suspend fun getESRSession(id: String): ESRSession {
+		return esrSessionDao.findById(id)
+	}
+
 	suspend fun getESRSessions(): List<ESRSession> {
 		return esrSessionDao.findAll()
 	}

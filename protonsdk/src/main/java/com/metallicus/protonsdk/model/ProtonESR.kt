@@ -31,8 +31,8 @@ class ProtonESR(
 	val requestAccount: Account? = null,
 	val returnPath: String? = "",
 	val requestKey: String? = "",
-	val actions: List<ESRAction> = emptyList(),
-	var resolvedSigningRequest: ResolvedSigningRequest? = null
+	val actions: List<ESRAction> = emptyList()//,
+	//var resolvedSigningRequest: ResolvedSigningRequest? = null
 ) {
 	fun getRequestAccountDisplayName(): String {
 		return requestAccount?.accountContact?.getDisplayName() ?: "Unknown Requester"
