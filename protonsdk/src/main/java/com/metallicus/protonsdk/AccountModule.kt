@@ -29,7 +29,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.greymass.esr.ESR
 import com.greymass.esr.SigningRequest
-import com.greymass.esr.models.Action
 import com.greymass.esr.models.PermissionLevel
 import com.greymass.esr.models.TransactionContext
 import com.metallicus.protonsdk.common.Prefs
@@ -445,6 +444,16 @@ class AccountModule {
 		return SigningRequest(esr)
 	}
 
+	val disallowedESRActions = listOf(
+		"updateauth",
+		"deleteauth",
+		"linkauth",
+		"unlinkauth",
+		"setabi",
+		"setcode",
+		"newaccount"
+	)
+
 	suspend fun decodeESR(chainAccount: ChainAccount, tokenContractMap: Map<String, TokenContract>, originalESRUrl: String, esrSession: ESRSession?=null): ProtonESR {
 		val originalESRUrlScheme = originalESRUrl.substringBefore(":")
 		val esrUrl = "esr:" + originalESRUrl.substringAfter(":")
@@ -485,22 +494,28 @@ class AccountModule {
 			val resolvedActions = signingRequest.resolveActions()
 			resolvedActions.forEach {
 				val name = it.name.name
-				val accountName = it.account.name
-				val data = it.data.data
+				if (!disallowedESRActions.contains(name)) {
+					val accountName = it.account.name
+					val data = it.data.data
 
-				val type = if (name == "transfer") Type.TRANSFER else Type.CUSTOM
+					val type = if (name == "transfer") Type.TRANSFER else Type.CUSTOM
 
-				val tokenContract = if (type==Type.TRANSFER) {
-					val quantity = data["quantity"] as String
-					if (quantity.isNotEmpty()) {
-						val symbol = quantity.split(" ")[1]
+					val tokenContract = if (type == Type.TRANSFER) {
+						val quantity = data["quantity"] as String
+						if (quantity.isNotEmpty()) {
+							val symbol = quantity.split(" ")[1]
 
-						tokenContractMap["$accountName:$symbol"]
-					} else { null }
-				} else { null }
+							tokenContractMap["$accountName:$symbol"]
+						} else {
+							null
+						}
+					} else {
+						null
+					}
 
-				val esrAction = ESRAction(type, name, accountName, data, tokenContract)
-				actions.add(esrAction)
+					val esrAction = ESRAction(type, name, accountName, data, tokenContract)
+					actions.add(esrAction)
+				}
 			}
 		}
 
@@ -607,9 +622,7 @@ class AccountModule {
 					requester = protonESR.requestAccount
 				)
 
-				esrRepository.removeSessions()
-
-				esrRepository.addSession(esrSession)
+				esrRepository.addESRSession(esrSession)
 
 				Resource.success(response.body())
 			} else {
@@ -629,6 +642,18 @@ class AccountModule {
 
 	suspend fun getESRSessions(): List<ESRSession> {
 		return esrRepository.getESRSessions()
+	}
+
+	suspend fun updateESRSession(esrSession: ESRSession) {
+		esrRepository.updateESRSession(esrSession)
+	}
+
+	suspend fun removeESRSession(esrSession: ESRSession) {
+		esrRepository.removeESRSession(esrSession)
+	}
+
+	suspend fun removeAllESRSessions() {
+		esrRepository.removeAllESRSessions()
 	}
 
 	@Throws(IllegalArgumentException::class)
@@ -680,9 +705,10 @@ class AccountModule {
 			if (chainInfoResponse.isSuccessful) {
 				chainInfoResponse.body()?.let {
 					val transactionContext = TransactionContext()
-					val lastIrreversibleBlockNumLong = it.lastIrreversibleBlockNum.toLong()
-					transactionContext.refBlockNum = BigInteger(1, HexUtils.toBytes(it.lastIrreversibleBlockId.substring(0, 8))).toLong().and(0xFFFF)
-					transactionContext.refBlockPrefix = BitUtils.uint32ToLong(HexUtils.toBytes(it.lastIrreversibleBlockId.substring(16, 24)), 0).and(0xFFFFFFFF)
+					transactionContext.refBlockNum =
+						BigInteger(1, HexUtils.toBytes(it.lastIrreversibleBlockId.substring(0, 8))).toLong().and(0xFFFF)
+					transactionContext.refBlockPrefix =
+						BitUtils.uint32ToLong(HexUtils.toBytes(it.lastIrreversibleBlockId.substring(16, 24)), 0).and(0xFFFFFFFF)
 					transactionContext.expiration = it.getTimeAfterHeadBlockTime(60000)
 
 					val resolvedSigningRequest =
@@ -718,7 +744,7 @@ class AccountModule {
 					val response = esrRepository.authorizeESR(callback.url, authParams)
 					if (response.isSuccessful) {
 						esrSession.updatedAt = Date().time
-						esrRepository.updateSession(esrSession)
+						esrRepository.updateESRSession(esrSession)
 
 						Resource.success(response.body())
 					} else {

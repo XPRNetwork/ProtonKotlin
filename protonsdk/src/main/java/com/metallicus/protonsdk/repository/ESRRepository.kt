@@ -49,15 +49,19 @@ class ESRRepository @Inject constructor(
 		return esrSessionDao.findAll()
 	}
 
-	suspend fun addSession(esrSession: ESRSession) {
+	suspend fun addESRSession(esrSession: ESRSession) {
 		esrSessionDao.insert(esrSession)
 	}
 
-	suspend fun updateSession(esrSession: ESRSession) {
+	suspend fun updateESRSession(esrSession: ESRSession) {
 		esrSessionDao.update(esrSession)
 	}
 
-	suspend fun removeSessions() {
+	suspend fun removeESRSession(esrSession: ESRSession) {
+		esrSessionDao.remove(esrSession.id)
+	}
+
+	suspend fun removeAllESRSessions() {
 		esrSessionDao.removeAll()
 	}
 }

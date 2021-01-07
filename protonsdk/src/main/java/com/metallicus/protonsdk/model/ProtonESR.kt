@@ -21,7 +21,6 @@
  */
 package com.metallicus.protonsdk.model
 
-import com.greymass.esr.ResolvedSigningRequest
 import com.greymass.esr.SigningRequest
 
 class ProtonESR(
@@ -31,8 +30,7 @@ class ProtonESR(
 	val requestAccount: Account? = null,
 	val returnPath: String? = "",
 	val requestKey: String? = "",
-	val actions: List<ESRAction> = emptyList()//,
-	//var resolvedSigningRequest: ResolvedSigningRequest? = null
+	val actions: List<ESRAction> = emptyList()
 ) {
 	fun getRequestAccountDisplayName(): String {
 		return requestAccount?.accountContact?.getDisplayName() ?: "Unknown Requester"

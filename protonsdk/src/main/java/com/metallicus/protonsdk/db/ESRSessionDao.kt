@@ -20,6 +20,9 @@ interface ESRSessionDao {
 	@Query("SELECT * FROM esrSession")
 	suspend fun findAll(): List<ESRSession>
 
+	@Query("DELETE FROM esrSession WHERE id = :id")
+	suspend fun remove(id: String)
+
 	@Query("DELETE FROM esrSession")
 	suspend fun removeAll()
 }

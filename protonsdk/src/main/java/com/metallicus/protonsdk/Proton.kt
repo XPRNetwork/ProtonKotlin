@@ -24,10 +24,7 @@ package com.metallicus.protonsdk
 import android.content.Context
 import androidx.lifecycle.*
 import com.google.gson.JsonObject
-import com.metallicus.protonsdk.common.ESRSessionResource
-import com.metallicus.protonsdk.common.ProtonException
-import com.metallicus.protonsdk.common.Resource
-import com.metallicus.protonsdk.common.SingletonHolder
+import com.metallicus.protonsdk.common.*
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.di.ProtonModule
 import com.metallicus.protonsdk.eosio.commander.digest.Sha256
@@ -542,7 +539,7 @@ class Proton private constructor(context: Context) {
 	}
 
 	private class ESRSessionListener(
-		val onOpenCallback: (String, Int) -> Unit,
+		val onOpenCallback: (WebSocket, String, Int) -> Unit,
 		val onMessageCallback: (String) -> Unit,
 		val onClosingCallback: (String, Int) -> Unit,
 		val onClosedCallback: (String, Int) -> Unit,
@@ -551,7 +548,7 @@ class Proton private constructor(context: Context) {
 		override fun onOpen(webSocket: WebSocket, response: Response) {
 			super.onOpen(webSocket, response)
 			Timber.d("ESRWebSocketListener onOpen - ${response.message}")
-			onOpenCallback(response.message, response.code)
+			onOpenCallback(webSocket, response.message, response.code)
 		}
 
 		override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
@@ -581,60 +578,96 @@ class Proton private constructor(context: Context) {
 
 		override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
 			super.onFailure(webSocket, t, response)
-			Timber.d("ESRWebSocketListener onFailure - ${response?.message.orEmpty()}")
-			onFailureCallback(response?.message.orEmpty(), response?.code ?: 0)
+			val message = response?.message.orEmpty()
+			val code = response?.code ?: 0
+			Timber.d("ESRWebSocketListener onFailure - ${response?.message} : ${t.localizedMessage}")
+			onFailureCallback(message, code)
 		}
 	}
 
-	val esrSessions = MutableLiveData<ESRSessionResource>()
-	fun initESRSessions() = protonCoroutineScope.launch {
+	private val openESRSessions = mutableListOf<Pair<String, WebSocket>>()
+	private fun getOpenESRSession(id: String): Pair<String, WebSocket>? {
+		return openESRSessions.find { it.first == id }
+	}
+	private fun isESRSessionOpen(id: String): Boolean {
+		return openESRSessions.find { it.first == id } != null
+	}
+	private fun addOpenESRSession(id: String, webSocket: WebSocket) {
+		openESRSessions.add(Pair(id, webSocket))
+	}
+	private fun removeOpenESRSession(id: String) {
+		getOpenESRSession(id)?.let {
+			it.second.cancel() // or close(1000, id)?
+			openESRSessions.remove(it)
+		}
+	}
+	private fun removeAllOpenESRSessions() {
+		openESRSessions.forEach {
+			it.second.cancel() // or close(1000, id)?
+		}
+		openESRSessions.clear()
+	}
+
+	val esrSessionMessages = MutableLiveData<MutableList<ESRSessionMessage>>(mutableListOf())
+	private fun addESRSessionMessage(esrSessionMessage: ESRSessionMessage) {
+		esrSessionMessages.value?.add(esrSessionMessage)
+		esrSessionMessages.postValue(esrSessionMessages.value)
+	}
+	private fun removeESRSessionMessage(esrSessionMessage: ESRSessionMessage) {
+		esrSessionMessages.value?.remove(esrSessionMessage)
+		esrSessionMessages.postValue(esrSessionMessages.value)
+	}
+
+	fun initESRSessions(/*activeAccount*/) = protonCoroutineScope.launch {
 		try {
 			val esrSessionList = accountModule.getESRSessions(/*activeAccount*/)
 			esrSessionList.forEach { esrSession ->
-				val request = Request.Builder().url(esrSession.receiveChannelUrl).build()
+				val esrSessionId = esrSession.id
+				if (!isESRSessionOpen(esrSessionId)) {
+					val request = Request.Builder().url(esrSession.receiveChannelUrl).build()
 
-				val logging = HttpLoggingInterceptor()
-				logging.level = HttpLoggingInterceptor.Level.BODY
+					val logging = HttpLoggingInterceptor()
+					logging.level = HttpLoggingInterceptor.Level.BODY
 
-				val httpClient = OkHttpClient.Builder()
-					.callTimeout(30, TimeUnit.SECONDS)
-					.connectTimeout(30, TimeUnit.SECONDS)
-					.readTimeout(30, TimeUnit.SECONDS)
-					.writeTimeout(30, TimeUnit.SECONDS)
-					.addInterceptor(logging)
-					.build()
+					val httpClient = OkHttpClient.Builder()
+						.callTimeout(30, TimeUnit.SECONDS)
+						.connectTimeout(30, TimeUnit.SECONDS)
+						.readTimeout(30, TimeUnit.SECONDS)
+						.writeTimeout(30, TimeUnit.SECONDS)
+						.addInterceptor(logging)
+						.build()
 
-				val esrSessionListener = ESRSessionListener(
-					onOpenCallback = { message, code ->
-						Timber.d("ESR Listener onOpen - $message")
-						esrSessions.postValue(ESRSessionResource.onConnected(esrSession, message, code))
-					},
-					onMessageCallback = { message ->
-						Timber.d("ESR Listener onMessage - $message")
-						esrSessions.postValue(ESRSessionResource.onMessage(esrSession, message))
-					},
-					onClosingCallback = { reason, code ->
-						Timber.d("ESR Listener onClosing - $reason")
-						esrSessions.postValue(ESRSessionResource.onClosing(esrSession, reason, code))
-					},
-					onClosedCallback = { reason, code ->
-						Timber.d("ESR Listener onClosed - $reason")
-						esrSessions.postValue(ESRSessionResource.onClosed(esrSession, reason, code))
-					},
-					onFailureCallback = { message, code ->
-						Timber.d("ESR Listener onFailure - $message")
-						esrSessions.postValue(ESRSessionResource.onFailure(esrSession, message, code))
-					}
-				)
+					httpClient.newWebSocket(request, ESRSessionListener(
+						onOpenCallback = { webSocket, message, _ ->
+							Timber.d("ESR Listener onOpen - $message")
 
-				httpClient.newWebSocket(request, esrSessionListener)
+							addOpenESRSession(esrSessionId, webSocket)
+						},
+						onMessageCallback = { message ->
+							Timber.d("ESR Listener onMessage - $message")
+
+							addESRSessionMessage(ESRSessionMessage(esrSession, message))
+						},
+						onClosingCallback = { reason, _ ->
+							Timber.d("ESR Listener onClosing - $reason")
+						},
+						onClosedCallback = { reason, _ ->
+							Timber.d("ESR Listener onClosed - $reason")
+
+							removeOpenESRSession(esrSessionId)
+						},
+						onFailureCallback = { message, _ ->
+							Timber.d("ESR Listener onFailure - $message")
+						}
+					))
+				}
 			}
 		} catch (e: Exception) {
 			Timber.e(e)
 		}
 	}
 
-	fun decodeESRSessionMessage(esrSession: ESRSession, message: String): LiveData<Resource<ProtonESR>> = liveData {
+	fun decodeESRSessionMessage(esrSessionMessage: ESRSessionMessage): LiveData<Resource<ProtonESR>> = liveData {
 		emit(Resource.loading())
 
 		try {
@@ -642,6 +675,9 @@ class Proton private constructor(context: Context) {
 
 			val tokenContracts = getTokenContractsAsync()
 			val tokenContractMap = tokenContracts.associateBy { "${it.contract}:${it.getSymbol()}" }
+
+			val esrSession = esrSessionMessage.esrSession
+			val message = esrSessionMessage.message
 
 			emit(Resource.success(accountModule.decodeESRSessionMessage(activeAccount, tokenContractMap, esrSession, message)))
 		} catch (e: ProtonException) {
@@ -653,16 +689,96 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun authorizeESRActions(pin: String, protonESR: ProtonESR): LiveData<Resource<String>> = liveData {
+	fun cancelESRSessionMessage(esrSessionMessage: ESRSessionMessage, protonESR: ProtonESR): LiveData<Resource<String>> = liveData {
 		emit(Resource.loading())
 
 		try {
-			emit(accountModule.authorizeESRActions(pin, protonESR))
+			val response = accountModule.cancelAuthorizeESR(protonESR)
+
+			removeESRSessionMessage(esrSessionMessage)
+
+			emit(response)
 		} catch (e: ProtonException) {
 			val error: Resource<String> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
 			val error: Resource<String> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun authorizeESRSessionMessage(pin: String, esrSessionMessage: ESRSessionMessage, protonESR: ProtonESR): LiveData<Resource<String>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val response = accountModule.authorizeESRActions(pin, protonESR)
+
+			removeESRSessionMessage(esrSessionMessage)
+
+			emit(response)
+		} catch (e: ProtonException) {
+			val error: Resource<String> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<String> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun getESRSessions(): LiveData<Resource<List<ESRSession>>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			val esrSessions = accountModule.getESRSessions(/*activeAccount*/)
+
+			emit(Resource.success(esrSessions))
+		} catch (e: ProtonException) {
+			val error: Resource<List<ESRSession>> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<List<ESRSession>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun removeESRSession(esrSession: ESRSession): LiveData<Resource<Boolean>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			removeOpenESRSession(esrSession.id)
+
+			accountModule.removeESRSession(esrSession)
+
+			emit(Resource.success(true))
+		} catch (e: ProtonException) {
+			val error: Resource<Boolean> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<Boolean> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun removeAllESRSessions(): LiveData<Resource<Boolean>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val activeAccount = getActiveAccountAsync()
+
+			removeAllOpenESRSessions()
+
+			accountModule.removeAllESRSessions()
+
+			emit(Resource.success(true))
+		} catch (e: ProtonException) {
+			val error: Resource<Boolean> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<Boolean> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}

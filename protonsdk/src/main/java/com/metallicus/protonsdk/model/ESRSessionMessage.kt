@@ -19,12 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.common
+package com.metallicus.protonsdk.model
 
-enum class ESRSessionStatus {
-	CONNECTED,
-	MESSAGE,
-	CLOSING,
-	CLOSED,
-	FAILURE
-}
+data class ESRSessionMessage(val esrSession: ESRSession, val message: String)
