@@ -60,10 +60,6 @@ class ActionRepository @Inject constructor(
 		return protonChainService.jsonToBin("$chainUrl/v1/chain/abi_json_to_bin", JsonToBinBody(code, action, args))
 	}
 
-	suspend fun getChainInfo(chainUrl: String): Response<ChainInfo> {
-		return protonChainService.getChainInfo("$chainUrl/v1/chain/get_info")
-	}
-
 	suspend fun getRequiredKeys(chainUrl: String, requiredKeysBody: RequiredKeysBody): Response<RequiredKeysResponse> {
 		return protonChainService.getRequiredKeys("$chainUrl/v1/chain/get_required_keys", requiredKeysBody)
 	}

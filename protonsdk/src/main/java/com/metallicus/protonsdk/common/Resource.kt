@@ -1,7 +1,7 @@
 package com.metallicus.protonsdk.common
 
 /**
- * A generic class that a loading status, data, and optional message.
+ * A generic class that emulates loading, success, and error states with optional data and messages.
  */
 data class Resource<out T>(val status: Status, val data: T?, val message: String?, val code: Int?) {
 	companion object {

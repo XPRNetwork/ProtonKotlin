@@ -47,15 +47,15 @@ class InitChainProviderWorker
 
 	@Suppress("BlockingMethodInNonBlockingContext")
 	override suspend fun doWork(): Result {
-		val protonChainUrl = inputData.getString(PROTON_CHAIN_URL).orEmpty()
+		val chainUrl = inputData.getString(PROTON_CHAIN_URL).orEmpty()
 
 		return try {
-			val response = chainProviderRepository.fetchChainProvider(protonChainUrl)
+			val response = chainProviderRepository.fetchChainProvider(chainUrl)
 			if (response.isSuccessful) {
 				chainProviderRepository.removeAll()
 
 				val chainProvider = Gson().fromJson(response.body(), ChainProvider::class.java)
-				chainProvider.chainApiUrl = protonChainUrl
+				chainProvider.chainApiUrl = chainUrl
 
 				chainProviderRepository.addChainProvider(chainProvider)
 

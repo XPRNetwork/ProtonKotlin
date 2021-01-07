@@ -24,25 +24,42 @@ package com.metallicus.protonsdk
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
-import com.google.gson.*
+import com.google.common.primitives.Longs
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.greymass.esr.ESR
 import com.greymass.esr.SigningRequest
 import com.greymass.esr.models.PermissionLevel
 import com.greymass.esr.models.TransactionContext
-import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
+import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.di.DaggerInjector
+import com.metallicus.protonsdk.eosio.commander.BitUtils
+import com.metallicus.protonsdk.eosio.commander.HexUtils
 import com.metallicus.protonsdk.eosio.commander.digest.Sha256
+import com.metallicus.protonsdk.eosio.commander.digest.Sha512
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
+import com.metallicus.protonsdk.eosio.commander.ec.EosPublicKey
 import com.metallicus.protonsdk.eosio.commander.model.types.TypeChainId
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.AccountContactRepository
 import com.metallicus.protonsdk.repository.AccountRepository
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.metallicus.protonsdk.repository.ESRRepository
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import java.math.BigInteger
+import java.security.InvalidAlgorithmParameterException
+import java.security.InvalidKeyException
+import java.security.NoSuchAlgorithmException
 import java.util.*
+import javax.crypto.BadPaddingException
+import javax.crypto.Cipher
+import javax.crypto.IllegalBlockSizeException
+import javax.crypto.NoSuchPaddingException
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
 
 /**
@@ -412,56 +429,104 @@ class AccountModule {
 		}
 	}
 
-	suspend fun decodeESR(chainAccount: ChainAccount, originalESRUrl: String): ProtonESR {
+	private suspend fun newSigningRequest(chainUrl: String): SigningRequest {
+		val esr = ESR(context) { account ->
+			runBlocking {
+				val response = chainProviderRepository.getAbi(chainUrl, account)
+				if (response.isSuccessful) {
+					val abiJson = response.body()?.get("abi")
+					abiJson?.toString().orEmpty()
+				} else {
+					response.errorBody()?.toString().orEmpty()
+				}
+			}
+		}
+		return SigningRequest(esr)
+	}
+
+	val disallowedESRActions = listOf(
+		"updateauth",
+		"deleteauth",
+		"linkauth",
+		"unlinkauth",
+		"setabi",
+		"setcode",
+		"newaccount"
+	)
+
+	suspend fun decodeESR(chainAccount: ChainAccount, tokenContractMap: Map<String, TokenContract>, originalESRUrl: String, esrSession: ESRSession?=null): ProtonESR {
 		val originalESRUrlScheme = originalESRUrl.substringBefore(":")
 		val esrUrl = "esr:" + originalESRUrl.substringAfter(":")
 
 		val chainId = chainAccount.chainProvider.chainId
 		val chainUrl = chainAccount.chainProvider.chainUrl
 
-		val esr = ESR(context) { account ->
-			val response = chainProviderRepository.getAbi(chainUrl, account)
-			if (response.isSuccessful) {
-				response.body()?.toString()
-			} else {
-				response.errorBody()?.toString()
-			}
-		}
-
-		val signingRequest = SigningRequest(esr)
+		val signingRequest = newSigningRequest(chainUrl)
 		signingRequest.load(esrUrl)
 
 		// TODO: need chainId original string from esr request
 		//val esrChainId = signingRequest.chainId.toVariant()
 		//if (esrChainId == chainAccount.chainProvider.chainId) {
 
-		val requestAccountName = signingRequest.info["req_account"].orEmpty()
+		val returnPath = signingRequest.info["return_path"].orEmpty()
 
+		var requestAccount: Account? = null
 		var requestKey = ""
+
+		if (esrSession != null) {
+			requestAccount = esrSession.requester
+			requestKey = esrSession.id
+		}
+
+		val actions = mutableListOf<ESRAction>()
 		if (signingRequest.isIdentity) {
+			val requestAccountName = signingRequest.info["req_account"].orEmpty()
+
+			requestAccount = fetchAccount(chainId, chainUrl, requestAccountName)
+
 			val linkHexValue = signingRequest.infoPairs.find {
 				it.key == "link"
 			}?.hexValue.orEmpty()
 
 			val linkCreate = signingRequest.decodeLinkCreate(linkHexValue)
 			requestKey = linkCreate.requestKey
-		}
-
-		val returnPath = signingRequest.info["return_path"].orEmpty()
-
-		val requestAccount: Account? = if (requestAccountName.isNotEmpty()) {
-			fetchAccount(chainId, chainUrl, requestAccountName)
 		} else {
-			null
+			val resolvedActions = signingRequest.resolveActions()
+			resolvedActions.forEach {
+				val name = it.name.name
+				if (!disallowedESRActions.contains(name)) {
+					val accountName = it.account.name
+					val data = it.data.data
+
+					val type = if (name == "transfer") Type.TRANSFER else Type.CUSTOM
+
+					val tokenContract = if (type == Type.TRANSFER) {
+						val quantity = data["quantity"] as String
+						if (quantity.isNotEmpty()) {
+							val symbol = quantity.split(" ")[1]
+
+							tokenContractMap["$accountName:$symbol"]
+						} else {
+							null
+						}
+					} else {
+						null
+					}
+
+					val esrAction = ESRAction(type, name, accountName, data, tokenContract)
+					actions.add(esrAction)
+				}
+			}
 		}
 
 		return ProtonESR(
-			requestKey,
 			chainAccount,
 			signingRequest,
 			originalESRUrlScheme,
 			requestAccount,
-			returnPath
+			returnPath,
+			requestKey,
+			actions
 		)
 	}
 
@@ -500,11 +565,13 @@ class AccountModule {
 
 	suspend fun authorizeESR(pin: String, protonESR: ProtonESR): Resource<String> {
 		return try {
+			requireNotNull(protonESR.requestKey)
+
 			val resolvedSigningRequest =
 				protonESR.signingRequest.resolve(
 					PermissionLevel(protonESR.signingAccount.account.accountName, "active"), TransactionContext())
 
-			protonESR.resolvedSigningRequest = resolvedSigningRequest
+//			protonESR.resolvedSigningRequest = resolvedSigningRequest
 
 			val chainIdStr = protonESR.signingAccount.chainProvider.chainId
 			val chainIdByteArray = TypeChainId(chainIdStr).bytes
@@ -542,6 +609,21 @@ class AccountModule {
 
 			val response = esrRepository.authorizeESR(callback.url, authParams)
 			if (response.isSuccessful) {
+				val createdAt = Date().time
+
+				val esrSession = ESRSession(
+					id = protonESR.requestKey,
+					signer = protonESR.signingAccount.account.accountName,
+					callbackUrl = callback.url,
+					receiveKey = sessionKey.toWif(),
+					receiveChannelUrl = sessionChannel.toString(),
+					createdAt = createdAt,
+					updatedAt = createdAt,
+					requester = protonESR.requestAccount
+				)
+
+				esrRepository.addESRSession(esrSession)
+
 				Resource.success(response.body())
 			} else {
 				val msg = response.errorBody()?.string()
@@ -556,5 +638,166 @@ class AccountModule {
 		} catch (e: Exception) {
 			Resource.error(e.localizedMessage.orEmpty())
 		}
+	}
+
+	suspend fun getESRSessions(): List<ESRSession> {
+		return esrRepository.getESRSessions()
+	}
+
+	suspend fun updateESRSession(esrSession: ESRSession) {
+		esrRepository.updateESRSession(esrSession)
+	}
+
+	suspend fun removeESRSession(esrSession: ESRSession) {
+		esrRepository.removeESRSession(esrSession)
+	}
+
+	suspend fun removeAllESRSessions() {
+		esrRepository.removeAllESRSessions()
+	}
+
+	@Throws(IllegalArgumentException::class)
+	suspend fun decodeESRSessionMessage(chainAccount: ChainAccount, tokenContractMap: Map<String, TokenContract>, esrSession: ESRSession, message: String): ProtonESR {
+		//val chainId = chainAccount.chainProvider.chainId
+		val chainUrl = chainAccount.chainProvider.chainUrl
+
+		val sealedMessageSigningRequest = newSigningRequest(chainUrl)
+		val sealedMessage = sealedMessageSigningRequest.decodeSealedMessage(message)
+
+		val sealedPublicKey = EosPublicKey(sealedMessage.from)
+
+		val sharedSecret = EosPrivateKey(esrSession.receiveKey).getSharedSecret(sealedPublicKey)
+
+		val nonceLong = sealedMessage.nonce.toLong()
+		val nonceByteArray = Longs.toByteArray(nonceLong).reversedArray()
+
+		val symmetricKey = nonceByteArray + sharedSecret
+		val symmetricSha512 = Sha512.from(symmetricKey).bytes
+
+		val key = symmetricSha512.copyOfRange(0, 32)
+		val iv = symmetricSha512.copyOfRange(32, 48)
+
+		val cipherTextByteArray = sealedMessage.cipherText.hexStringToByteArray()
+
+		val esrByteArray: ByteArray = try {
+			cipherTextByteArray.aesDecrypt(key, iv)
+		} catch (e: Exception) {
+			Timber.e(e)
+			byteArrayOf(0)
+		}
+
+		require(esrByteArray.isNotEmpty())
+
+		val esrUrl = String(esrByteArray)
+
+		val protonESR = decodeESR(chainAccount, tokenContractMap, esrUrl, esrSession)
+
+		return protonESR
+	}
+
+	suspend fun authorizeESRActions(pin: String, protonESR: ProtonESR): Resource<String> {
+		return try {
+			requireNotNull(protonESR.requestKey)
+
+			val chainUrl = protonESR.signingAccount.chainProvider.chainUrl
+
+			val chainInfoResponse = chainProviderRepository.getChainInfo(chainUrl)
+			if (chainInfoResponse.isSuccessful) {
+				chainInfoResponse.body()?.let {
+					val transactionContext = TransactionContext()
+					transactionContext.refBlockNum =
+						BigInteger(1, HexUtils.toBytes(it.lastIrreversibleBlockId.substring(0, 8))).toLong().and(0xFFFF)
+					transactionContext.refBlockPrefix =
+						BitUtils.uint32ToLong(HexUtils.toBytes(it.lastIrreversibleBlockId.substring(16, 24)), 0).and(0xFFFFFFFF)
+					transactionContext.expiration = it.getTimeAfterHeadBlockTime(60000)
+
+					val resolvedSigningRequest =
+						protonESR.signingRequest.resolve(
+							PermissionLevel(protonESR.signingAccount.account.accountName, "active"), transactionContext)
+
+					val chainIdStr = protonESR.signingAccount.chainProvider.chainId
+					val chainIdByteArray = TypeChainId(chainIdStr).bytes
+
+					val transactionByteArray = resolvedSigningRequest.serializedTransaction
+
+					val trailingByteArray = ByteArray(32)
+
+					val unsignedTransactionDigest = chainIdByteArray + transactionByteArray + trailingByteArray
+
+					val signature = signWithActiveKey(pin, unsignedTransactionDigest)
+
+					val callback = resolvedSigningRequest.getCallback(listOf(signature))
+
+					val esrSession = esrRepository.getESRSession(protonESR.requestKey)
+
+					val authParams = callback.payload
+					authParams["link_key"] = EosPrivateKey(esrSession.receiveKey).publicKey.toString()
+					authParams["link_ch"] = esrSession.receiveChannelUrl
+					authParams["link_name"] = getAppName()
+					//authParams.remove("SIG")
+					authParams["sig"] = signature
+
+					val originalESRUrlScheme = protonESR.originESRUrlScheme + ":"
+					val req = authParams["req"]?.replace("esr:", originalESRUrlScheme)
+					authParams["req"] = req
+
+					val response = esrRepository.authorizeESR(callback.url, authParams)
+					if (response.isSuccessful) {
+						esrSession.updatedAt = Date().time
+						esrRepository.updateESRSession(esrSession)
+
+						Resource.success(response.body())
+					} else {
+						val msg = response.errorBody()?.string()
+						val errorMsg = if (msg.isNullOrEmpty()) {
+							response.message()
+						} else {
+							msg
+						}
+
+						Resource.error(errorMsg)
+					}
+				} ?: Resource.error("No Chain Info")
+			} else {
+				val msg = chainInfoResponse.errorBody()?.string()
+				val errorMsg = if (msg.isNullOrEmpty()) {
+					chainInfoResponse.message()
+				} else {
+					msg
+				}
+
+				Resource.error(errorMsg)
+			}
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty())
+		}
+	}
+
+	private fun String.hexStringToByteArray(): ByteArray {
+		val s = toUpperCase(Locale.ROOT)
+		val len = s.length
+		val data = ByteArray(len / 2)
+		var i = 0
+		while (i < len) {
+			data[i / 2] = ((Character.digit(s[i], 16) shl 4) + Character.digit(s[i + 1], 16)).toByte()
+			i += 2
+		}
+		return data
+	}
+
+	@Throws(
+		NoSuchAlgorithmException::class,
+		NoSuchPaddingException::class,
+		InvalidKeyException::class,
+		InvalidAlgorithmParameterException::class,
+		IllegalBlockSizeException::class,
+		BadPaddingException::class
+	)
+	private fun ByteArray.aesDecrypt(key: ByteArray, iv: ByteArray): ByteArray {
+		val keySpec = SecretKeySpec(key, "AES")
+		val ivSpec = IvParameterSpec(iv)
+		val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+		cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
+		return cipher.doFinal(this)
 	}
 }

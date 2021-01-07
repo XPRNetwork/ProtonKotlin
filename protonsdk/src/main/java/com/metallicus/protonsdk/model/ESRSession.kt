@@ -21,18 +21,30 @@
  */
 package com.metallicus.protonsdk.model
 
-import com.greymass.esr.SigningRequest
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-class ProtonESR(
-	val signingAccount: ChainAccount,
-	val signingRequest: SigningRequest,
-	val originESRUrlScheme: String,
-	val requestAccount: Account? = null,
-	val returnPath: String? = "",
-	val requestKey: String? = "",
-	val actions: List<ESRAction> = emptyList()
-) {
-	fun getRequestAccountDisplayName(): String {
-		return requestAccount?.accountContact?.getDisplayName() ?: "Unknown Requester"
-	}
-}
+@Entity
+class ESRSession(
+	@PrimaryKey
+	@SerializedName("id")
+	var id: String,
+	@SerializedName("signer")
+	var signer: String,
+	@SerializedName("callbackUrl")
+	var callbackUrl: String,
+	@SerializedName("receiveKey")
+	var receiveKey: String,
+	@SerializedName("receiveChannelUrl")
+	var receiveChannelUrl: String,
+	@SerializedName("createdAt")
+	var createdAt: Long,
+	@SerializedName("updatedAt")
+	var updatedAt: Long,
+
+	@SerializedName("requester")
+	@Embedded(prefix = "requester_")
+	var requester: Account? = null
+)

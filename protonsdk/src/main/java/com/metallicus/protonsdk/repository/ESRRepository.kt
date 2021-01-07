@@ -22,13 +22,16 @@
 package com.metallicus.protonsdk.repository
 
 import com.metallicus.protonsdk.api.*
+import com.metallicus.protonsdk.db.ESRSessionDao
+import com.metallicus.protonsdk.model.ESRSession
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ESRRepository @Inject constructor(
-	private val esrCallbackService: ESRCallbackService
+	private val esrCallbackService: ESRCallbackService,
+	private val esrSessionDao: ESRSessionDao
 ) {
 	suspend fun cancelAuthorizeESR(url: String, error: String): Response<String> {
 		return esrCallbackService.cancelAuthorizeESR(url, CancelAuthorizeESRBody(error))
@@ -36,5 +39,29 @@ class ESRRepository @Inject constructor(
 
 	suspend fun authorizeESR(url: String, params: Map<String, String>): Response<String> {
 		return esrCallbackService.authorizeESR(url, params)
+	}
+
+	suspend fun getESRSession(id: String): ESRSession {
+		return esrSessionDao.findById(id)
+	}
+
+	suspend fun getESRSessions(): List<ESRSession> {
+		return esrSessionDao.findAll()
+	}
+
+	suspend fun addESRSession(esrSession: ESRSession) {
+		esrSessionDao.insert(esrSession)
+	}
+
+	suspend fun updateESRSession(esrSession: ESRSession) {
+		esrSessionDao.update(esrSession)
+	}
+
+	suspend fun removeESRSession(esrSession: ESRSession) {
+		esrSessionDao.remove(esrSession.id)
+	}
+
+	suspend fun removeAllESRSessions() {
+		esrSessionDao.removeAll()
 	}
 }
