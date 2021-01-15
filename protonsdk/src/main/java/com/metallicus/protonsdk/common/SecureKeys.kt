@@ -42,18 +42,27 @@ class SecureKeys(private val context: Context) {
 
 	fun checkPin(pin: String): Boolean {
 		var isValid = false
+
 		SecurePreferences.setSharedPreferencesName(SHARED_PREFS_FILENAME)
 		val securePrefs = SecurePreferences.getSharedPreferences(context)
-		if (securePrefs.all.isNotEmpty()) {
-			isValid = try {
-				val firstAccount = securePrefs.all.entries.iterator().next()
-				val publicKey = firstAccount.key
-				val privateKey = SecurePreferences.getStringValue(context, publicKey, pin, "")
-				EosPrivateKey(privateKey).publicKey.toString() == publicKey
-			} catch (e: Exception) {
-				false
+
+		// make sure at least one key is set with PIN
+		run loop@ {
+			securePrefs.all.forEach { secureKey ->
+				isValid = try {
+					val publicKey = secureKey.key
+					val privateKey = SecurePreferences.getStringValue(context, publicKey, pin, "")
+					EosPrivateKey(privateKey).publicKey.toString() == publicKey
+				} catch (e: Exception) {
+					false
+				}
+
+				if (isValid) {
+					return@loop
+				}
 			}
 		}
+
 		return isValid
 	}
 

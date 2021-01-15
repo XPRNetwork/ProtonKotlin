@@ -75,6 +75,11 @@ public final class SecurePreferences {
 
 		String transformedValue = "";
 		if (password != null) {
+			// HEX
+//			String encrypted = SecretKeyTool.encryptMessage(key, value, password);
+//			String encryptedHex = HexUtils.toHex(encrypted.getBytes());
+//			transformedValue = encryptedHex;
+
 			transformedValue = SecretKeyTool.encryptMessage(key, value, password);
 		} else {
 			if (!KeystoreTool.keyPairExists()) {
@@ -167,6 +172,12 @@ public final class SecurePreferences {
 		try {
 			if (!TextUtils.isEmpty(secureValue)) {
 				if (password != null) {
+
+					// HEX
+//					String secureValueHex = new String(HexUtils.toBytes(secureValue));
+//					String decrypted = SecretKeyTool.decryptMessage(key, secureValueHex, password);
+//					return decrypted;
+
 					return SecretKeyTool.decryptMessage(key, secureValue, password);
 				} else {
 					return KeystoreTool.decryptMessage(context, secureValue);
