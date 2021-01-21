@@ -23,8 +23,8 @@ const val kotlinVersion = "1.4.10" // TODO: 1.4.20
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 25
-	const val versionName = "0.8.0"
+	const val versionCode = 26
+	const val versionName = "0.8.1"
 }
 
 object BuildPlugins {
@@ -72,7 +72,7 @@ object Libraries {
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
 		const val guava = "29.0-jre"
-		const val esr = "1.0.4"
+		const val esr = "1.0.6"
 	}
 
 	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
