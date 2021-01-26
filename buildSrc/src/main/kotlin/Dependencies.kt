@@ -29,7 +29,7 @@ object ProtonSdk {
 
 object BuildPlugins {
 	object Versions {
-		const val gradle = "4.1.1"
+		const val gradle = "4.1.2"
 		const val dokka = "0.10.1" // TODO: 1.4.0
 		const val bintray = "1.8.5"
 	}
@@ -49,7 +49,7 @@ object Android {
 	const val minSdk = 21
 	const val compileSdk = 30
 	const val targetSdk = compileSdk
-	const val buildTools = "30.0.2"
+	const val buildTools = "30.0.3"
 
 	object Progaurd {
 		const val consumeFile = "consumer-rules.pro"
@@ -60,10 +60,10 @@ object Android {
 
 object Libraries {
 	private object Versions {
-		const val ktx = "1.5.0-alpha04"
-		const val lifecycleLiveData = "2.3.0-beta01"
-		const val room = "2.2.5"
-		const val workManager = "2.4.0"
+		const val ktx = "1.5.0-beta01"
+		const val lifecycleLiveData = "2.3.0-rc01"
+		const val room = "2.2.6"
+		const val workManager = "2.5.0-rc01"
 		const val okhttp3 = "4.9.0"
 		const val retrofit = "2.9.0"
 		const val dagger = "2.30.1"
@@ -71,7 +71,7 @@ object Libraries {
 		const val coroutines = "1.4.0-M1"
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
-		const val guava = "29.0-jre"
+		const val guava = "30.1-jre"
 		const val esr = "1.0.6"
 	}
 
@@ -105,7 +105,7 @@ object Libraries {
 
 object TestLibraries {
 	private object Versions {
-		const val junit = "4.13"
+		const val junit = "4.13.1"
 		const val testExt = "1.1.2"
 		const val espresso = "3.3.0"
 	}
