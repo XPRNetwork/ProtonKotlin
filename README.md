@@ -115,7 +115,7 @@ Key Storage inspired by
 
 # MIT License
 
-Copyright (c) 2020 Proton Chain LLC, Delaware
+Copyright (c) 2021 Proton Chain LLC, Delaware
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
