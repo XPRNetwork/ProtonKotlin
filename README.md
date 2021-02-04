@@ -10,8 +10,8 @@ signing and pushing transactions.
 
 **Important:** *This library is currently under heavy development.
 Please be aware that all functionality is subject to change at anytime.
-Documentation and examples are also being worked on and will be added
-over time as well.*
+Documentation and examples are also being worked on and will change
+over time.*
 
 # Installation
 
