@@ -74,9 +74,7 @@ dependencies {
 
 	// Dagger
 	implementation(Libraries.dagger)
-	implementation(Libraries.daggerAndroidSupport)
-	kapt(Libraries.daggerAndroidProcessor)
-	kapt(Libraries.daggerAndroidCompiler)
+	kapt(Libraries.daggerCompiler)
 
 	// Assisted Inject (Dagger)
 	compileOnly(Libraries.daggerAssistedInjectAnnotations)

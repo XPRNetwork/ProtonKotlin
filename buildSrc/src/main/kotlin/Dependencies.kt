@@ -23,8 +23,8 @@ const val kotlinVersion = "1.4.10" // TODO: 1.4.20
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 27
-	const val versionName = "0.8.2"
+	const val versionCode = 28
+	const val versionName = "0.8.3"
 }
 
 object BuildPlugins {
@@ -86,9 +86,7 @@ object Libraries {
 	const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
 	const val retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
 	const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
-	const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:${Versions.dagger}"
-	const val daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:${Versions.dagger}"
-	const val daggerAndroidCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
+	const val daggerCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
 	const val daggerAssistedInjectAnnotations = "com.squareup.inject:assisted-inject-annotations-dagger2:${Versions.daggerAssistedInject}"
 	const val daggerAssistedInjectProcessor = "com.squareup.inject:assisted-inject-processor-dagger2:${Versions.daggerAssistedInject}"
 	const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"

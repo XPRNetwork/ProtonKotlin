@@ -349,28 +349,29 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getActiveAccountActions(contract: String, symbol: String): LiveData<Resource<List<Action>>> = liveData {
-		emit(Resource.loading())
-
-		try {
+	suspend fun getActiveAccountActions(contract: String, symbol: String, limit: Int, skip: Int): Resource<List<Action>> {
+		return try {
 			val activeAccount = getActiveAccountAsync()
 
-			val actions =
-				actionsModule.getActions(
-					activeAccount.chainProvider.chainUrl,
-					activeAccount.chainProvider.hyperionHistoryUrl,
-					activeAccount.account.accountName,
-					contract,
-					symbol)
-
-			emit(actions)
+			actionsModule.getActions(
+				activeAccount.chainProvider.chainUrl,
+				activeAccount.chainProvider.hyperionHistoryUrl,
+				activeAccount.account.accountName,
+				contract,
+				symbol,
+				limit,
+				skip)
 		} catch (e: ProtonException) {
-			val error: Resource<List<Action>> = Resource.error(e)
-			emit(error)
+			Resource.error(e)
 		} catch (e: Exception) {
-			val error: Resource<List<Action>> = Resource.error(e.localizedMessage.orEmpty())
-			emit(error)
+			Resource.error(e.localizedMessage.orEmpty())
 		}
+	}
+
+	fun getActiveAccountActionsLiveData(contract: String, symbol: String, limit: Int, skip: Int): LiveData<Resource<List<Action>>> = liveData {
+		emit(Resource.loading())
+
+		emit(getActiveAccountActions(contract, symbol, limit, skip))
 	}
 
 	fun updateAccountName(pin: String, name: String): LiveData<Resource<ChainAccount>> = liveData {

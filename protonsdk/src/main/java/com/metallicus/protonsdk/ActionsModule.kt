@@ -69,14 +69,15 @@ class ActionsModule {
 		DaggerInjector.component.inject(this)
 	}
 
-	suspend fun getActions(chainUrl: String, hyperionHistoryUrl: String, accountName: String, contract: String, symbol: String): Resource<List<AccountAction>> {
+	suspend fun getActions(chainUrl: String, hyperionHistoryUrl: String, accountName: String, contract: String, symbol: String, limit: Int=250, skip: Int=0): Resource<List<AccountAction>> {
 		return try {
-			val response = actionRepository.fetchAccountTokenActions(hyperionHistoryUrl, accountName, symbol)
+			val response = actionRepository.fetchAccountTokenActions(hyperionHistoryUrl, accountName, symbol, limit, skip)
 			if (response.isSuccessful) {
 				val jsonObject = response.body()
 
-				val actions = jsonObject?.getAsJsonArray("actions")
+				val accountTokenActions = mutableListOf<AccountAction>()
 
+				val actions = jsonObject?.getAsJsonArray("actions")
 				actions?.forEach {
 					try {
 						val action = convertStateHistoryAction(it.asJsonObject)
@@ -132,16 +133,18 @@ class ActionsModule {
 						action.accountContact = accountContact
 
 						actionRepository.addAction(action)
+
+						accountTokenActions.add(action)
 					} catch (e: Exception) {
 						Timber.d("%s - %s", e.localizedMessage, it.toString())
 					}
 				}
 
-				val accountTokenActions = if (contract == "eosio.token") {
-					actionRepository.getAccountSystemTokenActions(accountName, contract, symbol)
-				} else {
-					actionRepository.getAccountTokenActions(accountName, contract, symbol)
-				}
+//				val accountTokenActions = if (contract == "eosio.token") {
+//					actionRepository.getAccountSystemTokenActions(accountName, contract, symbol)
+//				} else {
+//					actionRepository.getAccountTokenActions(accountName, contract, symbol)
+//				}
 
 				Resource.success(accountTokenActions)
 			} else {
