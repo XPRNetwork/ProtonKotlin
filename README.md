@@ -9,7 +9,7 @@ for this library is for account and key management, but also handles
 signing and pushing transactions.
 
 **Important:** *This library is currently under heavy development.
-Please be aware that all functionality is subject to change at anytime.
+Please be aware that all functionality is subject to change at any time.
 Documentation and examples are also being worked on and will change
 over time.*
 
