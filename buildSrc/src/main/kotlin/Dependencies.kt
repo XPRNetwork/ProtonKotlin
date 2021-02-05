@@ -74,7 +74,7 @@ object Libraries {
 		const val esr = "1.0.6"
 	}
 
-	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 	const val ktxCore = "androidx.core:core-ktx:${Versions.ktx}"
 	const val lifeCycleLiveData = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycleLiveData}"
 	const val roomKtx = "androidx.room:room-ktx:${Versions.room}"
