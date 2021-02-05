@@ -21,6 +21,7 @@
  */
 package com.metallicus.protonsdk.model
 
+import androidx.annotation.NonNull
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
 import com.metallicus.protonsdk.db.DefaultTypeConverters
@@ -34,7 +35,10 @@ data class CurrencyBalance(
 	@SerializedName("symbol") val symbol: String,
 	@SerializedName("amount") val amount: String
 ) {
+	@NonNull
 	lateinit var tokenContractId: String
+
+	@NonNull
 	lateinit var accountName: String
 
 	fun getAmountDouble(): Double {

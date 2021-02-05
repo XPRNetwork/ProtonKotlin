@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const val kotlinVersion = "1.4.10" // TODO: 1.4.20
+const val kotlinVersion = "1.4.30"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
@@ -37,7 +37,6 @@ object BuildPlugins {
 	const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.gradle}"
 	const val androidLibrary = "com.android.library"
 	const val kotlinAndroid = "android"
-	const val kotlinAndroidExtensions = "android.extensions"
 	const val kotlinKapt = "kapt"
 	const val mavenPublish = "maven-publish"
 	const val dokka = "org.jetbrains.dokka"

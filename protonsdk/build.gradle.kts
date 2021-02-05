@@ -5,7 +5,6 @@ import com.jfrog.bintray.gradle.tasks.BintrayUploadTask
 plugins {
 	id(BuildPlugins.androidLibrary)
 	kotlin(BuildPlugins.kotlinAndroid)
-	kotlin(BuildPlugins.kotlinAndroidExtensions)
 	kotlin(BuildPlugins.kotlinKapt)
 	id(BuildPlugins.mavenPublish)
 	id(BuildPlugins.dokka)

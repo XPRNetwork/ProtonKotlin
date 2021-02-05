@@ -69,6 +69,7 @@ class ActionsModule {
 		DaggerInjector.component.inject(this)
 	}
 
+	@Suppress("unused", "UNUSED_PARAMETER")
 	suspend fun getActions(chainUrl: String, hyperionHistoryUrl: String, accountName: String, contract: String, symbol: String, limit: Int=250, skip: Int=0): Resource<List<AccountAction>> {
 		return try {
 			val response = actionRepository.fetchAccountTokenActions(hyperionHistoryUrl, accountName, symbol, limit, skip)

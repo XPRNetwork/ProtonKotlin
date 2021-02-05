@@ -730,6 +730,7 @@ class Proton private constructor(context: Context) {
 		emit(Resource.loading())
 
 		try {
+			@Suppress("UNUSED_VARIABLE")
 			val activeAccount = getActiveAccountAsync()
 
 			val esrSessions = accountModule.getESRSessions(/*activeAccount*/)
@@ -748,6 +749,7 @@ class Proton private constructor(context: Context) {
 		emit(Resource.loading())
 
 		try {
+			@Suppress("UNUSED_VARIABLE")
 			val activeAccount = getActiveAccountAsync()
 
 			removeOpenESRSession(esrSession.id)
@@ -768,6 +770,7 @@ class Proton private constructor(context: Context) {
 		emit(Resource.loading())
 
 		try {
+			@Suppress("UNUSED_VARIABLE")
 			val activeAccount = getActiveAccountAsync()
 
 			removeAllOpenESRSessions()

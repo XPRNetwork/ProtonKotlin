@@ -21,6 +21,7 @@
  */
 package com.metallicus.protonsdk.model
 
+import androidx.annotation.NonNull
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
@@ -49,6 +50,7 @@ data class Action(
 	@SerializedName("action_trace")
 	@Embedded(prefix = "action_trace_") val actionTrace: ActionTrace
 ) {
+	@NonNull
 	lateinit var accountName: String
 
 	lateinit var accountContact: AccountContact
