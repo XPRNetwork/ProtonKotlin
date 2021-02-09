@@ -19,17 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const val kotlinVersion = "1.4.10" // TODO: 1.4.20
+const val kotlinVersion = "1.4.30"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 26
-	const val versionName = "0.8.1"
+	const val versionCode = 28
+	const val versionName = "0.8.3"
 }
 
 object BuildPlugins {
 	object Versions {
-		const val gradle = "4.1.1"
+		const val gradle = "4.1.2"
 		const val dokka = "0.10.1" // TODO: 1.4.0
 		const val bintray = "1.8.5"
 	}
@@ -37,7 +37,6 @@ object BuildPlugins {
 	const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.gradle}"
 	const val androidLibrary = "com.android.library"
 	const val kotlinAndroid = "android"
-	const val kotlinAndroidExtensions = "android.extensions"
 	const val kotlinKapt = "kapt"
 	const val mavenPublish = "maven-publish"
 	const val dokka = "org.jetbrains.dokka"
@@ -49,7 +48,7 @@ object Android {
 	const val minSdk = 21
 	const val compileSdk = 30
 	const val targetSdk = compileSdk
-	const val buildTools = "30.0.2"
+	const val buildTools = "30.0.3"
 
 	object Progaurd {
 		const val consumeFile = "consumer-rules.pro"
@@ -60,10 +59,10 @@ object Android {
 
 object Libraries {
 	private object Versions {
-		const val ktx = "1.5.0-alpha04"
-		const val lifecycleLiveData = "2.3.0-beta01"
-		const val room = "2.2.5"
-		const val workManager = "2.4.0"
+		const val ktx = "1.5.0-beta01"
+		const val lifecycleLiveData = "2.3.0-rc01"
+		const val room = "2.2.6"
+		const val workManager = "2.5.0"
 		const val okhttp3 = "4.9.0"
 		const val retrofit = "2.9.0"
 		const val dagger = "2.30.1"
@@ -71,11 +70,11 @@ object Libraries {
 		const val coroutines = "1.4.0-M1"
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
-		const val guava = "29.0-jre"
+		const val guava = "30.1-jre"
 		const val esr = "1.0.6"
 	}
 
-	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 	const val ktxCore = "androidx.core:core-ktx:${Versions.ktx}"
 	const val lifeCycleLiveData = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycleLiveData}"
 	const val roomKtx = "androidx.room:room-ktx:${Versions.room}"
@@ -86,9 +85,7 @@ object Libraries {
 	const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
 	const val retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
 	const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
-	const val daggerAndroidSupport = "com.google.dagger:dagger-android-support:${Versions.dagger}"
-	const val daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:${Versions.dagger}"
-	const val daggerAndroidCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
+	const val daggerCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
 	const val daggerAssistedInjectAnnotations = "com.squareup.inject:assisted-inject-annotations-dagger2:${Versions.daggerAssistedInject}"
 	const val daggerAssistedInjectProcessor = "com.squareup.inject:assisted-inject-processor-dagger2:${Versions.daggerAssistedInject}"
 	const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
@@ -105,7 +102,7 @@ object Libraries {
 
 object TestLibraries {
 	private object Versions {
-		const val junit = "4.13"
+		const val junit = "4.13.1"
 		const val testExt = "1.1.2"
 		const val espresso = "3.3.0"
 	}

@@ -87,13 +87,14 @@ interface ProtonChainService {
 		@Query("account") account: String
 	): Response<JsonObject>
 
-	@GET//("/v2/history/get_actions?account=&transfer.symbol=&filter=&limit=")
+	@GET//("/v2/history/get_actions?account=&transfer.symbol=&filter=&limit=&skip=")
 	suspend fun getActions(
 		@Url url: String,
 		@Query("account") account: String,
 		@Query("transfer.symbol") symbol: String,
 		//@Query("filter") filter: String,
-		@Query("limit") limit: Int
+		@Query("limit") limit: Int,
+		@Query("skip") skip: Int
 	): Response<JsonObject>
 
 	@POST//("/v1/chain/get_table_rows")

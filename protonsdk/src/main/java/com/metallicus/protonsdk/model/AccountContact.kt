@@ -22,6 +22,7 @@
 package com.metallicus.protonsdk.model
 
 import android.util.Base64
+import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.TypeConverters
@@ -38,6 +39,7 @@ data class AccountContact(
 	var avatar: String = "",
 	var verified: Boolean = false
 ) {
+	@NonNull
 	lateinit var accountName: String // owner accountName
 
 	fun getDisplayName(): String {

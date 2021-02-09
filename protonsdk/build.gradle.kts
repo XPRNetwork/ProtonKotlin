@@ -5,7 +5,6 @@ import com.jfrog.bintray.gradle.tasks.BintrayUploadTask
 plugins {
 	id(BuildPlugins.androidLibrary)
 	kotlin(BuildPlugins.kotlinAndroid)
-	kotlin(BuildPlugins.kotlinAndroidExtensions)
 	kotlin(BuildPlugins.kotlinKapt)
 	id(BuildPlugins.mavenPublish)
 	id(BuildPlugins.dokka)
@@ -74,9 +73,7 @@ dependencies {
 
 	// Dagger
 	implementation(Libraries.dagger)
-	implementation(Libraries.daggerAndroidSupport)
-	kapt(Libraries.daggerAndroidProcessor)
-	kapt(Libraries.daggerAndroidCompiler)
+	kapt(Libraries.daggerCompiler)
 
 	// Assisted Inject (Dagger)
 	compileOnly(Libraries.daggerAssistedInjectAnnotations)

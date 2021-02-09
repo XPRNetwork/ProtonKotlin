@@ -9,9 +9,9 @@ for this library is for account and key management, but also handles
 signing and pushing transactions.
 
 **Important:** *This library is currently under heavy development.
-Please be aware that all functionality is subject to change at anytime.
-Documentation and examples are also being worked on and will be added
-over time as well.*
+Please be aware that all functionality is subject to change at any time.
+Documentation and examples are also being worked on and will change
+over time.*
 
 # Installation
 
@@ -31,7 +31,7 @@ Then add the following dependency to your module's build.gradle
 ```gradle
 dependencies {
     ...
-    implementation "com.metallicus:protonsdk:0.8.1"
+    implementation "com.metallicus:protonsdk:0.8.3"
 }
 ```
 
@@ -115,7 +115,7 @@ Key Storage inspired by
 
 # MIT License
 
-Copyright (c) 2020 Proton Chain LLC, Delaware
+Copyright (c) 2021 Proton Chain LLC, Delaware
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the

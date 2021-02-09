@@ -537,7 +537,7 @@ class AccountModule {
 			val response =
 				esrRepository.cancelAuthorizeESR(callback, "User canceled request")
 			if (response.isSuccessful) {
-				Resource.success(response.body())
+				Resource.success(protonESR.returnPath)
 			} else {
 				val msg = response.errorBody()?.string()
 				val errorMsg = if (msg.isNullOrEmpty()) {
@@ -624,7 +624,7 @@ class AccountModule {
 
 				esrRepository.addESRSession(esrSession)
 
-				Resource.success(response.body())
+				Resource.success(protonESR.returnPath)
 			} else {
 				val msg = response.errorBody()?.string()
 				val errorMsg = if (msg.isNullOrEmpty()) {
@@ -746,7 +746,7 @@ class AccountModule {
 						esrSession.updatedAt = Date().time
 						esrRepository.updateESRSession(esrSession)
 
-						Resource.success(response.body())
+						Resource.success(protonESR.returnPath)
 					} else {
 						val msg = response.errorBody()?.string()
 						val errorMsg = if (msg.isNullOrEmpty()) {

@@ -44,8 +44,8 @@ class ActionRepository @Inject constructor(
 		}
 	}
 
-	suspend fun fetchAccountTokenActions(hyperionHistoryUrl: String, accountName: String, symbol: String): Response<JsonObject> {
-		return protonChainService.getActions("$hyperionHistoryUrl/v2/history/get_actions", accountName, symbol, 250)
+	suspend fun fetchAccountTokenActions(hyperionHistoryUrl: String, accountName: String, symbol: String, limit: Int=250, skip: Int=0): Response<JsonObject> {
+		return protonChainService.getActions("$hyperionHistoryUrl/v2/history/get_actions", accountName, symbol, limit, skip)
 	}
 
 	suspend fun getAccountSystemTokenActions(accountName: String, contract: String, symbol: String): List<Action> {

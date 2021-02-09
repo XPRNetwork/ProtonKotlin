@@ -23,9 +23,12 @@ package com.metallicus.protonsdk.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
+import com.metallicus.protonsdk.db.DefaultTypeConverters
 
 @Entity
+@TypeConverters(DefaultTypeConverters::class)
 data class ChainProvider(
 	@PrimaryKey
 	@SerializedName("chainId") val chainId: String,
@@ -48,7 +51,10 @@ data class ChainProvider(
 	@SerializedName("createAccountPath") val createAccountPath: String,
 	@SerializedName("updateAccountAvatarPath") val updateAccountAvatarPath: String,
 	@SerializedName("updateAccountNamePath") val updateAccountNamePath: String,
-	@SerializedName("exchangeRatePath") val exchangeRatePath: String
+	@SerializedName("exchangeRatePath") val exchangeRatePath: String,
+
+	@SerializedName("chainUrls") val chainUrls: List<String>,
+	@SerializedName("hyperionHistoryUrls") val hyperionHistoryUrls: List<String>
 ) {
 	lateinit var chainApiUrl: String
 }
