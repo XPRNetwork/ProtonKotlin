@@ -57,6 +57,8 @@ class InitChainProviderWorker
 				val chainProvider = Gson().fromJson(response.body(), ChainProvider::class.java)
 				chainProvider.chainApiUrl = chainUrl
 
+				// TODO: find fastest chain/history urls
+
 				chainProviderRepository.addChainProvider(chainProvider)
 
 				prefs.activeChainId = chainProvider.chainId

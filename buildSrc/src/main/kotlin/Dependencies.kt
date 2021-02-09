@@ -62,7 +62,7 @@ object Libraries {
 		const val ktx = "1.5.0-beta01"
 		const val lifecycleLiveData = "2.3.0-rc01"
 		const val room = "2.2.6"
-		const val workManager = "2.5.0-rc01"
+		const val workManager = "2.5.0"
 		const val okhttp3 = "4.9.0"
 		const val retrofit = "2.9.0"
 		const val dagger = "2.30.1"
