@@ -56,6 +56,10 @@ class ChainProviderRepository @Inject constructor(
 		return protonChainService.getChainInfo("$chainUrl/v1/chain/get_info")
 	}
 
+	suspend fun getHealth(chainUrl: String): Response<JsonObject> {
+		return protonChainService.getHealth("$chainUrl/v2/health")
+	}
+
 	suspend fun getAbi(chainUrl: String, accountName: String): Response<JsonObject> {
 		return protonChainService.getAbi("$chainUrl/v1/chain/get_abi", AccountBody(accountName))
 	}

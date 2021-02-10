@@ -37,8 +37,8 @@ data class ChainProvider(
 	@SerializedName("description") val description: String,
 	@SerializedName("iconUrl") val iconUrl: String,
 	@SerializedName("isTestnet") val isTestnet: Boolean,
-	@SerializedName("chainUrl") val chainUrl: String,
-	@SerializedName("hyperionHistoryUrl") val hyperionHistoryUrl: String,
+	@SerializedName("chainUrl") var chainUrl: String,
+	@SerializedName("hyperionHistoryUrl") var hyperionHistoryUrl: String,
 
 	@SerializedName("explorerName") val explorerName: String,
 	@SerializedName("explorerUrl") val explorerUrl: String,
