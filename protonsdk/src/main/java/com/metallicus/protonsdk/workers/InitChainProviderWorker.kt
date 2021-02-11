@@ -57,7 +57,67 @@ class InitChainProviderWorker
 				val chainProvider = Gson().fromJson(response.body(), ChainProvider::class.java)
 				chainProvider.chainApiUrl = chainUrl
 
-				// TODO: find fastest chain/history urls
+				val timeout = 4000L // 4 milliseconds
+				val acceptableChainBlockDiff = 350L
+				val acceptableHyperionHistoryBlockDiff = 30L
+
+				var fastestChainUrl = chainProvider.chainUrl
+				var fastestChainUrlTime = timeout
+
+				chainProvider.chainUrls.forEach {
+					val chainUrlResponse = chainProviderRepository.getChainInfo(it)
+					if (chainUrlResponse.isSuccessful) {
+						chainUrlResponse.body()?.let { chainInfo ->
+							val blockDiff = chainInfo.headBlockNum - chainInfo.lastIrreversibleBlockNum
+							val responseTime = chainUrlResponse.raw().receivedResponseAtMillis - chainUrlResponse.raw().sentRequestAtMillis
+							if (responseTime < fastestChainUrlTime && blockDiff < acceptableChainBlockDiff) {
+								fastestChainUrl = it
+								fastestChainUrlTime = responseTime
+							}
+						}
+					}
+				}
+
+				chainProvider.chainUrl = fastestChainUrl
+
+				var fastestHyperionHistoryUrl = chainProvider.hyperionHistoryUrl
+				var fastestHyperionHistoryUrlTime = timeout
+
+				chainProvider.hyperionHistoryUrls.forEach {
+					val healthResponse = chainProviderRepository.getHealth(it)
+					if (healthResponse.isSuccessful) {
+						var blockDiff = acceptableHyperionHistoryBlockDiff
+
+						healthResponse.body()?.let { body ->
+							var headBlockNum = 0L
+							var lastIndexedBlock = 0L
+							val health = body.get("health").asJsonArray
+							health.forEach { healthElement ->
+								val serviceObj = healthElement.asJsonObject
+								if (serviceObj.get("service").asString == "NodeosRPC") {
+									val serviceDataObj = serviceObj.get("service_data").asJsonObject
+									headBlockNum = serviceDataObj.get("head_block_num").asLong
+								}
+								if (serviceObj.get("service").asString == "Elasticsearch") {
+									val serviceDataObj = serviceObj.get("service_data").asJsonObject
+									lastIndexedBlock = serviceDataObj.get("last_indexed_block").asLong
+								}
+							}
+
+							if (headBlockNum != 0L && lastIndexedBlock != 0L) {
+								blockDiff = headBlockNum - lastIndexedBlock
+							}
+						}
+
+						val responseTime = healthResponse.raw().receivedResponseAtMillis - healthResponse.raw().sentRequestAtMillis
+						if (responseTime < fastestHyperionHistoryUrlTime && blockDiff < acceptableHyperionHistoryBlockDiff) {
+							fastestHyperionHistoryUrl = it
+							fastestHyperionHistoryUrlTime = responseTime
+						}
+					}
+				}
+
+				chainProvider.hyperionHistoryUrl = fastestHyperionHistoryUrl
 
 				chainProviderRepository.addChainProvider(chainProvider)
 

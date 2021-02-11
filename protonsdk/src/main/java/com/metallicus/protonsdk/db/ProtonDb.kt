@@ -34,7 +34,7 @@ import com.metallicus.protonsdk.model.*
 		CurrencyBalance::class,
 		Action::class,
 		ESRSession::class],
-	version = 24,
+	version = 25,
 	exportSchema = false
 )
 abstract class ProtonDb : RoomDatabase() {
