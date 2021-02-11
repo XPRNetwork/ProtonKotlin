@@ -26,6 +26,7 @@ import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.model.*
 import com.metallicus.protonsdk.repository.CurrencyBalanceRepository
+import com.metallicus.protonsdk.repository.TokenContractRepository
 import javax.inject.Inject
 
 /**
@@ -34,6 +35,9 @@ import javax.inject.Inject
 class CurrencyBalancesModule {
 	@Inject
 	lateinit var context: Context
+
+	@Inject
+	lateinit var tokenContractRepository: TokenContractRepository
 
 	@Inject
 	lateinit var currencyBalanceRepository: CurrencyBalanceRepository
@@ -105,8 +109,29 @@ class CurrencyBalancesModule {
 					val symbol = token.get("symbol").asString
 					val amount = token.get("amount").asString
 
+					val tokenContractId = "$code:$symbol"
+
 					if (tokenContractsMap.containsKey("$code:$symbol")) {
-						val tokenContractId = tokenContractsMap.getValue("$code:$symbol")
+						val currencyBalance = CurrencyBalance(code, symbol, amount)
+						currencyBalance.tokenContractId = tokenContractId
+						currencyBalance.accountName = accountName
+
+						currencyBalanceRepository.addCurrencyBalance(currencyBalance)
+					} else {
+						val precision = token.get("precision").asInt
+						val precisionSymbol = "$precision,$symbol"
+						val tokenContract = TokenContract(
+							id = tokenContractId,
+							contract = code,
+							name = symbol,
+							url = "",
+							description = "",
+							iconUrl = "",
+							precisionSymbol = precisionSymbol,
+							blacklisted = 0)
+						tokenContract.rates = mapOf(Pair("USD", 0.0))
+
+						tokenContractRepository.addTokenContract(tokenContract)
 
 						val currencyBalance = CurrencyBalance(code, symbol, amount)
 						currencyBalance.tokenContractId = tokenContractId

@@ -31,7 +31,7 @@ import java.util.*
 @TypeConverters(DefaultTypeConverters::class)
 data class TokenContract(
 	@PrimaryKey
-	@SerializedName("id") val id: String,
+	@SerializedName("id") var id: String,
 
 	@SerializedName("tcontract") val contract: String,
 	@SerializedName("tname") val name: String,

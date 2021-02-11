@@ -71,6 +71,7 @@ class InitTokenContractsWorker
 					val tokenContractJsonObject = it.asJsonObject
 
 					val tokenContract = gson.fromJson(tokenContractJsonObject, TokenContract::class.java)
+					tokenContract.id = "${tokenContract.contract}:${tokenContract.getSymbol()}"
 					tokenContract.rates = mapOf(Pair("USD", 0.0))
 
 					if (chainProvider.systemTokenSymbol == tokenContract.getSymbol()) {
