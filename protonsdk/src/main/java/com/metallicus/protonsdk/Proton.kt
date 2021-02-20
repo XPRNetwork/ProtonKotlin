@@ -292,6 +292,33 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
+	fun getMarketTokenPrices(currency: String = "USD"): LiveData<Resource<List<MarketTokenPrice>>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val chainProvider = getChainProviderAsync()
+			val tokenContracts = getTokenContractsAsync()
+
+			val tokenContractsMap = mutableMapOf<String, TokenContract>()
+			tokenContracts.forEach {
+				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it
+			}
+
+			val exchangeRateUrl =
+				chainProvider.chainApiUrl + chainProvider.exchangeRatePath
+
+			val marketTokenPrices = tokenContractsModule.getMarketTokenPrices(exchangeRateUrl, tokenContractsMap, currency)
+
+			emit(Resource.success(marketTokenPrices))
+		} catch (e: ProtonException) {
+			val error: Resource<List<MarketTokenPrice>> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<List<MarketTokenPrice>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
 	fun getActiveAccountTokenBalances(): LiveData<Resource<List<TokenCurrencyBalance>>> = liveData {
 		emit(Resource.loading())
 

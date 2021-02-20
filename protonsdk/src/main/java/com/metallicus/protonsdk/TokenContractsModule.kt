@@ -24,6 +24,7 @@ package com.metallicus.protonsdk
 import android.content.Context
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.di.DaggerInjector
+import com.metallicus.protonsdk.model.MarketTokenPrice
 import com.metallicus.protonsdk.model.TokenContract
 import com.metallicus.protonsdk.repository.TokenContractRepository
 import timber.log.Timber
@@ -54,7 +55,39 @@ class TokenContractsModule {
 		return tokenContractRepository.getTokenContracts()
 	}
 
-	suspend fun updateExchangeRates(exchangeRatesUrl: String, tokenContractsMap: Map<String, String>) {
+	suspend fun getMarketTokenPrices(exchangeRatesUrl: String, tokenContractsMap: Map<String, TokenContract>, currency: String): List<MarketTokenPrice> {
+		val marketTokenPrices = mutableListOf<MarketTokenPrice>()
+		try {
+			val exchangeRatesResponse = tokenContractRepository.fetchExchangeRates(exchangeRatesUrl)
+			if (exchangeRatesResponse.isSuccessful) {
+				val exchangeRatesJsonArray = exchangeRatesResponse.body()
+				exchangeRatesJsonArray?.forEach {
+					val exchangeRate = it.asJsonObject
+					val contract = exchangeRate.get("contract").asString
+					val symbol = exchangeRate.get("symbol").asString
+
+					val rates = exchangeRate.get("rates").asJsonObject
+					val price = if (rates.has(currency)) {
+						rates.get(currency).asDouble
+					} else {
+						rates.get("USD").asDouble
+					}
+
+					val priceChangePercent = exchangeRate.get("priceChangePercent").asDouble
+
+					val tokenContract = tokenContractsMap["$contract:$symbol"]
+
+					val marketTokenPrice = MarketTokenPrice(contract, symbol, price, priceChangePercent, tokenContract)
+					marketTokenPrices.add(marketTokenPrice)
+				}
+			}
+		} catch (e: Exception) {
+			Timber.d(e.localizedMessage)
+		}
+		return marketTokenPrices
+	}
+
+	suspend fun updateExchangeRates(exchangeRatesUrl: String, tokenContractIdsMap: Map<String, String>) {
 		try {
 			val exchangeRatesResponse = tokenContractRepository.fetchExchangeRates(exchangeRatesUrl)
 			if (exchangeRatesResponse.isSuccessful) {
@@ -65,7 +98,7 @@ class TokenContractsModule {
 					val symbol = exchangeRate.get("symbol").asString
 					val rates = exchangeRate.get("rates").asJsonObject
 
-					val tokenContractId = tokenContractsMap.getValue("$contract:$symbol")
+					val tokenContractId = tokenContractIdsMap.getValue("$contract:$symbol")
 					tokenContractRepository.updateRates(tokenContractId, rates.toString())
 				}
 			}
