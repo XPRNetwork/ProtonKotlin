@@ -24,9 +24,7 @@ package com.metallicus.protonsdk.db
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.metallicus.protonsdk.model.AccountContact
-import com.metallicus.protonsdk.model.AccountRefundsXPRInfo
-import com.metallicus.protonsdk.model.AccountVotersXPRInfo
+import com.metallicus.protonsdk.model.*
 
 object ProtonTypeConverters {
 	@TypeConverter
@@ -70,4 +68,19 @@ object ProtonTypeConverters {
 		val type = object : TypeToken<AccountRefundsXPRInfo>() {}.type
 		return Gson().toJson(accountRefundsXPRInfo, type)
 	}
+
+	@TypeConverter
+	@JvmStatic
+	fun stringToKYCProviderList(value: String): List<KYCProvider> {
+		val type = object : TypeToken<List<KYCProvider>>() {}.type
+		return Gson().fromJson(value, type)
+	}
+
+	@TypeConverter
+	@JvmStatic
+	fun kycProviderListToString(value: List<KYCProvider>): String {
+		val type = object : TypeToken<List<KYCProvider>>() {}.type
+		return Gson().toJson(value, type)
+	}
+
 }
