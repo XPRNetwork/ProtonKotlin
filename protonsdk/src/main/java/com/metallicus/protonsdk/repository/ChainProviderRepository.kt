@@ -24,6 +24,7 @@ package com.metallicus.protonsdk.repository
 import com.google.gson.JsonObject
 import com.metallicus.protonsdk.api.AccountBody
 import com.metallicus.protonsdk.api.ProtonChainService
+import com.metallicus.protonsdk.api.TableRowsBody
 import com.metallicus.protonsdk.db.ChainProviderDao
 import com.metallicus.protonsdk.model.ChainInfo
 import com.metallicus.protonsdk.model.ChainProvider
@@ -44,8 +45,12 @@ class ChainProviderRepository @Inject constructor(
 		chainProviderDao.insert(chainProvider)
 	}
 
-	suspend fun fetchChainProvider(chainUrl: String): Response<JsonObject> {
-		return protonChainService.getChainProvider("$chainUrl/v1/chain/info")
+	suspend fun fetchChainProvider(protonChainUrl: String): Response<JsonObject> {
+		return protonChainService.getChainProvider("$protonChainUrl/v1/chain/info")
+	}
+
+	suspend fun fetchKYCProviders(chainUrl: String, kycProvidersTableScope: String, kycProvidersTableCode: String, kycProvidersTableName: String): Response<JsonObject> {
+		return protonChainService.getTableRows("$chainUrl/v1/chain/get_table_rows", TableRowsBody(kycProvidersTableScope, kycProvidersTableCode, kycProvidersTableName, "", "", 100))
 	}
 
 	suspend fun getChainProvider(id: String): ChainProvider {

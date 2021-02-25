@@ -94,12 +94,12 @@ class ActionsModule {
 						accountContact.accountName = accountName
 
 						// add appropriate account contacts
-						if (action.isSender() &&
-							toAccount != "eosio.stake" &&
-							toAccount != "eosio.ramfee" &&
-							toAccount != "eosio.ram") {
-							accountContactRepository.addAccountContact(accountContact)
-						}
+//						if (action.isSender() &&
+//							toAccount != "eosio.stake" &&
+//							toAccount != "eosio.ramfee" &&
+//							toAccount != "eosio.ram") {
+//							accountContactRepository.addAccountContact(accountContact)
+//						}
 
 						val usersInfoTableScope = context.getString(R.string.usersInfoTableScope)
 						val usersInfoTableCode = context.getString(R.string.usersInfoTableCode)
@@ -129,11 +129,11 @@ class ActionsModule {
 							Timber.d(errorMsg)
 						}
 
-						accountContactRepository.updateAccountContact(accountContact)
+//						accountContactRepository.updateAccountContact(accountContact)
 
 						action.accountContact = accountContact
 
-						actionRepository.addAction(action)
+//						actionRepository.addAction(action)
 
 						accountTokenActions.add(action)
 					} catch (e: Exception) {

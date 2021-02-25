@@ -7,7 +7,6 @@
 	<string name="votersXPRInfoTableCode" translatable="false">eosio</string>
 	<string name="votersXPRInfoTableName" translatable="false">votersxpr</string>
 
-	<!--string name="refundsXPRInfoTableScope" translatable="false">eosio</string-->
 	<string name="refundsXPRInfoTableCode" translatable="false">eosio</string>
 	<string name="refundsXPRInfoTableName" translatable="false">refundsxpr</string>
 
@@ -18,6 +17,10 @@
 	<string name="tokensTableScope" translatable="false">token.proton</string>
 	<string name="tokensTableCode" translatable="false">token.proton</string>
 	<string name="tokensTableName" translatable="false">tokens</string>
+
+	<string name="kycProvidersTableScope" translatable="false">eosio.proton</string>
+	<string name="kycProvidersTableCode" translatable="false">eosio.proton</string>
+	<string name="kycProvidersTableName" translatable="false">kycproviders</string>
 
 	<string name="secureStorageKeyPairAlreadyExists">KeyPair already exists!</string>
 	<string name="secureStorageKeyPairDoesNotExist">KeyPair does not exist in Keystore</string>

@@ -69,11 +69,11 @@ class ProtonModule {
 		return db.accountDao()
 	}
 
-	@Singleton
-	@Provides
-	fun provideAccountContactDao(db: ProtonDb): AccountContactDao {
-		return db.accountContactDao()
-	}
+//	@Singleton
+//	@Provides
+//	fun provideAccountContactDao(db: ProtonDb): AccountContactDao {
+//		return db.accountContactDao()
+//	}
 
 	@Singleton
 	@Provides

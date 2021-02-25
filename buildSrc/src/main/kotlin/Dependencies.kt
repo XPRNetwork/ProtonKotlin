@@ -23,8 +23,8 @@ const val kotlinVersion = "1.4.30"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 30
-	const val versionName = "0.8.5"
+	const val versionCode = 31
+	const val versionName = "0.8.6"
 }
 
 object BuildPlugins {
@@ -65,7 +65,7 @@ object Libraries {
 		const val workManager = "2.5.0"
 		const val okhttp3 = "4.9.0"
 		const val retrofit = "2.9.0"
-		const val dagger = "2.30.1"
+		const val dagger = "2.29.1"
 		const val daggerAssistedInject = "0.6.0"
 		const val coroutines = "1.4.0-M1"
 		const val timber = "4.7.1"

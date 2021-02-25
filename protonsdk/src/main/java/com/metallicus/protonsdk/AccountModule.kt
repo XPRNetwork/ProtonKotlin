@@ -150,13 +150,15 @@ class AccountModule {
 		return secureKeys.checkPin(pin)
 	}
 
-	private suspend fun fetchAccountContact(chainUrl: String, accountName: String): AccountContact {
+	private suspend fun fetchAccountContact(chainId: String, chainUrl: String, accountName: String): AccountContact {
 		val accountContact = AccountContact(accountName)
 		accountContact.accountName = accountName
 
 		val usersInfoTableScope = context.getString(R.string.usersInfoTableScope)
 		val usersInfoTableCode = context.getString(R.string.usersInfoTableCode)
 		val usersInfoTableName = context.getString(R.string.usersInfoTableName)
+
+		val chainProvider = chainProviderRepository.getChainProvider(chainId)
 
 		val response = accountContactRepository.fetchAccountContact(
 			chainUrl, accountName, usersInfoTableScope, usersInfoTableCode, usersInfoTableName)
@@ -171,6 +173,31 @@ class AccountModule {
 				accountContact.avatar = userInfo?.get("avatar")?.asString.orEmpty()
 				val verifiedInt = userInfo?.get("verified")?.asInt ?: 0
 				accountContact.verified = verifiedInt == 1
+
+				val verifiedFields = mutableListOf<String>()
+
+				if (userInfo?.has("kyc") == true) {
+					val kyc = userInfo.get("kyc")?.asJsonArray
+					kyc?.forEach { kycJsonElement ->
+						val kycRow = kycJsonElement.asJsonObject
+						val kycProvider = kycRow.get("kyc_provider").asString
+						if (chainProvider.kycProviders.find { it.kycProvider == kycProvider } != null) {
+							val kycLevel = kycRow.get("kyc_level").asString
+
+							val kycFields = kycLevel.split(",")
+							kycFields.forEach { kycField ->
+								val verifiedField = kycField.split(":")[1]
+
+								verifiedFields.add(verifiedField)
+							}
+						}
+					}
+				}
+
+				// make sure there are no duplicates
+				verifiedFields.distinct()
+
+				accountContact.verifiedFields = verifiedFields
 			}
 		} else {
 			val msg = response.errorBody()?.string()
@@ -269,7 +296,7 @@ class AccountModule {
 				it.accountChainId = chainId
 
 				// fetch contact info
-				it.accountContact = fetchAccountContact(chainUrl, accountName)
+				it.accountContact = fetchAccountContact(chainId, chainUrl, accountName)
 
 				// fetch voter info
 				it.votersXPRInfo = fetchAccountVotersXPRInfo(chainUrl, accountName)
@@ -301,16 +328,6 @@ class AccountModule {
 		accountRepository.addAccount(account)
 	}
 
-	private suspend fun updateAccount(chainId: String, chainUrl: String, accountName: String): ChainAccount {
-		val account = fetchAccount(chainId, chainUrl, accountName)
-
-		requireNotNull(account) { "$accountName Not Found" }
-
-		accountRepository.updateAccount(account)
-
-		return accountRepository.getChainAccount(accountName)
-	}
-
 	suspend fun setActiveAccount(chainId: String, chainUrl: String, activeAccount: ActiveAccount): Resource<ChainAccount> {
 		val publicKey = activeAccount.publicKey
 		val accountName = activeAccount.accountName
@@ -339,7 +356,15 @@ class AccountModule {
 
 	suspend fun refreshAccount(chainId: String, chainUrl: String, accountName: String): Resource<ChainAccount> {
 		return try {
-			Resource.success(updateAccount(chainId, chainUrl, accountName))
+			val account = fetchAccount(chainId, chainUrl, accountName)
+
+			requireNotNull(account) { "$accountName Not Found" }
+
+			accountRepository.updateAccount(account)
+
+			val chainAccount = accountRepository.getChainAccount(accountName)
+
+			Resource.success(chainAccount)
 		} catch (e: Exception) {
 			Resource.error(e.localizedMessage.orEmpty())
 		}
@@ -373,7 +398,7 @@ class AccountModule {
 		val accountName = chainAccount.account.accountName
 
 		val updateAccountNameUrl =
-			chainAccount.chainProvider.chainApiUrl + chainAccount.chainProvider.updateAccountNamePath
+			chainAccount.chainProvider.protonChainUrl + chainAccount.chainProvider.updateAccountNamePath
 
 		val response = accountRepository.updateAccountName(
 			updateAccountNameUrl,
@@ -404,7 +429,7 @@ class AccountModule {
 		val accountName = chainAccount.account.accountName
 
 		val updateAccountAvatarUrl =
-			chainAccount.chainProvider.chainApiUrl + chainAccount.chainProvider.updateAccountAvatarPath
+			chainAccount.chainProvider.protonChainUrl + chainAccount.chainProvider.updateAccountAvatarPath
 
 		val response = accountRepository.updateAccountAvatar(
 			updateAccountAvatarUrl,

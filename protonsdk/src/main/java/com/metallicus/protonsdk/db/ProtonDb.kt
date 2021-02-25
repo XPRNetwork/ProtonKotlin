@@ -30,11 +30,11 @@ import com.metallicus.protonsdk.model.*
 		ChainProvider::class,
 		TokenContract::class,
 		Account::class,
-		AccountContact::class,
+		//AccountContact::class,
 		CurrencyBalance::class,
 		Action::class,
 		ESRSession::class],
-	version = 25,
+	version = 26,
 	exportSchema = false
 )
 abstract class ProtonDb : RoomDatabase() {
@@ -42,7 +42,7 @@ abstract class ProtonDb : RoomDatabase() {
 	abstract fun tokenContractDao(): TokenContractDao
 	abstract fun accountDao(): AccountDao
 	abstract fun currencyBalanceDao(): CurrencyBalanceDao
-	abstract fun accountContactDao(): AccountContactDao
+//	abstract fun accountContactDao(): AccountContactDao
 	abstract fun actionDao(): ActionDao
 	abstract fun esrSessionDao(): ESRSessionDao
 }

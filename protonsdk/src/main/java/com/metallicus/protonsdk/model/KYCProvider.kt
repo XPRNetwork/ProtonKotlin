@@ -21,42 +21,18 @@
  */
 package com.metallicus.protonsdk.model
 
-import android.util.Base64
-import androidx.annotation.NonNull
-import androidx.room.TypeConverters
-import com.metallicus.protonsdk.db.DefaultTypeConverters
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-//@Entity(
-//	indices = [(Index("id", "accountName"))],
-//	primaryKeys = ["id", "accountName"]
-//)
-@TypeConverters(DefaultTypeConverters::class)
-data class AccountContact(
-	val id: String, // accountName
-	var name: String = "",
-	var avatar: String = "",
-	var verified: Boolean = false,
-	var verifiedFields: List<String>? = null
-) {
-	@NonNull
-	lateinit var accountName: String // owner accountName
+@Entity
+data class KYCProvider(
+	@PrimaryKey
+	@SerializedName("kyc_provider") val kycProvider: String,
 
-	fun getDisplayName(): String {
-		return name.ifEmpty { id }
-	}
-
-	fun getAvatarByteArray(): ByteArray {
-		return if (avatar.isEmpty()) ByteArray(0) else Base64.decode(avatar, Base64.DEFAULT)
-	}
-
-	fun isLightKYCVerified(): Boolean {
-		val lightKYC = listOf(
-			"lastname",
-			"firstname",
-			"birthdate",
-			"address"
-		)
-
-		return verifiedFields?.containsAll(lightKYC) ?: false
-	}
-}
+	@SerializedName("desc") val description: String,
+	@SerializedName("url") val url: String,
+	@SerializedName("iconurl") val iconurl: String,
+	@SerializedName("name") val name: String,
+	@SerializedName("blisted") val blackListed: Int
+)

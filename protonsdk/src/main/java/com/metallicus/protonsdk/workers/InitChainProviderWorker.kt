@@ -26,9 +26,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
+import com.metallicus.protonsdk.R
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.ProtonError
 import com.metallicus.protonsdk.model.ChainProvider
+import com.metallicus.protonsdk.model.KYCProvider
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -45,17 +47,21 @@ class InitChainProviderWorker
 		const val PROTON_CHAIN_URL = "protonChainUrl"
 	}
 
+	private val kycProvidersTableScope = context.getString(R.string.kycProvidersTableScope)
+	private val kycProvidersTableCode = context.getString(R.string.kycProvidersTableCode)
+	private val kycProvidersTableName = context.getString(R.string.kycProvidersTableName)
+
 	@Suppress("BlockingMethodInNonBlockingContext")
 	override suspend fun doWork(): Result {
-		val chainUrl = inputData.getString(PROTON_CHAIN_URL).orEmpty()
+		val protonChainUrl = inputData.getString(PROTON_CHAIN_URL).orEmpty()
 
 		return try {
-			val response = chainProviderRepository.fetchChainProvider(chainUrl)
+			val response = chainProviderRepository.fetchChainProvider(protonChainUrl)
 			if (response.isSuccessful) {
 				chainProviderRepository.removeAll()
 
 				val chainProvider = Gson().fromJson(response.body(), ChainProvider::class.java)
-				chainProvider.chainApiUrl = chainUrl
+				chainProvider.protonChainUrl = protonChainUrl
 
 //				val timeout = 4000L // 4 milliseconds
 //				val acceptableChainBlockDiff = 350L
@@ -118,6 +124,32 @@ class InitChainProviderWorker
 //				}
 //
 //				chainProvider.hyperionHistoryUrl = fastestHyperionHistoryUrl
+
+				val kycProviders = mutableListOf<KYCProvider>()
+
+				val kycProvidersResponse = chainProviderRepository.fetchKYCProviders(
+					chainProvider.chainUrl,
+					kycProvidersTableScope,
+					kycProvidersTableCode,
+					kycProvidersTableName)
+				if (kycProvidersResponse.isSuccessful) {
+					val responseJsonObject = kycProvidersResponse.body()
+
+					val gson = Gson()
+					val rows = responseJsonObject?.getAsJsonArray("rows")
+					rows?.forEach {
+						val kycProvidersJsonObject = it.asJsonObject
+
+						val kycProvider =
+							gson.fromJson(kycProvidersJsonObject, KYCProvider::class.java)
+
+						if (kycProvider.blackListed == 0) {
+							kycProviders.add(kycProvider)
+						}
+					}
+				}
+
+				chainProvider.kycProviders = kycProviders
 
 				chainProviderRepository.addChainProvider(chainProvider)
 

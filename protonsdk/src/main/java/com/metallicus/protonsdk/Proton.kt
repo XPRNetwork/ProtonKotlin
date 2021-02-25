@@ -305,7 +305,7 @@ class Proton private constructor(context: Context) {
 			}
 
 			val exchangeRateUrl =
-				chainProvider.chainApiUrl + chainProvider.exchangeRatePath
+				chainProvider.protonChainUrl + chainProvider.exchangeRatePath
 
 			val marketTokenPrices = tokenContractsModule.getMarketTokenPrices(exchangeRateUrl, tokenContractsMap, currency)
 
@@ -332,7 +332,7 @@ class Proton private constructor(context: Context) {
 			}
 
 			val exchangeRateUrl =
-				activeAccount.chainProvider.chainApiUrl + activeAccount.chainProvider.exchangeRatePath
+				activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
 
 			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
 
