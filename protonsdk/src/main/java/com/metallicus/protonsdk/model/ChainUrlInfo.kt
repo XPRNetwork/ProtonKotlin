@@ -19,42 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk
+package com.metallicus.protonsdk.model
 
-import android.content.Context
-import com.metallicus.protonsdk.common.Prefs
-import com.metallicus.protonsdk.di.DaggerInjector
-import com.metallicus.protonsdk.model.ChainProvider
-import com.metallicus.protonsdk.repository.ChainProviderRepository
-import javax.inject.Inject
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-/**
- * Helper class used for [ChainProvider] based operations
- */
-class ChainProviderModule {
-	@Inject
-	lateinit var context: Context
+@Entity
+data class ChainUrlInfo(
+	@PrimaryKey
+	val url: String,
 
-	@Inject
-	lateinit var chainProviderRepository: ChainProviderRepository
+	val responseTimeMillis: Long,
+	val blockDiff: Long,
 
-	@Inject
-	lateinit var prefs: Prefs
-
-	init {
-		DaggerInjector.component.inject(this)
-	}
-
-	suspend fun getActiveChainProvider(): ChainProvider {
-		val chainId = prefs.activeChainId
-		return chainProviderRepository.getChainProvider(chainId)
-	}
-
-	suspend fun updateChainUrl(chainId: String, chainUrl: String) {
-		chainProviderRepository.updateChainUrl(chainId, chainUrl)
-	}
-
-	suspend fun updateHyperionHistoryUrl(chainId: String, hyperionHistoryUrl: String) {
-		chainProviderRepository.updateHyperionHistoryUrl(chainId, hyperionHistoryUrl)
+	val inSync: Boolean = false
+) {
+	companion object {
+		const val ACCEPTABLE_CHAIN_BLOCK_DIFF = 350L
+		const val ACCEPTABLE_HYPERION_HISTORY_BLOCK_DIFF = 30L
 	}
 }

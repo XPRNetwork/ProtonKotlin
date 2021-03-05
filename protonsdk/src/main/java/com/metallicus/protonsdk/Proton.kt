@@ -113,6 +113,42 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
+	fun setPreferredChainUrl(chainUrl: String): LiveData<Resource<Boolean>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val chainProvider = getChainProviderAsync()
+
+			chainProviderModule.updateChainUrl(chainProvider.chainId, chainUrl)
+
+			emit(Resource.success(true))
+		} catch (e: ProtonException) {
+			val error: Resource<Boolean> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<Boolean> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun setPreferredHyperionHistoryUrl(hyperionHistoryUrl: String): LiveData<Resource<Boolean>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val chainProvider = getChainProviderAsync()
+
+			chainProviderModule.updateHyperionHistoryUrl(chainProvider.chainId, hyperionHistoryUrl)
+
+			emit(Resource.success(true))
+		} catch (e: ProtonException) {
+			val error: Resource<Boolean> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<Boolean> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
 	private suspend fun getTokenContractsAsync() = suspendCoroutine<List<TokenContract>> { continuation ->
 		workersModule.onInitTokenContracts { success, data ->
 			if (success) {
@@ -142,6 +178,15 @@ class Proton private constructor(context: Context) {
 
 	fun generatePrivateKey(): EosPrivateKey {
 		return EosPrivateKey()
+	}
+
+	fun isPrivateKeyValid(privateKeyStr: String): Boolean {
+		return try {
+			EosPrivateKey(privateKeyStr)
+			true
+		} catch (e: Exception) {
+			false
+		}
 	}
 
 	fun signWithPrivateKey(privateKeyStr: String, valueToSign: String): String {
@@ -233,7 +278,14 @@ class Proton private constructor(context: Context) {
 
 		try {
 			val chainProvider = getChainProviderAsync()
-			emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
+
+			val accountNames = accountModule.getAccountNamesForPublicKey(chainProvider.hyperionHistoryUrl, activeAccount.publicKey)
+			if (accountNames.contains(activeAccount.accountName)) {
+				emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
+			} else {
+				val error: Resource<ChainAccount> = Resource.error("Please use the private key associated with '${activeAccount.accountName}'")
+				emit(error)
+			}
 		} catch (e: ProtonException) {
 			val error: Resource<ChainAccount> = Resource.error(e)
 			emit(error)

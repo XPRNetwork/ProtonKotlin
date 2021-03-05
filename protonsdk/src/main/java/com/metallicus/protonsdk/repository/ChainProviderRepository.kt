@@ -45,6 +45,14 @@ class ChainProviderRepository @Inject constructor(
 		chainProviderDao.insert(chainProvider)
 	}
 
+	suspend fun updateChainUrl(chainId: String, chainUrl: String) {
+		chainProviderDao.updateChainUrl(chainId, chainUrl)
+	}
+
+	suspend fun updateHyperionHistoryUrl(chainId: String, hyperionHistory: String) {
+		chainProviderDao.updateHyperionHistoryUrl(chainId, hyperionHistory)
+	}
+
 	suspend fun fetchChainProvider(protonChainUrl: String): Response<JsonObject> {
 		return protonChainService.getChainProvider("$protonChainUrl/v1/chain/info")
 	}

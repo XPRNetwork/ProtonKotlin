@@ -105,31 +105,34 @@ class AccountModule {
 		}
 	}
 
-	suspend fun fetchAccountsForKey(chainId: String, chainUrl: String, hyperionHistoryUrl: String, publicKey: String): Resource<List<Account>> {
-		val accounts = mutableListOf<Account>()
-
+	suspend fun getAccountNamesForPublicKey(hyperionHistoryUrl: String, publicKey: String): List<String> {
 		return try {
-			val keyAccountResponse =
-				accountRepository.fetchKeyAccount(hyperionHistoryUrl, publicKey)
+			val keyAccountResponse = accountRepository.fetchKeyAccount(hyperionHistoryUrl, publicKey)
 			if (keyAccountResponse.isSuccessful) {
-				keyAccountResponse.body()?.let { keyAccount ->
-					keyAccount.accountNames.forEach { accountName ->
-						fetchAccount(chainId, chainUrl, accountName)?.let { account ->
-							accounts.add(account)
-						}
+				keyAccountResponse.body()?.accountNames ?: emptyList()
+			} else {
+				emptyList()
+			}
+		} catch (e: Exception) {
+			emptyList()
+		}
+	}
+
+	suspend fun fetchAccountsForKey(chainId: String, chainUrl: String, hyperionHistoryUrl: String, publicKey: String): Resource<List<Account>> {
+		return try {
+			val accountNames = getAccountNamesForPublicKey(hyperionHistoryUrl, publicKey)
+			if (accountNames.isNotEmpty()) {
+				val accounts = mutableListOf<Account>()
+
+				accountNames.forEach { accountName ->
+					fetchAccount(chainId, chainUrl, accountName)?.let { account ->
+						accounts.add(account)
 					}
 				}
 
 				Resource.success(accounts)
 			} else {
-				val msg = keyAccountResponse.errorBody()?.string()
-				val errorMsg = if (msg.isNullOrEmpty()) {
-					keyAccountResponse.message()
-				} else {
-					msg
-				}
-
-				Resource.error(errorMsg)
+				Resource.error("No Account Names For Key")
 			}
 		} catch (e: Exception) {
 			Timber.d(e)
