@@ -114,8 +114,8 @@ class WorkersModule {
 					val chainProviderWorkInfos =
 						workInfos.filter { it.tags.contains(InitChainProviderWorker::class.java.name) }
 					if (chainProviderWorkInfos.isEmpty() ||
-						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
-						val data = workInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
+						chainProviderWorkInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
+						val data = chainProviderWorkInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
 						callback(false, data)
 						workInfoLiveData.removeObserver(this)
 					} else if (chainProviderWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
@@ -139,8 +139,8 @@ class WorkersModule {
 					val tokenContractWorkInfos =
 						workInfos.filter { it.tags.contains(InitTokenContractsWorker::class.java.name) }
 					if (tokenContractWorkInfos.isEmpty() ||
-						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
-						val data = workInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
+						tokenContractWorkInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
+						val data = tokenContractWorkInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
 						callback(false, data)
 						workInfoLiveData.removeObserver(this)
 					} else if (tokenContractWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
@@ -164,8 +164,8 @@ class WorkersModule {
 					val activeAccountWorkInfos =
 						workInfos.filter { it.tags.contains(InitActiveAccountWorker::class.java.name) }
 					if (activeAccountWorkInfos.isEmpty() ||
-						workInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
-						val data = workInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
+						activeAccountWorkInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
+						val data = activeAccountWorkInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
 						callback(false, data)
 						workInfoLiveData.removeObserver(this)
 					} else if (activeAccountWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {

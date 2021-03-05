@@ -83,4 +83,17 @@ object ProtonTypeConverters {
 		return Gson().toJson(value, type)
 	}
 
+	@TypeConverter
+	@JvmStatic
+	fun stringToChainUrlInfoList(value: String): List<ChainUrlInfo> {
+		val type = object : TypeToken<List<ChainUrlInfo>>() {}.type
+		return Gson().fromJson(value, type)
+	}
+
+	@TypeConverter
+	@JvmStatic
+	fun chainUrlInfoListToString(value: List<ChainUrlInfo>): String {
+		val type = object : TypeToken<List<ChainUrlInfo>>() {}.type
+		return Gson().toJson(value, type)
+	}
 }

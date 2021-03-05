@@ -59,4 +59,7 @@ data class ChainProvider(
 ) {
 	lateinit var protonChainUrl: String
 	lateinit var kycProviders: List<KYCProvider>
+
+	lateinit var chainUrlStats: List<ChainUrlInfo>
+	lateinit var hyperionHistoryUrlStats: List<ChainUrlInfo>
 }

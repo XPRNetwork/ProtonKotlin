@@ -31,6 +31,10 @@ class MarketTokenPrice(
 	val priceChangePercent: Double,
 	val tokenContract: TokenContract?
 ) {
+	fun getName(): String {
+		return tokenContract?.name ?: symbol
+	}
+
 	fun formatPrice(): String {
 		val nf = NumberFormat.getCurrencyInstance(Locale.US)
 		return nf.format(price)

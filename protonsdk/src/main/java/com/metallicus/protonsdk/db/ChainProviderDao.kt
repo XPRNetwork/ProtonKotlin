@@ -41,6 +41,12 @@ interface ChainProviderDao {
 	@Query("SELECT * FROM chainProvider")
 	suspend fun findAll(): List<ChainProvider>
 
+	@Query("UPDATE chainProvider SET chainUrl = :chainUrl WHERE chainId = :chainId")
+	suspend fun updateChainUrl(chainId: String, chainUrl: String)
+
+	@Query("UPDATE chainProvider SET hyperionHistoryUrl = :hyperionHistoryUrl WHERE chainId = :chainId")
+	suspend fun updateHyperionHistoryUrl(chainId: String, hyperionHistoryUrl: String)
+
 	@Query("DELETE FROM chainProvider")
 	suspend fun removeAll()
 }
