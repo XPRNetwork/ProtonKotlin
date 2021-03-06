@@ -176,17 +176,11 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun generatePrivateKey(): EosPrivateKey {
-		return EosPrivateKey()
-	}
-
-	fun isPrivateKeyValid(privateKeyStr: String): Boolean {
-		return try {
-			EosPrivateKey(privateKeyStr)
-			true
-		} catch (e: Exception) {
-			false
-		}
+	fun generatePrivateKey(): Pair<String, String> {
+		val privateKey = EosPrivateKey()
+		val publicKeyStr = privateKey.publicKey.toString()
+		val privateKeyStr = privateKey.toWif()
+		return Pair<String, String>(publicKeyStr, privateKeyStr)
 	}
 
 	fun signWithPrivateKey(privateKeyStr: String, valueToSign: String): String {
@@ -279,11 +273,17 @@ class Proton private constructor(context: Context) {
 		try {
 			val chainProvider = getChainProviderAsync()
 
-			val accountNames = accountModule.getAccountNamesForPublicKey(chainProvider.hyperionHistoryUrl, activeAccount.publicKey)
-			if (accountNames.contains(activeAccount.accountName)) {
-				emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
+			val publicKey = activeAccount.getPublicKey()
+			if (publicKey.isNotEmpty()) {
+				val accountNames = accountModule.getAccountNamesForPublicKey(chainProvider.hyperionHistoryUrl, publicKey)
+				if (accountNames.contains(activeAccount.accountName)) {
+					emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
+				} else {
+					val error: Resource<ChainAccount> = Resource.error("Please use the private key associated with '${activeAccount.accountName}'")
+					emit(error)
+				}
 			} else {
-				val error: Resource<ChainAccount> = Resource.error("Please use the private key associated with '${activeAccount.accountName}'")
+				val error: Resource<ChainAccount> = Resource.error("Invalid private key length or format")
 				emit(error)
 			}
 		} catch (e: ProtonException) {
