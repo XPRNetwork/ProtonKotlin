@@ -267,24 +267,28 @@ class Proton private constructor(context: Context) {
 		return getActiveAccountName().isNotEmpty()
 	}
 
-	fun setActiveAccount(activeAccount: ActiveAccount): LiveData<Resource<ChainAccount>> = liveData {
+	fun setActiveAccount(activeAccount: ActiveAccount, newAccount: Boolean=false): LiveData<Resource<ChainAccount>> = liveData {
 		emit(Resource.loading())
 
 		try {
 			val chainProvider = getChainProviderAsync()
 
-			val publicKey = activeAccount.getPublicKey()
-			if (publicKey.isNotEmpty()) {
-				val accountNames = accountModule.getAccountNamesForPublicKey(chainProvider.hyperionHistoryUrl, publicKey)
-				if (accountNames.contains(activeAccount.accountName)) {
-					emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
+			if (newAccount) {
+				emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
+			} else {
+				val publicKey = activeAccount.getPublicKey()
+				if (publicKey.isNotEmpty()) {
+					val accountNames = accountModule.getAccountNamesForPublicKey(chainProvider.hyperionHistoryUrl, publicKey)
+					if (accountNames.contains(activeAccount.accountName)) {
+						emit(accountModule.setActiveAccount(chainProvider.chainId, chainProvider.chainUrl, activeAccount))
+					} else {
+						val error: Resource<ChainAccount> = Resource.error("Please use the private key associated with '${activeAccount.accountName}'")
+						emit(error)
+					}
 				} else {
-					val error: Resource<ChainAccount> = Resource.error("Please use the private key associated with '${activeAccount.accountName}'")
+					val error: Resource<ChainAccount> = Resource.error("Invalid private key length or format")
 					emit(error)
 				}
-			} else {
-				val error: Resource<ChainAccount> = Resource.error("Invalid private key length or format")
-				emit(error)
 			}
 		} catch (e: ProtonException) {
 			val error: Resource<ChainAccount> = Resource.error(e)
