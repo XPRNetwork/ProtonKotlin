@@ -332,23 +332,27 @@ class AccountModule {
 	}
 
 	suspend fun setActiveAccount(chainId: String, chainUrl: String, activeAccount: ActiveAccount): Resource<ChainAccount> {
-		val publicKey = activeAccount.publicKey
-		val accountName = activeAccount.accountName
+		val publicKey = activeAccount.getPublicKey()
+		return if (publicKey.isNotEmpty()) {
+			val accountName = activeAccount.accountName
 
-		prefs.setActiveAccount(publicKey, accountName)
+			prefs.setActiveAccount(publicKey, accountName)
 
-		return try {
-			if (activeAccount.hasPrivateKey()) {
-				secureKeys.addKey(publicKey, activeAccount.privateKey, activeAccount.pin)
+			try {
+				if (activeAccount.hasPrivateKey()) {
+					secureKeys.addKey(publicKey, activeAccount.privateKey, activeAccount.pin)
+				}
+
+				addAccount(chainId, chainUrl, accountName)
+
+				prefs.hasActiveAccount = true
+
+				Resource.success(accountRepository.getChainAccount(accountName))
+			} catch (e: Exception) {
+				Resource.error(e.localizedMessage.orEmpty())
 			}
-
-			addAccount(chainId, chainUrl, accountName)
-
-			prefs.hasActiveAccount = true
-
-			Resource.success(accountRepository.getChainAccount(accountName))
-		} catch (e: Exception) {
-			Resource.error(e.localizedMessage.orEmpty())
+		} else {
+			Resource.error("Invalid private key length or format")
 		}
 	}
 

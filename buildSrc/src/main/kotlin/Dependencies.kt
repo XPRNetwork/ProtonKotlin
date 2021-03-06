@@ -24,7 +24,7 @@ const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
 	const val versionCode = 33
-	const val versionName = "0.8.8"
+	const val versionName = "0.8.9"
 }
 
 object BuildPlugins {
