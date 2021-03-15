@@ -32,6 +32,18 @@ import retrofit2.Response
 import retrofit2.http.*
 
 data class AccountBody(val account_name: String)
+enum class TableRowsIndexPosition(val indexPositionName: String) {
+	PRIMARY("primary"),
+	SECONDARY("secondary"),
+	TERTIARY("tertiary"),
+	FOURTH("fourth"),
+	FIFTH("fifth"),
+	SIXTH("sixth"),
+	SEVENTH("seventh"),
+	EIGHTH("eighth"),
+	NINTH("ninth"),
+	TENTH("tenth")
+}
 data class TableRowsBody(
 	val scope: String,
 	val code: String,
@@ -39,6 +51,9 @@ data class TableRowsBody(
 	val lower_bound: String = "",
 	val upper_bound: String = "",
 	val limit: Long = 1,
+	val index_position: String = TableRowsIndexPosition.PRIMARY.indexPositionName,
+	val reverse: Boolean = false,
+	val key_type: String = "name",
 	val json: Boolean = true)
 data class UserNameBody(val name: String)
 data class JsonToBinBody(val code: String, val action: String, val args: JsonElement)

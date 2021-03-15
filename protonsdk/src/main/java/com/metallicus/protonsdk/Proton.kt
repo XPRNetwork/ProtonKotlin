@@ -24,6 +24,7 @@ package com.metallicus.protonsdk
 import android.content.Context
 import androidx.lifecycle.*
 import com.google.gson.JsonObject
+import com.metallicus.protonsdk.api.TableRowsIndexPosition
 import com.metallicus.protonsdk.common.*
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.di.ProtonModule
@@ -868,5 +869,29 @@ class Proton private constructor(context: Context) {
 			val error: Resource<Boolean> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
+	}
+
+	suspend fun getTableRows(
+		scope: String,
+		code: String,
+		name: String,
+		lowerBound: String = "",
+		upperBound: String = "",
+		limit: Long = 10,
+		indexPosition: String = TableRowsIndexPosition.PRIMARY.indexPositionName,
+		reverse: Boolean = false
+	): Resource<JsonObject> {
+		val chainProvider = getChainProviderAsync()
+
+		return chainProviderModule.getTableRows(
+			chainProvider.chainUrl,
+			scope,
+			code,
+			name,
+			lowerBound,
+			upperBound,
+			limit,
+			indexPosition,
+			reverse)
 	}
 }

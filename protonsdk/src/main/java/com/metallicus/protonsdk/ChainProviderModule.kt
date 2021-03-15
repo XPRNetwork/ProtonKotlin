@@ -22,7 +22,10 @@
 package com.metallicus.protonsdk
 
 import android.content.Context
+import com.google.gson.JsonObject
+import com.metallicus.protonsdk.api.TableRowsIndexPosition
 import com.metallicus.protonsdk.common.Prefs
+import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.model.ChainProvider
 import com.metallicus.protonsdk.repository.ChainProviderRepository
@@ -56,5 +59,34 @@ class ChainProviderModule {
 
 	suspend fun updateHyperionHistoryUrl(chainId: String, hyperionHistoryUrl: String) {
 		chainProviderRepository.updateHyperionHistoryUrl(chainId, hyperionHistoryUrl)
+	}
+
+	suspend fun getTableRows(
+		chainUrl: String,
+		scope: String,
+		code: String,
+		name: String,
+		lowerBound: String = "",
+		upperBound: String = "",
+		limit: Long = 1,
+		indexPosition: String = TableRowsIndexPosition.PRIMARY.indexPositionName,
+		reverse: Boolean = false
+	): Resource<JsonObject> {
+		return try {
+			val response = chainProviderRepository.getTableRows(chainUrl, scope, code, name, lowerBound, upperBound, limit, indexPosition, reverse)
+			if (response.isSuccessful) {
+				Resource.success(response.body())
+			} else {
+				val msg = response.errorBody()?.string()
+				val errorMsg = if (msg.isNullOrEmpty()) {
+					response.message()
+				} else {
+					msg
+				}
+				Resource.error(errorMsg)
+			}
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty())
+		}
 	}
 }
