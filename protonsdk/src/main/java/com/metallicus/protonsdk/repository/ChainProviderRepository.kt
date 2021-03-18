@@ -25,6 +25,7 @@ import com.google.gson.JsonObject
 import com.metallicus.protonsdk.api.AccountBody
 import com.metallicus.protonsdk.api.ProtonChainService
 import com.metallicus.protonsdk.api.TableRowsBody
+import com.metallicus.protonsdk.api.TableRowsIndexPosition
 import com.metallicus.protonsdk.db.ChainProviderDao
 import com.metallicus.protonsdk.model.ChainInfo
 import com.metallicus.protonsdk.model.ChainProvider
@@ -75,5 +76,21 @@ class ChainProviderRepository @Inject constructor(
 
 	suspend fun getAbi(chainUrl: String, accountName: String): Response<JsonObject> {
 		return protonChainService.getAbi("$chainUrl/v1/chain/get_abi", AccountBody(accountName))
+	}
+
+	suspend fun getTableRows(
+		chainUrl: String,
+		scope: String,
+		code: String,
+		name: String,
+		lowerBound: String = "",
+		upperBound: String = "",
+		limit: Long = 1,
+		indexPosition: String = TableRowsIndexPosition.PRIMARY.indexPositionName,
+		reverse: Boolean = false
+	): Response<JsonObject> {
+		return protonChainService.getTableRows(
+			"$chainUrl/v1/chain/get_table_rows",
+			TableRowsBody(scope, code, name, lowerBound, upperBound, limit, indexPosition, reverse))
 	}
 }
