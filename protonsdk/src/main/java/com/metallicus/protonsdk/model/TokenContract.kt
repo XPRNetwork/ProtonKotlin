@@ -57,37 +57,12 @@ data class TokenContract(
 		return precision.toInt()
 	}
 
-	fun formatRate(currency: String): String {
-		val value = if (rates.containsKey(currency)) { rates.getValue(currency) } else { 0.0 }
-		val cf = NumberFormat.getCurrencyInstance(Locale.US)
-		cf.minimumFractionDigits = 2
-		cf.maximumFractionDigits = 6
-		return cf.format(value)
-	}
+	fun formatAmountForCurrency(amount: Double, currency: String): String {
+		val nf = NumberFormat.getCurrencyInstance(Locale.US)
 
-//	fun formatSupply(includeSymbol: Boolean): String {
-//		return if (supply.isEmpty()) {
-//			""
-//		} else {
-//			val supplyDouble = supply.substringBefore(" ").toDouble()
-//
-//			val nf = NumberFormat.getNumberInstance(Locale.US)
-//			nf.minimumFractionDigits = precision.toInt()
-//			nf.maximumFractionDigits = precision.toInt()
-//			nf.format(supplyDouble) + if (includeSymbol) " $contractSymbol" else ""
-//		}
-//	}
-//
-//	fun formatMaxSupply(includeSymbol: Boolean): String {
-//		return if (maxSupply.isEmpty()) {
-//			""
-//		} else {
-//			val maxSupplyDouble = maxSupply.substringBefore(" ").toDouble()
-//
-//			val nf = NumberFormat.getNumberInstance(Locale.US)
-//			nf.minimumFractionDigits = precision.toInt()
-//			nf.maximumFractionDigits = precision.toInt()
-//			nf.format(maxSupplyDouble) + if (includeSymbol) " $contractSymbol" else ""
-//		}
-//	}
+		val rate = if (rates.containsKey(currency)) { rates.getValue(currency) } else { 0.0 }
+		val amountCurrency = amount.times(rate)
+
+		return nf.format(amountCurrency)
+	}
 }
