@@ -95,8 +95,7 @@ public class EosTransfer implements EosType.Packer {
 	}
 
 	// Added by joey-harward on 7/1/20
-	public JsonElement jsonToBinArgs() {
-		String json = Utils.prettyPrintJson(this);
-		return JsonParser.parseString(json);
+	public String jsonToBinArgs() {
+		return Utils.prettyPrintJson(this);
 	}
 }

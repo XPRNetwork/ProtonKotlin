@@ -28,6 +28,7 @@ import com.google.gson.JsonParser
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.Resource
 import com.metallicus.protonsdk.common.SecureKeys
+import com.metallicus.protonsdk.common.Status
 import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
 import com.metallicus.protonsdk.eosio.commander.model.chain.Action
@@ -212,6 +213,83 @@ class ActionsModule {
 			ActionTrace(actionTrxId, actionTraceAct))
 	}
 
+	suspend fun signTransaction(chainUrl: String, pin: String, actions: List<Action>): Resource<SignedTransaction>{
+		return try {
+			if (actions.isNotEmpty()) {
+				var jsonToBinErrorMsg = ""
+				run loop@ {
+					actions.forEach { action ->
+						val jsonToBinResponse = actionRepository.jsonToBin(
+							chainUrl,
+							action.account,
+							action.name,
+							JsonParser.parseString(action.data.asString)
+						)
+						if (jsonToBinResponse.isSuccessful) {
+							val jsonToBin = jsonToBinResponse.body()
+
+							requireNotNull(jsonToBin)
+
+							action.setData(jsonToBin.binArgs)
+						} else {
+							val msg = jsonToBinResponse.errorBody()?.string()
+							val errorMsg = if (msg.isNullOrEmpty()) {
+								jsonToBinResponse.message()
+							} else {
+								msg
+							}
+
+							jsonToBinErrorMsg = errorMsg
+							return@loop
+						}
+					}
+				}
+
+				if (jsonToBinErrorMsg.isNotEmpty()) {
+					Resource.error(jsonToBinErrorMsg)
+				} else {
+					val signedTransaction = SignedTransaction()
+					signedTransaction.actions = actions
+
+					val chainInfoResponse = chainProviderRepository.getChainInfo(chainUrl)
+					if (chainInfoResponse.isSuccessful) {
+						val chainInfo = chainInfoResponse.body()
+
+						requireNotNull(chainInfo)
+
+						signedTransaction.setReferenceBlock(chainInfo.headBlockId)
+						signedTransaction.expiration = chainInfo.getTimeAfterHeadBlockTime(30000)
+
+						val publicKey = prefs.getActivePublicKey()
+
+						val privateKeyStr = secureKeys.getPrivateKey(publicKey, pin)
+
+						require(privateKeyStr != null && privateKeyStr != "") { "No private key found" }
+
+						val privateKey = EosPrivateKey(privateKeyStr)
+
+						signedTransaction.sign(privateKey, TypeChainId(chainInfo.chainId))
+
+						Resource.success(signedTransaction)
+					} else {
+						val msg = chainInfoResponse.errorBody()?.string()
+						val errorMsg = if (msg.isNullOrEmpty()) {
+							chainInfoResponse.message()
+						} else {
+							msg
+						}
+
+						Resource.error(errorMsg)
+					}
+				}
+			} else {
+				Resource.error("No Actions")
+			}
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty())
+		}
+	}
+
 	suspend fun transferTokens(chainUrl: String, pin: String, contract: String, from: String,
 							   to: String, quantity: String, memo: String): Resource<JsonObject> {
 		return try {
@@ -220,118 +298,41 @@ class ActionsModule {
 
 			val action = Action(contract, eosTransfer.action)
 			action.setAuthorization(eosTransfer.activePermission)
+			action.setData(jsonToBinArgs)
 
-			val jsonToBinResponse =
-				actionRepository.jsonToBin(
-					chainUrl,
-					contract,
-					eosTransfer.action,
-					jsonToBinArgs)
-			if (jsonToBinResponse.isSuccessful) {
-				val jsonToBin = jsonToBinResponse.body()
+			signAndPushTransaction(chainUrl, pin, listOf(action))
+		} catch (e: Exception) {
+			Resource.error(e.localizedMessage.orEmpty())
+		}
+	}
 
-				requireNotNull(jsonToBin)
-
-				action.setData(jsonToBin.binArgs)
-
-				val signedTransaction = SignedTransaction()
-				signedTransaction.addAction(action)
-
-				signAndPushTransaction(chainUrl, pin, signedTransaction)
+	suspend fun signAndPushTransaction(chainUrl: String, pin: String, actions: List<Action>): Resource<JsonObject> {
+		return try {
+			val signedTransactionResource = signTransaction(chainUrl, pin, actions)
+			if (signedTransactionResource.status == Status.SUCCESS) {
+				signedTransactionResource.data?.let {
+					pushTransaction(chainUrl, it)
+				} ?: Resource.error("No SignedTransaction")
 			} else {
-				val msg = jsonToBinResponse.errorBody()?.string()
-				val errorMsg = if (msg.isNullOrEmpty()) {
-					jsonToBinResponse.message()
-				} else {
-					msg
-				}
-
-				Resource.error(errorMsg)
+				Resource.error(signedTransactionResource.message.orEmpty(), signedTransactionResource.code ?: -1)
 			}
 		} catch (e: Exception) {
 			Resource.error(e.localizedMessage.orEmpty())
 		}
 	}
 
-	suspend fun pushTransactions(chainUrl: String, pin: String, actions: List<Action>): Resource<JsonObject> {
-		try {
-			if (actions.isNotEmpty()) {
-				actions.forEach { action ->
-					val jsonToBinResponse = actionRepository.jsonToBin(
-						chainUrl,
-						action.account,
-						action.name,
-						JsonParser.parseString(action.data.asString)
-					)
-					if (jsonToBinResponse.isSuccessful) {
-						val jsonToBin = jsonToBinResponse.body()
-
-						requireNotNull(jsonToBin)
-
-						action.setData(jsonToBin.binArgs)
-					} else {
-						val msg = jsonToBinResponse.errorBody()?.string()
-						val errorMsg = if (msg.isNullOrEmpty()) {
-							jsonToBinResponse.message()
-						} else {
-							msg
-						}
-
-						return Resource.error(errorMsg)
-					}
-				}
-			} else {
-				return Resource.error("No Actions")
-			}
-		} catch (e: Exception) {
-			return Resource.error(e.localizedMessage.orEmpty())
-		}
-
-		val signedTransaction = SignedTransaction()
-		signedTransaction.actions = actions
-		return signAndPushTransaction(chainUrl, pin, signedTransaction)
-	}
-
-	private suspend fun signAndPushTransaction(chainUrl: String, pin: String, signedTransaction: SignedTransaction): Resource<JsonObject> {
+	private suspend fun pushTransaction(chainUrl: String, signedTransaction: SignedTransaction): Resource<JsonObject> {
 		return try {
-			val chainInfoResponse = chainProviderRepository.getChainInfo(chainUrl)
-			if (chainInfoResponse.isSuccessful) {
-				val chainInfo = chainInfoResponse.body()
+			val packedTransaction = PackedTransaction(signedTransaction)
 
-				requireNotNull(chainInfo)
-
-				signedTransaction.setReferenceBlock(chainInfo.headBlockId)
-				signedTransaction.expiration = chainInfo.getTimeAfterHeadBlockTime(30000)
-
-				val publicKey = prefs.getActivePublicKey()
-
-				val privateKeyStr = secureKeys.getPrivateKey(publicKey, pin)
-
-				require(privateKeyStr != null && privateKeyStr != "") { "No private key found" }
-
-				val privateKey = EosPrivateKey(privateKeyStr)
-
-				signedTransaction.sign(privateKey, TypeChainId(chainInfo.chainId))
-
-				val packedTransaction = PackedTransaction(signedTransaction)
-
-				val pushTransactionResponse = actionRepository.pushTransaction(chainUrl, packedTransaction)
-				if (pushTransactionResponse.isSuccessful) {
-					Resource.success(pushTransactionResponse.body())
-				} else {
-					val msg = pushTransactionResponse.errorBody()?.string()
-					val errorMsg = if (msg.isNullOrEmpty()) {
-						pushTransactionResponse.message()
-					} else {
-						msg
-					}
-
-					Resource.error(errorMsg)
-				}
+			val pushTransactionResponse =
+				actionRepository.pushTransaction(chainUrl, packedTransaction)
+			if (pushTransactionResponse.isSuccessful) {
+				Resource.success(pushTransactionResponse.body())
 			} else {
-				val msg = chainInfoResponse.errorBody()?.string()
+				val msg = pushTransactionResponse.errorBody()?.string()
 				val errorMsg = if (msg.isNullOrEmpty()) {
-					chainInfoResponse.message()
+					pushTransactionResponse.message()
 				} else {
 					msg
 				}

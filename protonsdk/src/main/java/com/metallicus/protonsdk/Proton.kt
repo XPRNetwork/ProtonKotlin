@@ -30,6 +30,7 @@ import com.metallicus.protonsdk.di.DaggerInjector
 import com.metallicus.protonsdk.di.ProtonModule
 import com.metallicus.protonsdk.eosio.commander.digest.Sha256
 import com.metallicus.protonsdk.eosio.commander.ec.EosPrivateKey
+import com.metallicus.protonsdk.eosio.commander.model.chain.SignedTransaction
 import com.metallicus.protonsdk.eosio.commander.model.chain.Action as ChainAction
 import com.metallicus.protonsdk.model.*
 import kotlinx.coroutines.*
@@ -538,32 +539,22 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	/*fun pushTransaction(pin: String, action: ChainAction): LiveData<Resource<JsonObject>> = liveData {
+	suspend fun signTransaction(pin: String, actions: List<ChainAction>): Resource<SignedTransaction> {
+		val activeAccount = getActiveAccountAsync()
+
+		return actionsModule.signTransaction(
+			activeAccount.chainProvider.chainUrl,
+			pin,
+			actions)
+	}
+
+	fun signAndPushTransaction(pin: String, actions: List<ChainAction>): LiveData<Resource<JsonObject>> = liveData {
 		emit(Resource.loading())
 
 		try {
 			val activeAccount = getActiveAccountAsync()
 
-			emit(actionsModule.pushTransaction(
-				activeAccount.chainProvider.chainUrl,
-				pin,
-				action))
-		} catch (e: ProtonException) {
-			val error: Resource<JsonObject> = Resource.error(e)
-			emit(error)
-		} catch (e: Exception) {
-			val error: Resource<JsonObject> = Resource.error(e.localizedMessage.orEmpty())
-			emit(error)
-		}
-	}*/
-
-	fun pushTransactions(pin: String, actions: List<ChainAction>): LiveData<Resource<JsonObject>> = liveData {
-		emit(Resource.loading())
-
-		try {
-			val activeAccount = getActiveAccountAsync()
-
-			emit(actionsModule.pushTransactions(
+			emit(actionsModule.signAndPushTransaction(
 				activeAccount.chainProvider.chainUrl,
 				pin,
 				actions))

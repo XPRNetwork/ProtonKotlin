@@ -60,8 +60,8 @@ public class TransactionHeader implements EosType.Packer {
 		ref_block_num = new BigInteger(1, HexUtils.toBytes(refBlockIdAsSha256.substring(0, 8))).intValue();
 
 		ref_block_prefix = //new BigInteger( 1, HexUtils.toBytesReversed( refBlockIdAsSha256.substring(16,24))).longValue();
-			BitUtils.uint32ToLong(HexUtils.toBytes(refBlockIdAsSha256.substring(16, 24)), 0); // BitUtils treats bytes in little endian.
-		// so, no need to reverse bytes.
+			BitUtils.uint32ToLong(HexUtils.toBytes(refBlockIdAsSha256.substring(16, 24)), 0);
+		// BitUtils treats bytes in little endian, so no need to reverse bytes.
 	}
 
 	public int getRefBlockNum() {
@@ -71,7 +71,6 @@ public class TransactionHeader implements EosType.Packer {
 	public long getRefBlockPrefix() {
 		return ref_block_prefix;
 	}
-
 
 	private Date getExpirationAsDate(String dateStr) {
 		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
@@ -85,12 +84,28 @@ public class TransactionHeader implements EosType.Packer {
 		}
 	}
 
-	public void putNetUsageWords(long netUsage) {
+	public Long getMaxNetUsageWords() {
+		return max_net_usage_words;
+	}
+
+	public void setMaxNetUsageWords(long netUsage) {
 		this.max_net_usage_words = netUsage;
 	}
 
-	public void putKcpuUsage(long kCpuUsage) {
+	public Long getMaxCpuUsageMs() {
+		return max_cpu_usage_ms;
+	}
+
+	public void setMaxCpuUsageMs(long kCpuUsage) {
 		this.max_cpu_usage_ms = kCpuUsage;
+	}
+
+	public Long getDelaySec() {
+		return delay_sec;
+	}
+
+	public void setDelaySec(long delaySec) {
+		this.delay_sec = delaySec;
 	}
 
 	@Override
