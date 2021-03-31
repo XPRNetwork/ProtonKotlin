@@ -60,7 +60,7 @@ class TokenContractRepository @Inject constructor(
 		return protonChainService.getExchangeRates(exchangeRateUrl)
 	}
 
-	suspend fun updateRates(tokenContractId: String, rates: String) {
-		return tokenContractDao.updateRates(tokenContractId, rates)
+	suspend fun updateRates(tokenContractId: String, rates: String, priceChangePercent: Double) {
+		return tokenContractDao.updateRates(tokenContractId, rates, priceChangePercent)
 	}
 }

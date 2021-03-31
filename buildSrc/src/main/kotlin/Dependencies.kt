@@ -23,8 +23,8 @@ const val kotlinVersion = "1.4.30"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 35
-	const val versionName = "0.9.2"
+	const val versionCode = 36
+	const val versionName = "0.9.3"
 }
 
 object BuildPlugins {
@@ -48,7 +48,7 @@ object Android {
 	const val minSdk = 21
 	const val compileSdk = 30
 	const val targetSdk = compileSdk
-	const val buildTools = "30.0.3"
+	const val buildTools = "31.0.0-rc01"
 
 	object Progaurd {
 		const val consumeFile = "consumer-rules.pro"
@@ -59,18 +59,18 @@ object Android {
 
 object Libraries {
 	private object Versions {
-		const val ktx = "1.5.0-beta01"
-		const val lifecycleLiveData = "2.3.0-rc01"
-		const val room = "2.2.6"
+		const val ktx = "1.5.0-beta03"
+		const val lifecycleLiveData = "2.3.1"
+		const val room = "2.3.0-rc01"
 		const val workManager = "2.5.0"
-		const val okhttp3 = "4.9.0"
+		const val okhttp3 = "5.0.0-alpha.2"
 		const val retrofit = "2.9.0"
 		const val dagger = "2.29.1"
 		const val daggerAssistedInject = "0.6.0"
-		const val coroutines = "1.4.0-M1"
+		const val coroutines = "1.4.3"
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
-		const val guava = "30.1-jre"
+		const val guava = "30.1.1-jre"
 		const val esr = "1.0.6"
 	}
 

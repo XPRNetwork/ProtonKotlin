@@ -62,10 +62,11 @@ class UpdateTokenContractRatesWorker
 					val contract = exchangeRate.get("contract").asString
 					val symbol = exchangeRate.get("symbol").asString
 					val rates = exchangeRate.get("rates").asJsonObject
+					val priceChangePercent = exchangeRate.get("priceChangePercent").asDouble
 
 					try {
 						val tokenContractId = tokenContractsMap.getValue("$contract:$symbol")
-						tokenContractRepository.updateRates(tokenContractId, rates.toString())
+						tokenContractRepository.updateRates(tokenContractId, rates.toString(), priceChangePercent)
 					} catch (e: Exception) {
 						Timber.d(e.localizedMessage)
 					}

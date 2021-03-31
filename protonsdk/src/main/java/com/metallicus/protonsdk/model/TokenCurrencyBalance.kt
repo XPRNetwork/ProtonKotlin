@@ -54,11 +54,7 @@ data class TokenCurrencyBalance(
 
 	fun getBalanceForCurrencyDouble(currency: String, adjustments: Double = 0.0): Double {
 		val amount = getBalanceDouble(adjustments)
-		val rate = if (tokenContract.rates.containsKey(currency)) {
-			tokenContract.rates.getValue(currency)
-		} else {
-			0.0
-		}
+		val rate = tokenContract.getRate(currency)
 		return amount.times(rate)
 	}
 

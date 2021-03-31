@@ -350,29 +350,28 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getMarketTokenPrices(currency: String = "USD"): LiveData<Resource<List<MarketTokenPrice>>> = liveData {
+	fun getTokenContractPrices(): LiveData<Resource<List<TokenContract>>> = liveData {
 		emit(Resource.loading())
 
 		try {
-			val chainProvider = getChainProviderAsync()
 			val tokenContracts = getTokenContractsAsync()
+			val activeAccount = getActiveAccountAsync()
 
-			val tokenContractsMap = mutableMapOf<String, TokenContract>()
+			val tokenContractsMap = mutableMapOf<String, String>()
 			tokenContracts.forEach {
-				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it
+				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
 			}
 
-			val exchangeRateUrl =
-				chainProvider.protonChainUrl + chainProvider.exchangeRatePath
+			val exchangeRateUrl = activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
 
-			val marketTokenPrices = tokenContractsModule.getMarketTokenPrices(exchangeRateUrl, tokenContractsMap, currency)
+			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
 
-			emit(Resource.success(marketTokenPrices))
+			emit(Resource.success(getTokenContractsAsync()))
 		} catch (e: ProtonException) {
-			val error: Resource<List<MarketTokenPrice>> = Resource.error(e)
+			val error: Resource<List<TokenContract>> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
-			val error: Resource<List<MarketTokenPrice>> = Resource.error(e.localizedMessage.orEmpty())
+			val error: Resource<List<TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}
@@ -389,8 +388,7 @@ class Proton private constructor(context: Context) {
 				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
 			}
 
-			val exchangeRateUrl =
-				activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
+			val exchangeRateUrl = activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
 
 			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
 
@@ -604,7 +602,9 @@ class Proton private constructor(context: Context) {
 		emit(Resource.loading())
 
 		try {
-			emit(accountModule.authorizeESR(pin, protonESR))
+			val returnPath = accountModule.authorizeESR(pin, protonESR)
+			initESRSessions()
+			emit(returnPath)
 		} catch (e: ProtonException) {
 			val error: Resource<String> = Resource.error(e)
 			emit(error)

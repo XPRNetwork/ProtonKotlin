@@ -40,10 +40,10 @@ data class TokenContract(
 	@SerializedName("iconurl") val iconUrl: String,
 	@SerializedName("symbol") val precisionSymbol: String,
 	@SerializedName("blisted") val blacklisted: Int,
-	var isSystemToken: Boolean = false
+	var isSystemToken: Boolean = false,
+	var rates: Map<String, Double> = mapOf(Pair("USD", 0.0)),
+	var priceChangePercent: Double = 0.0
 ) {
-	lateinit var rates: Map<String, Double>
-
 //	lateinit var supply: String
 //	lateinit var maxSupply: String
 //	lateinit var issuer: String
@@ -57,12 +57,46 @@ data class TokenContract(
 		return precision.toInt()
 	}
 
-	fun formatAmountForCurrency(amount: Double, currency: String): String {
-		val nf = NumberFormat.getCurrencyInstance(Locale.US)
+	fun getRate(currency: String): Double {
+		return if (rates.contains(currency)) {
+			rates.getOrElse(currency) { 0.0 }
+		} else {
+			rates.getOrElse("USD") { 0.0 }
+		}
+	}
 
-		val rate = if (rates.containsKey(currency)) { rates.getValue(currency) } else { 0.0 }
+	fun formatRateForCurrency(currency: String): String {
+		val rate = getRate(currency)
+		val nf = NumberFormat.getCurrencyInstance(Locale.US)
+		return nf.format(rate)
+	}
+
+	fun formatAmountAsAsset(amount: Double): String {
+		val amountBD = amount.toBigDecimal()
+
+		val symbol = getSymbol()
+		val precision = getPrecision()
+
+		val nf = NumberFormat.getNumberInstance(Locale.US)
+		nf.minimumFractionDigits = precision
+		nf.maximumFractionDigits = precision
+
+		return "${nf.format(amountBD)} $symbol"
+	}
+
+	fun formatAmountForCurrency(amount: Double, currency: String): String {
+		val rate = getRate(currency)
 		val amountCurrency = amount.times(rate)
 
+		val nf = NumberFormat.getCurrencyInstance(Locale.US)
 		return nf.format(amountCurrency)
+	}
+
+	fun formatPriceChangePercent(): String {
+		return if (priceChangePercent <= 0.0) {
+			"$priceChangePercent%"
+		} else {
+			"+$priceChangePercent%"
+		}
 	}
 }
