@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const val kotlinVersion = "1.4.30"
+const val kotlinVersion = "1.4.32"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
@@ -29,7 +29,7 @@ object ProtonSdk {
 
 object BuildPlugins {
 	object Versions {
-		const val gradle = "4.1.2"
+		const val gradle = "4.1.3"
 		const val dokka = "0.10.1" // TODO: 1.4.0
 		const val bintray = "1.8.5"
 	}
@@ -48,7 +48,7 @@ object Android {
 	const val minSdk = 21
 	const val compileSdk = 30
 	const val targetSdk = compileSdk
-	const val buildTools = "31.0.0-rc01"
+	const val buildTools = "31.0.0-rc02"
 
 	object Progaurd {
 		const val consumeFile = "consumer-rules.pro"
