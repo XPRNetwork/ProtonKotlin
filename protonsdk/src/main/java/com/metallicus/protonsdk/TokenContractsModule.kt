@@ -22,9 +22,12 @@
 package com.metallicus.protonsdk
 
 import android.content.Context
+import com.google.gson.Gson
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.di.DaggerInjector
+import com.metallicus.protonsdk.model.ChainProvider
 import com.metallicus.protonsdk.model.TokenContract
+import com.metallicus.protonsdk.model.TokenContractRate
 import com.metallicus.protonsdk.repository.TokenContractRepository
 import timber.log.Timber
 import javax.inject.Inject
@@ -63,12 +66,21 @@ class TokenContractsModule {
 					val exchangeRate = it.asJsonObject
 					val contract = exchangeRate.get("contract").asString
 					val symbol = exchangeRate.get("symbol").asString
-					val rates = exchangeRate.get("rates").asJsonObject
-					val priceChangePercent = exchangeRate.get("priceChangePercent").asDouble
+					val rank = exchangeRate.get("rank").asInt
+
+					val ratesMap = mutableMapOf<String, TokenContractRate>()
+
+					val ratesJsonArray = exchangeRate.get("rates").asJsonArray
+					ratesJsonArray.forEach { rateJsonElement ->
+						val rateJsonObj = rateJsonElement.asJsonObject
+						val currency = rateJsonObj.get("counterCurrency").asString
+						val rate = Gson().fromJson(rateJsonObj, TokenContractRate::class.java)
+						ratesMap[currency] = rate
+					}
 
 					val tokenContractId = tokenContractIdsMap.getOrElse("$contract:$symbol") { null }
 					if (tokenContractId != null) {
-						tokenContractRepository.updateRates(tokenContractId, rates.toString(), priceChangePercent)
+						tokenContractRepository.updateRates(tokenContractId, ratesMap, rank)
 					}
 				}
 			}

@@ -23,6 +23,7 @@ package com.metallicus.protonsdk.db
 
 import androidx.room.*
 import com.metallicus.protonsdk.model.TokenContract
+import com.metallicus.protonsdk.model.TokenContractRate
 
 /**
  * Interface for database access for [TokenContract] related operations
@@ -41,8 +42,8 @@ interface TokenContractDao {
 	@Query("SELECT * FROM tokenContract")
 	suspend fun findAll(): List<TokenContract>
 
-	@Query("UPDATE tokenContract SET rates = :rates, priceChangePercent = :priceChangePercent WHERE id = :tokenContractId")
-	suspend fun updateRates(tokenContractId: String, rates: String, priceChangePercent: Double)
+	@Query("UPDATE tokenContract SET rates = :rates, rank = :rank WHERE id = :tokenContractId")
+	suspend fun updateRates(tokenContractId: String, rates: Map<String, TokenContractRate>, rank: Int)
 
 	@Query("DELETE FROM tokenContract")
 	suspend fun removeAll()

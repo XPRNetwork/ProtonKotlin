@@ -23,12 +23,10 @@ package com.metallicus.protonsdk.model
 
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
-import com.metallicus.protonsdk.db.DefaultTypeConverters
 import java.text.NumberFormat
 import java.util.*
 
 @Entity
-@TypeConverters(DefaultTypeConverters::class)
 data class TokenContract(
 	@PrimaryKey
 	@SerializedName("id") var id: String,
@@ -41,8 +39,8 @@ data class TokenContract(
 	@SerializedName("symbol") val precisionSymbol: String,
 	@SerializedName("blisted") val blacklisted: Int,
 	var isSystemToken: Boolean = false,
-	var rates: Map<String, Double> = mapOf(Pair("USD", 0.0)),
-	var priceChangePercent: Double = 0.0
+	var rank: Int = 0,
+	var rates: Map<String, TokenContractRate> = mapOf(Pair("USD", TokenContractRate())),
 ) {
 //	lateinit var supply: String
 //	lateinit var maxSupply: String
@@ -59,9 +57,9 @@ data class TokenContract(
 
 	fun getRate(currency: String): Double {
 		return if (rates.contains(currency)) {
-			rates.getOrElse(currency) { 0.0 }
+			rates[currency]?.price ?: 0.0
 		} else {
-			rates.getOrElse("USD") { 0.0 }
+			rates["USD"]?.price ?: 0.0
 		}
 	}
 
@@ -92,11 +90,28 @@ data class TokenContract(
 		return nf.format(amountCurrency)
 	}
 
-	fun formatPriceChangePercent(): String {
+	fun getPriceChangePercent(currency: String): Double {
+		return if (rates.contains(currency)) {
+			rates[currency]?.priceChangePercent ?: 0.0
+		} else {
+			rates["USD"]?.priceChangePercent ?: 0.0
+		}
+	}
+
+	fun formatPriceChangePercent(currency: String): String {
+		val priceChangePercent = getPriceChangePercent(currency)
 		return if (priceChangePercent <= 0.0) {
 			"$priceChangePercent%"
 		} else {
 			"+$priceChangePercent%"
+		}
+	}
+
+	fun getMarketCap(currency: String): Double {
+		return if (rates.contains(currency)) {
+			rates[currency]?.marketCap ?: 0.0
+		} else {
+			rates["USD"]?.marketCap ?: 0.0
 		}
 	}
 }

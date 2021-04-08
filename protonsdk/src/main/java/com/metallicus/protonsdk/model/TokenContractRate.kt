@@ -19,32 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.db
+package com.metallicus.protonsdk.model
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.metallicus.protonsdk.model.*
+import com.google.gson.annotations.SerializedName
 
-@Database(
-	entities = [
-		ChainProvider::class,
-		TokenContract::class,
-		Account::class,
-		//AccountContact::class,
-		CurrencyBalance::class,
-		Action::class,
-		ESRSession::class],
-	version = 31,
-	exportSchema = false
+data class TokenContractRate(
+	@SerializedName("price") val price: Double = 0.0,
+	@SerializedName("priceChangePercent") val priceChangePercent: Double = 0.0,
+	@SerializedName("marketCap") val marketCap: Double = 0.0,
+	@SerializedName("volume") val volume: Double = 0.0,
+	@SerializedName("timestamp") val timestamp: Long = 0L
 )
-@TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class, ProtonTypeConverters::class)
-abstract class ProtonDb : RoomDatabase() {
-	abstract fun chainProviderDao(): ChainProviderDao
-	abstract fun tokenContractDao(): TokenContractDao
-	abstract fun accountDao(): AccountDao
-	abstract fun currencyBalanceDao(): CurrencyBalanceDao
-//	abstract fun accountContactDao(): AccountContactDao
-	abstract fun actionDao(): ActionDao
-	abstract fun esrSessionDao(): ESRSessionDao
-}

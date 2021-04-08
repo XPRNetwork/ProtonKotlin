@@ -23,13 +23,9 @@ package com.metallicus.protonsdk.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
-import com.metallicus.protonsdk.db.DefaultTypeConverters
-import com.metallicus.protonsdk.db.ProtonTypeConverters
 
 @Entity
-@TypeConverters(DefaultTypeConverters::class, ProtonTypeConverters::class)
 data class ChainProvider(
 	@PrimaryKey
 	@SerializedName("chainId") val chainId: String,
