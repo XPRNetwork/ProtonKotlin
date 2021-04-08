@@ -23,12 +23,8 @@ package com.metallicus.protonsdk.model
 
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
-import com.metallicus.protonsdk.db.DefaultTypeConverters
-import com.metallicus.protonsdk.db.EOSTypeConverters
-import com.metallicus.protonsdk.db.ProtonTypeConverters
 
 @Entity
-@TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class, ProtonTypeConverters::class)
 data class Account(
 	@PrimaryKey
 	@SerializedName("account_name") val accountName: String,

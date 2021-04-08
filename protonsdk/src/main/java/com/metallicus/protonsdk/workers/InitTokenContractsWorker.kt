@@ -30,6 +30,7 @@ import com.metallicus.protonsdk.R
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.common.ProtonError
 import com.metallicus.protonsdk.model.TokenContract
+import com.metallicus.protonsdk.model.TokenContractRate
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.metallicus.protonsdk.repository.TokenContractRepository
 import com.squareup.inject.assisted.Assisted
@@ -72,7 +73,7 @@ class InitTokenContractsWorker
 
 					val tokenContract = gson.fromJson(tokenContractJsonObject, TokenContract::class.java)
 					tokenContract.id = "${tokenContract.contract}:${tokenContract.getSymbol()}"
-					tokenContract.rates = mapOf(Pair("USD", 0.0))
+					tokenContract.rates = mapOf(Pair("USD", TokenContractRate()))
 
 					if (chainProvider.systemTokenSymbol == tokenContract.getSymbol()) {
 						tokenContract.isSystemToken = true

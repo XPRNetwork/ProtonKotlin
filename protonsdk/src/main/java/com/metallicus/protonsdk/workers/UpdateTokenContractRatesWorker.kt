@@ -24,7 +24,9 @@ package com.metallicus.protonsdk.workers
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.google.gson.Gson
 import com.metallicus.protonsdk.common.Prefs
+import com.metallicus.protonsdk.model.TokenContractRate
 import com.metallicus.protonsdk.repository.ChainProviderRepository
 import com.metallicus.protonsdk.repository.TokenContractRepository
 import com.squareup.inject.assisted.Assisted
@@ -61,12 +63,21 @@ class UpdateTokenContractRatesWorker
 					val exchangeRate = it.asJsonObject
 					val contract = exchangeRate.get("contract").asString
 					val symbol = exchangeRate.get("symbol").asString
-					val rates = exchangeRate.get("rates").asJsonObject
-					val priceChangePercent = exchangeRate.get("priceChangePercent").asDouble
+					val rank = exchangeRate.get("rank").asInt
+
+					val ratesMap = mutableMapOf<String, TokenContractRate>()
+
+					val ratesJsonArray = exchangeRate.get("rates").asJsonArray
+					ratesJsonArray.forEach { rateJsonElement ->
+						val rateJsonObj = rateJsonElement.asJsonObject
+						val currency = rateJsonObj.get("counterCurrency").asString
+						val rate = Gson().fromJson(rateJsonObj, TokenContractRate::class.java)
+						ratesMap[currency] = rate
+					}
 
 					try {
 						val tokenContractId = tokenContractsMap.getValue("$contract:$symbol")
-						tokenContractRepository.updateRates(tokenContractId, rates.toString(), priceChangePercent)
+						tokenContractRepository.updateRates(tokenContractId, ratesMap, rank)
 					} catch (e: Exception) {
 						Timber.d(e.localizedMessage)
 					}

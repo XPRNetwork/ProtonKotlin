@@ -63,7 +63,7 @@ interface ProtonChainService {
 	@GET//("/v1/chain/info")
 	suspend fun getChainProvider(@Url url: String): Response<JsonObject>
 
-	@GET//("/v1/chain/exchange-rates")
+	@GET//("/v1/chain/exchange-rates/info")
 	suspend fun getExchangeRates(@Url url: String): Response<JsonArray>
 
 	@PUT

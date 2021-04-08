@@ -24,12 +24,10 @@ package com.metallicus.protonsdk.model
 import androidx.annotation.NonNull
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
-import com.metallicus.protonsdk.db.DefaultTypeConverters
 
 @Entity(
 	indices = [(Index("tokenContractId", "accountName", "contract", "symbol"))],
 	primaryKeys = ["tokenContractId", "accountName"])
-@TypeConverters(DefaultTypeConverters::class)
 data class CurrencyBalance(
 	@SerializedName("contract") val contract: String,
 	@SerializedName("symbol") val symbol: String,

@@ -129,7 +129,7 @@ class CurrencyBalancesModule {
 							iconUrl = "",
 							precisionSymbol = precisionSymbol,
 							blacklisted = 0)
-						tokenContract.rates = mapOf(Pair("USD", 0.0))
+						tokenContract.rates = mapOf(Pair("USD", TokenContractRate()))
 
 						tokenContractRepository.addTokenContract(tokenContract)
 

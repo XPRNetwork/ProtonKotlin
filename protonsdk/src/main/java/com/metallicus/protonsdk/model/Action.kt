@@ -25,11 +25,7 @@ import androidx.annotation.NonNull
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
-import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
-import com.metallicus.protonsdk.db.DefaultTypeConverters
-import com.metallicus.protonsdk.db.EOSTypeConverters
-import com.metallicus.protonsdk.db.ProtonTypeConverters
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.sign
@@ -42,7 +38,6 @@ import kotlin.math.sign
 	))],
 	primaryKeys = ["accountName", "action_trace_trxId", "action_trace_act_name", "action_trace_act_authorization"]
 )
-@TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class, ProtonTypeConverters::class)
 data class Action(
 	@SerializedName("global_action_seq") val globalActionSeq: Int,
 	@SerializedName("block_num") val blockNum: Int,

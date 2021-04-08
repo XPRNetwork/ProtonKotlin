@@ -61,18 +61,4 @@ object DefaultTypeConverters {
 	fun stringListToString(strings: List<String>?): String? {
 		return strings?.joinToString(",")
 	}
-
-	@TypeConverter
-	@JvmStatic
-	fun stringToStringDoubleMap(value: String?): Map<String, Double>? {
-		val type = object : TypeToken<Map<String, Double>>() {}.type
-		return Gson().fromJson(value, type)
-	}
-
-	@TypeConverter
-	@JvmStatic
-	fun stringDoubleMapToString(map: Map<String, Double>): String {
-		val type = object : TypeToken<Map<String, Double>>() {}.type
-		return Gson().toJson(map, type)
-	}
 }

@@ -27,6 +27,7 @@ import com.metallicus.protonsdk.api.ProtonChainService
 import com.metallicus.protonsdk.api.TableRowsBody
 import com.metallicus.protonsdk.db.TokenContractDao
 import com.metallicus.protonsdk.model.TokenContract
+import com.metallicus.protonsdk.model.TokenContractRate
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -57,10 +58,10 @@ class TokenContractRepository @Inject constructor(
 	}
 
 	suspend fun fetchExchangeRates(exchangeRateUrl: String): Response<JsonArray> {
-		return protonChainService.getExchangeRates(exchangeRateUrl)
+		return protonChainService.getExchangeRates("$exchangeRateUrl/info")
 	}
 
-	suspend fun updateRates(tokenContractId: String, rates: String, priceChangePercent: Double) {
-		return tokenContractDao.updateRates(tokenContractId, rates, priceChangePercent)
+	suspend fun updateRates(tokenContractId: String, rates: Map<String, TokenContractRate>, rank: Int) {
+		return tokenContractDao.updateRates(tokenContractId, rates, rank)
 	}
 }

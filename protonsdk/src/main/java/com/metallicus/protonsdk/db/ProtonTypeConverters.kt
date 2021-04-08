@@ -96,4 +96,18 @@ object ProtonTypeConverters {
 		val type = object : TypeToken<List<ChainUrlInfo>>() {}.type
 		return Gson().toJson(value, type)
 	}
+
+	@TypeConverter
+	@JvmStatic
+	fun stringToStringTokenContractRateMap(value: String?): Map<String, TokenContractRate>? {
+		val type = object : TypeToken<Map<String, TokenContractRate>>() {}.type
+		return Gson().fromJson(value, type)
+	}
+
+	@TypeConverter
+	@JvmStatic
+	fun stringTokenContractRateMapToString(map: Map<String, TokenContractRate>): String {
+		val type = object : TypeToken<Map<String, TokenContractRate>>() {}.type
+		return Gson().toJson(map, type)
+	}
 }
