@@ -15,7 +15,7 @@
  */
 
 /*
- * Modifications Copyright (C) 2020 Proton Chain LLC, Delaware
+ * Modifications Copyright (C) 2021 Proton Chain LLC, Delaware
  *
  * Modifications include changes to KeyStore alias
  *
