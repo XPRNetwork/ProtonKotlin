@@ -23,6 +23,7 @@ package com.metallicus.protonsdk
 
 import android.content.Context
 import androidx.lifecycle.*
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.metallicus.protonsdk.api.TableRowsIndexPosition
 import com.metallicus.protonsdk.common.*
@@ -858,6 +859,53 @@ class Proton private constructor(context: Context) {
 			emit(error)
 		} catch (e: Exception) {
 			val error: Resource<Boolean> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun getSwapPools(): LiveData<Resource<List<SwapPool>>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val resource = getTableRows(
+				"proton.swaps",
+				"proton.swaps",
+				"pools",
+				"",
+				"",
+				250//,
+				//TableRowsIndexPosition.SECONDARY.indexPositionName
+			)
+			when (resource.status) {
+				Status.SUCCESS -> {
+					val swapPools = mutableListOf<SwapPool>()
+
+					val gson = Gson()
+
+					resource.data?.let { tableJson ->
+						val rows = tableJson.get("rows").asJsonArray
+						rows.forEach {
+							val swapPoolJsonObject = it.asJsonObject
+
+							val swapPool = gson.fromJson(swapPoolJsonObject, SwapPool::class.java)
+
+							swapPools.add(swapPool)
+						}
+					}
+
+					emit(Resource.success(swapPools))
+				}
+				Status.ERROR -> {
+					val error: Resource<List<SwapPool>> = Resource.error(resource.message.orEmpty(), resource.code ?: -1)
+					emit(error)
+				}
+				Status.LOADING -> { }
+			}
+		} catch (e: ProtonException) {
+			val error: Resource<List<SwapPool>> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<List<SwapPool>> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}
