@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Proton Chain LLC, Delaware
+ * Copyright (c) 2021 Proton Chain LLC, Delaware
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -63,9 +63,12 @@ data class TokenContract(
 		}
 	}
 
-	fun formatRateForCurrency(currency: String): String {
+	fun formatRateForCurrency(currency: String, precision: Int = 2): String {
 		val rate = getRate(currency)
-		val nf = NumberFormat.getCurrencyInstance(Locale.US)
+		val nf = NumberFormat.getCurrencyInstance()
+		nf.currency = Currency.getInstance(Locale.US)
+		nf.minimumFractionDigits = precision
+		nf.maximumFractionDigits = precision
 		return nf.format(rate)
 	}
 

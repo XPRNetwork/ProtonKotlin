@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Proton Chain LLC, Delaware
+ * Copyright (c) 2021 Proton Chain LLC, Delaware
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,8 @@ const val kotlinVersion = "1.4.32"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 37
-	const val versionName = "0.9.4"
+	const val versionCode = 38
+	const val versionName = "0.9.5"
 }
 
 object BuildPlugins {
