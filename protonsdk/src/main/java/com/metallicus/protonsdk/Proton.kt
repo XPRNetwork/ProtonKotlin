@@ -164,17 +164,59 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getTokenContracts(): LiveData<Resource<List<TokenContract>>> = liveData {
+	private suspend fun getTokenContractsMapAsync(): Map<String, TokenContract> {
+		val tokenContracts = getTokenContractsAsync()
+		return tokenContracts.associateBy { "${it.contract}:${it.getSymbol()}" }
+	}
+
+	fun getTokenContracts(updateExchangeRates: Boolean = false): LiveData<Resource<List<TokenContract>>> = liveData {
 		emit(Resource.loading())
 
 		try {
 			val tokenContracts = getTokenContractsAsync()
+
+			if (updateExchangeRates) {
+				val activeAccount = getActiveAccountAsync()
+
+				val tokenContractsMap = tokenContracts.associateBy { "${it.contract}:${it.getSymbol()}" }
+
+				val exchangeRateUrl =
+					activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
+
+				tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
+			}
+
 			emit(Resource.success(tokenContracts))
 		} catch (e: ProtonException) {
 			val error: Resource<List<TokenContract>> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
 			val error: Resource<List<TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun getTokenContractsMap(updateExchangeRates: Boolean = false): LiveData<Resource<Map<String, TokenContract>>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val tokenContractsMap = getTokenContractsMapAsync()
+
+			if (updateExchangeRates) {
+				val activeAccount = getActiveAccountAsync()
+
+				val exchangeRateUrl =
+					activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
+
+				tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
+			}
+
+			emit(Resource.success(tokenContractsMap))
+		} catch (e: ProtonException) {
+			val error: Resource<Map<String, TokenContract>> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<Map<String, TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}
@@ -351,43 +393,12 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getTokenContractPrices(): LiveData<Resource<List<TokenContract>>> = liveData {
-		emit(Resource.loading())
-
-		try {
-			val tokenContracts = getTokenContractsAsync()
-			val activeAccount = getActiveAccountAsync()
-
-			val tokenContractsMap = mutableMapOf<String, String>()
-			tokenContracts.forEach {
-				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
-			}
-
-			val exchangeRateUrl = activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
-
-			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
-
-			emit(Resource.success(getTokenContractsAsync()))
-		} catch (e: ProtonException) {
-			val error: Resource<List<TokenContract>> = Resource.error(e)
-			emit(error)
-		} catch (e: Exception) {
-			val error: Resource<List<TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
-			emit(error)
-		}
-	}
-
 	fun getActiveAccountTokenBalances(): LiveData<Resource<List<TokenCurrencyBalance>>> = liveData {
 		emit(Resource.loading())
 
 		try {
-			val tokenContracts = getTokenContractsAsync()
+			val tokenContractsMap = getTokenContractsMapAsync()
 			val activeAccount = getActiveAccountAsync()
-
-			val tokenContractsMap = mutableMapOf<String, String>()
-			tokenContracts.forEach {
-				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
-			}
 
 			val exchangeRateUrl = activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
 
@@ -863,49 +874,91 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getSwapPools(): LiveData<Resource<List<SwapPool>>> = liveData {
+	fun getSwapPoolMap(): LiveData<Resource<Map<String, SwapPoolMapEntry>>> = liveData {
 		emit(Resource.loading())
 
 		try {
-			val resource = getTableRows(
-				"proton.swaps",
-				"proton.swaps",
-				"pools",
-				"",
-				"",
-				250//,
-				//TableRowsIndexPosition.SECONDARY.indexPositionName
-			)
-			when (resource.status) {
+			val tokenContractsMap = getTokenContractsMapAsync()
+			val activeAccount = getActiveAccountAsync()
+
+			val exchangeRateUrl = activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
+
+			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
+
+			val tokenBalancesResource =
+				currencyBalancesModule.getTokenCurrencyBalances(
+					activeAccount.chainProvider.hyperionHistoryUrl,
+					activeAccount.account.accountName,
+					tokenContractsMap)
+
+			when (tokenBalancesResource.status) {
 				Status.SUCCESS -> {
-					val swapPools = mutableListOf<SwapPool>()
+					tokenBalancesResource.data?.let { tokenCurrencyBalances ->
+						val tokenCurrencyBalancesMap = tokenCurrencyBalances.associateBy {
+							"${it.tokenContract.contract}:${it.tokenContract.getSymbol()}"
+						}
 
-					val gson = Gson()
+						val tableRowsResource = getTableRows(
+							"proton.swaps",
+							"proton.swaps",
+							"pools",
+							"",
+							"",
+							250//,
+							//TableRowsIndexPosition.SECONDARY.indexPositionName
+						)
+						when (tableRowsResource.status) {
+							Status.SUCCESS -> {
+								val poolMap = mutableMapOf<String, SwapPool>()
 
-					resource.data?.let { tableJson ->
-						val rows = tableJson.get("rows").asJsonArray
-						rows.forEach {
-							val swapPoolJsonObject = it.asJsonObject
+								val gson = Gson()
 
-							val swapPool = gson.fromJson(swapPoolJsonObject, SwapPool::class.java)
+								tableRowsResource.data?.let { tableJson ->
+									val rows = tableJson.get("rows").asJsonArray
+									rows.forEach {
+										val swapPoolJsonObject = it.asJsonObject
 
-							swapPools.add(swapPool)
+										val swapPool = gson.fromJson(swapPoolJsonObject, SwapPool::class.java)
+
+										poolMap[swapPool.getPool1Symbol()] = swapPool
+									}
+								}
+
+								val poolGraph = mutableMapOf<String, SwapPoolMapEntry>()
+
+								poolMap.forEach {
+									val symbol = it.key
+									val rate = it.value.getPool1Rate()
+									val contract = it.value.getPool1Contract()
+
+									tokenCurrencyBalancesMap["$contract:$symbol"]?.let { tokenCurrencyBalance ->
+										poolGraph[symbol] = SwapPoolMapEntry(rate, tokenCurrencyBalance)
+									}
+								}
+
+								emit(Resource.success(poolGraph))
+							}
+							Status.ERROR -> {
+								val error: Resource<Map<String, SwapPoolMapEntry>> =
+									Resource.error(tableRowsResource.message.orEmpty(), tableRowsResource.code ?: -1)
+								emit(error)
+							}
+							Status.LOADING -> { }
 						}
 					}
-
-					emit(Resource.success(swapPools))
 				}
 				Status.ERROR -> {
-					val error: Resource<List<SwapPool>> = Resource.error(resource.message.orEmpty(), resource.code ?: -1)
+					val error: Resource<Map<String, SwapPoolMapEntry>> =
+						Resource.error(tokenBalancesResource.message.orEmpty(), tokenBalancesResource.code ?: -1)
 					emit(error)
 				}
 				Status.LOADING -> { }
 			}
 		} catch (e: ProtonException) {
-			val error: Resource<List<SwapPool>> = Resource.error(e)
+			val error: Resource<Map<String, SwapPoolMapEntry>> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
-			val error: Resource<List<SwapPool>> = Resource.error(e.localizedMessage.orEmpty())
+			val error: Resource<Map<String, SwapPoolMapEntry>> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}

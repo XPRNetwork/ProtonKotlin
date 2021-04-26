@@ -57,7 +57,7 @@ class TokenContractsModule {
 		return tokenContractRepository.getTokenContracts()
 	}
 
-	suspend fun updateExchangeRates(exchangeRatesUrl: String, tokenContractIdsMap: Map<String, String>) {
+	suspend fun updateExchangeRates(exchangeRatesUrl: String, tokenContractsMap: Map<String, TokenContract>) {
 		try {
 			val exchangeRatesResponse = tokenContractRepository.fetchExchangeRates(exchangeRatesUrl)
 			if (exchangeRatesResponse.isSuccessful) {
@@ -78,8 +78,8 @@ class TokenContractsModule {
 						ratesMap[currency] = rate
 					}
 
-					val tokenContractId = tokenContractIdsMap.getOrElse("$contract:$symbol") { null }
-					if (tokenContractId != null) {
+					val tokenContractId = "$contract:$symbol"
+					if (tokenContractsMap.containsKey(tokenContractId)) {
 						tokenContractRepository.updateRates(tokenContractId, ratesMap, rank)
 					}
 				}

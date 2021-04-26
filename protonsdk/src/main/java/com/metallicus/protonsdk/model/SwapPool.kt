@@ -27,14 +27,36 @@ data class SwapPool(
 	@SerializedName("lt_symbol") val symbol: String,
 	@SerializedName("creator") val creator: String,
 	@SerializedName("memo") val memo: String,
-	@SerializedName("pool1")val pool1: SwapPoolAsset,
+	@SerializedName("pool1") val pool1: SwapPoolAsset,
 	@SerializedName("pool2") val pool2: SwapPoolAsset,
 	@SerializedName("hash") val hash: String,
 	@SerializedName("fee") val fee: SwapPoolFee,
 	@SerializedName("active") val active: Int,
 	@SerializedName("reserved") val reserved: Int
 ) {
+	fun getPool1Symbol(): String {
+		return memo.split("<>")[0]
+	}
 
+	fun getPool2Symbol(): String {
+		return memo.split("<>")[1]
+	}
+
+	fun getPool1Amount(): Double {
+		return pool1.quantity.substringBefore(" ").toDouble()
+	}
+
+	fun getPool2Amount(): Double {
+		return pool2.quantity.substringBefore(" ").toDouble()
+	}
+
+	fun getPool1Rate(): Double {
+		return getPool1Amount() / getPool2Amount()
+	}
+
+	fun getPool1Contract(): String {
+		return pool1.contract
+	}
 }
 
 data class SwapPoolAsset(
@@ -46,4 +68,9 @@ data class SwapPoolFee(
 	@SerializedName("exchange_fee") val exchangeFee: Long,
 	@SerializedName("add_liquidity_fee") val addLiquidityFee: Long,
 	@SerializedName("remove_liquidity_fee") val removeLiquidityFee: Long
+)
+
+data class SwapPoolMapEntry(
+	val rate: Double,
+	val tokenCurrencyBalance: TokenCurrencyBalance
 )

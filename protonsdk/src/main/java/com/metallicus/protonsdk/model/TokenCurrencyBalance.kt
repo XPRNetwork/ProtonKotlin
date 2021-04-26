@@ -21,20 +21,12 @@
  */
 package com.metallicus.protonsdk.model
 
-import androidx.room.Embedded
-import androidx.room.Relation
 import java.text.NumberFormat
 import java.util.*
 
 data class TokenCurrencyBalance(
-	@Embedded
-	val currencyBalance: CurrencyBalance,
-
-	@Relation(
-		parentColumn = "tokenContractId",
-		entityColumn = "id"
-	)
-	val tokenContract: TokenContract
+	val tokenContract: TokenContract,
+	val currencyBalance: CurrencyBalance
 ) {
 	fun isSystemToken(): Boolean {
 		return (tokenContract.isSystemToken)
