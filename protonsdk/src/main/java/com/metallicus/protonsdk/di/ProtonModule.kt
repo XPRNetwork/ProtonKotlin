@@ -75,11 +75,11 @@ class ProtonModule {
 //		return db.accountContactDao()
 //	}
 
-	@Singleton
-	@Provides
-	fun provideCurrencyBalanceDao(db: ProtonDb): CurrencyBalanceDao {
-		return db.currencyBalanceDao()
-	}
+//	@Singleton
+//	@Provides
+//	fun provideCurrencyBalanceDao(db: ProtonDb): CurrencyBalanceDao {
+//		return db.currencyBalanceDao()
+//	}
 
 	@Singleton
 	@Provides

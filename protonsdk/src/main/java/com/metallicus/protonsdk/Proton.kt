@@ -393,7 +393,7 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getActiveAccountTokenBalances(): LiveData<Resource<List<TokenCurrencyBalance>>> = liveData {
+	fun getActiveAccountTokenBalances(addEmptyTokens: Boolean = false): LiveData<Resource<List<TokenCurrencyBalance>>> = liveData {
 		emit(Resource.loading())
 
 		try {
@@ -408,7 +408,8 @@ class Proton private constructor(context: Context) {
 				currencyBalancesModule.getTokenCurrencyBalances(
 					activeAccount.chainProvider.hyperionHistoryUrl,
 					activeAccount.account.accountName,
-					tokenContractsMap)
+					tokenContractsMap,
+					addEmptyTokens)
 
 			emit(tokenBalances)
 		} catch (e: ProtonException) {

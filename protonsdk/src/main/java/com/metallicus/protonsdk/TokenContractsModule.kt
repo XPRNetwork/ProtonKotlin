@@ -80,6 +80,8 @@ class TokenContractsModule {
 
 					val tokenContractId = "$contract:$symbol"
 					if (tokenContractsMap.containsKey(tokenContractId)) {
+						tokenContractsMap[tokenContractId]?.rates = ratesMap
+
 						tokenContractRepository.updateRates(tokenContractId, ratesMap, rank)
 					}
 				}
