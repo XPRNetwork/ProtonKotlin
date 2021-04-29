@@ -16,16 +16,16 @@ plugins {
 	id(BuildPlugins.dokka) version BuildPlugins.Versions.dokka
 	id(BuildPlugins.orchid) version orchidVersion
 	`maven-publish`
-	id(BuildPlugins.bintray) version BuildPlugins.Versions.bintray
 }
 
 allprojects {
 	repositories {
+		mavenLocal()
+
 		google()
 		mavenCentral()
 		jcenter()
 
-		mavenLocal()
 		maven {
 			name = "eosio-signing-request-java"
 			url = uri("https://maven.pkg.github.com/ProtonProtocol/eosio-signing-request-java")
