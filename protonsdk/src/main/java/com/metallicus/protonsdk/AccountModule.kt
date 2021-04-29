@@ -530,19 +530,21 @@ class AccountModule {
 					val accountName = it.account.name
 					val data = it.data.data
 
-					val type = if (name == "transfer") Type.TRANSFER else Type.CUSTOM
+					val isTypicalTransfer = (name == "transfer" && data.containsKey("quantity"))
 
-					val tokenContract = if (type == Type.TRANSFER) {
+					val type = if (isTypicalTransfer) Type.TRANSFER else Type.CUSTOM
+
+					var tokenContract: TokenContract? = null
+
+					if (type == Type.TRANSFER) {
 						val quantity = data["quantity"] as String
 						if (quantity.isNotEmpty()) {
 							val symbol = quantity.split(" ")[1]
-
-							tokenContractMap["$accountName:$symbol"]
-						} else {
-							null
+							val tokenContractId = "$accountName:$symbol"
+							if (tokenContractMap.containsKey(tokenContractId)) {
+								tokenContract = tokenContractMap[tokenContractId]
+							}
 						}
-					} else {
-						null
 					}
 
 					val esrAction = ESRAction(type, name, accountName, data, tokenContract)
