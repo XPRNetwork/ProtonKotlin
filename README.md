@@ -1,6 +1,5 @@
 # Proton Kotlin Wallet SDK (Beta) 🚧
 
-![Bintray](https://img.shields.io/bintray/v/protonprotocol/ProtonKotlin/com.metallicus.protonsdk)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/ProtonProtocol/ProtonKotlin?include_prereleases)
 ![GitHub](https://img.shields.io/github/license/ProtonProtocol/ProtonKotlin)
 
