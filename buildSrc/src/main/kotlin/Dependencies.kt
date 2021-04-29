@@ -24,7 +24,7 @@ const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
 	const val versionCode = 40
-	const val versionName = "1.0.0"
+	const val versionName = "1.0.1"
 }
 
 object BuildPlugins {
@@ -69,7 +69,7 @@ object Libraries {
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
 		const val guava = "30.1.1-jre"
-		const val esr = "1.0.4"
+		const val esr = "1.0.0"
 	}
 
 	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
@@ -95,7 +95,7 @@ object Libraries {
 	const val orchidKotlindoc = "io.github.javaeden.orchid:OrchidKotlindoc:$orchidVersion"
 	const val orchidPluginDocs = "io.github.javaeden.orchid:OrchidPluginDocs:$orchidVersion"
 	const val orchidGithub = "io.github.javaeden.orchid:OrchidGithub:$orchidVersion"
-	const val greymassESR = "com.greymass:esrsdk:${Versions.esr}"
+	const val greymassESR = "com.metallicus:esrsdk:${Versions.esr}"
 }
 
 object TestLibraries {
