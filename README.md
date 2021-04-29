@@ -21,15 +21,15 @@ credentials for access.
 allprojects {
     repositories {
         ...
-		maven {
-			name = "ProtonKotlinSdk"
-			url = uri("https://maven.pkg.github.com/ProtonProtocol/ProtonKotlin")
-			credentials {
+        maven {
+            name = "ProtonKotlinSdk"
+            url = uri("https://maven.pkg.github.com/ProtonProtocol/ProtonKotlin")
+            credentials {
                 ...
                 username = properties.getProperty('github.username')
                 password = properties.getProperty('github.token')
-			}
-		}
+            }
+        }
 
         // this is needed for ESR library access
         maven {
