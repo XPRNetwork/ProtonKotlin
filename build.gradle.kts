@@ -24,11 +24,11 @@ allprojects {
 
 		google()
 		mavenCentral()
-		jcenter()
+		jcenter() // for orchid
 
 		maven {
-			name = "eosio-signing-request-java"
-			url = uri("https://maven.pkg.github.com/ProtonProtocol/eosio-signing-request-java")
+			name = "ProtonKotlinSdk"
+			url = uri("https://maven.pkg.github.com/ProtonProtocol/ProtonKotlin")
 			credentials {
 				username = gradleLocalProperties(rootDir).getProperty("github.username")
 				password = gradleLocalProperties(rootDir).getProperty("github.token")

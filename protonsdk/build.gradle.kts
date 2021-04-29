@@ -125,11 +125,11 @@ tasks {
 		}
 	}
 
-//	// publishing depends on build
-//	withType<PublishToMavenLocal> {
-//		dependsOn(build)
-//	}
-//
+	// publishing depends on build
+	withType<PublishToMavenLocal> {
+		dependsOn(build)
+	}
+
 //	// uploading to Bintray depends on publications
 //	withType<BintrayUploadTask> {
 //		dependsOn(publishToMavenLocal)

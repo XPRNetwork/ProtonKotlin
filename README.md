@@ -30,17 +30,6 @@ allprojects {
                 password = properties.getProperty('github.token')
             }
         }
-
-        // this is needed for ESR library access
-        maven {
-            name = "ESRSdk"
-            url = uri("https://maven.pkg.github.com/ProtonProtocol/eosio-signing-request-java")
-            credentials {
-                ...
-                username = properties.getProperty('github.username')
-                password = properties.getProperty('github.token')
-            }
-        }
     }
 }
 ```
@@ -50,7 +39,7 @@ Then add the following dependency to your module's build.gradle
 ```gradle
 dependencies {
     ...
-    implementation "com.metallicus:protonsdk:1.0.0"
+    implementation "com.metallicus:protonsdk:1.0.1"
 }
 ```
 
