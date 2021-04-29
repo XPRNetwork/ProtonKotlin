@@ -23,8 +23,8 @@ const val kotlinVersion = "1.4.32"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 38
-	const val versionName = "0.9.5"
+	const val versionCode = 39
+	const val versionName = "0.9.6"
 }
 
 object BuildPlugins {
@@ -71,7 +71,7 @@ object Libraries {
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
 		const val guava = "30.1.1-jre"
-		const val esr = "1.0.6"
+		const val esr = "1.0.4"
 	}
 
 	const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"

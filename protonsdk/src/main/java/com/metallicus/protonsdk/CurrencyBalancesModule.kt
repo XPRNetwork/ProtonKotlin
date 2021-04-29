@@ -96,7 +96,7 @@ class CurrencyBalancesModule {
 	suspend fun getTokenCurrencyBalances(
 		hyperionHistoryUrl: String,
 		accountName: String,
-		tokenContractsMap: Map<String, String>): Resource<List<TokenCurrencyBalance>> {
+		tokenContractsMap: Map<String, TokenContract>): Resource<List<TokenCurrencyBalance>> {
 		return try {
 			val balancesResponse = currencyBalanceRepository.fetchCurrencyBalances(hyperionHistoryUrl, accountName)
 			if (balancesResponse.isSuccessful) {

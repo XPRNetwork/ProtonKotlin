@@ -163,17 +163,59 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getTokenContracts(): LiveData<Resource<List<TokenContract>>> = liveData {
+	private suspend fun getTokenContractsMapAsync(): Map<String, TokenContract> {
+		val tokenContracts = getTokenContractsAsync()
+		return tokenContracts.associateBy { "${it.contract}:${it.getSymbol()}" }
+	}
+
+	fun getTokenContracts(updateExchangeRates: Boolean = false): LiveData<Resource<List<TokenContract>>> = liveData {
 		emit(Resource.loading())
 
 		try {
 			val tokenContracts = getTokenContractsAsync()
+
+			if (updateExchangeRates) {
+				val activeAccount = getActiveAccountAsync()
+
+				val tokenContractsMap = tokenContracts.associateBy { "${it.contract}:${it.getSymbol()}" }
+
+				val exchangeRateUrl =
+					activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
+
+				tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
+			}
+
 			emit(Resource.success(tokenContracts))
 		} catch (e: ProtonException) {
 			val error: Resource<List<TokenContract>> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
 			val error: Resource<List<TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
+	fun getTokenContractsMap(updateExchangeRates: Boolean = false): LiveData<Resource<Map<String, TokenContract>>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val tokenContractsMap = getTokenContractsMapAsync()
+
+			if (updateExchangeRates) {
+				val activeAccount = getActiveAccountAsync()
+
+				val exchangeRateUrl =
+					activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
+
+				tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
+			}
+
+			emit(Resource.success(tokenContractsMap))
+		} catch (e: ProtonException) {
+			val error: Resource<Map<String, TokenContract>> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<Map<String, TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}
@@ -350,43 +392,12 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getTokenContractPrices(): LiveData<Resource<List<TokenContract>>> = liveData {
-		emit(Resource.loading())
-
-		try {
-			val tokenContracts = getTokenContractsAsync()
-			val activeAccount = getActiveAccountAsync()
-
-			val tokenContractsMap = mutableMapOf<String, String>()
-			tokenContracts.forEach {
-				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
-			}
-
-			val exchangeRateUrl = activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
-
-			tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
-
-			emit(Resource.success(getTokenContractsAsync()))
-		} catch (e: ProtonException) {
-			val error: Resource<List<TokenContract>> = Resource.error(e)
-			emit(error)
-		} catch (e: Exception) {
-			val error: Resource<List<TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
-			emit(error)
-		}
-	}
-
 	fun getActiveAccountTokenBalances(): LiveData<Resource<List<TokenCurrencyBalance>>> = liveData {
 		emit(Resource.loading())
 
 		try {
-			val tokenContracts = getTokenContractsAsync()
+			val tokenContractsMap = getTokenContractsMapAsync()
 			val activeAccount = getActiveAccountAsync()
-
-			val tokenContractsMap = mutableMapOf<String, String>()
-			tokenContracts.forEach {
-				tokenContractsMap["${it.contract}:${it.getSymbol()}"] = it.id
-			}
 
 			val exchangeRateUrl = activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
 
@@ -666,10 +677,14 @@ class Proton private constructor(context: Context) {
 		return openESRSessions.find { it.first == id }
 	}
 	private fun isESRSessionOpen(id: String): Boolean {
-		return openESRSessions.find { it.first == id } != null
+		return getOpenESRSession(id) != null
 	}
 	private fun addOpenESRSession(id: String, webSocket: WebSocket) {
-		openESRSessions.add(Pair(id, webSocket))
+		if (!isESRSessionOpen(id)) {
+			openESRSessions.add(Pair(id, webSocket))
+		} else {
+			webSocket.cancel()
+		}
 	}
 	private fun removeOpenESRSession(id: String) {
 		getOpenESRSession(id)?.let {
@@ -685,13 +700,36 @@ class Proton private constructor(context: Context) {
 	}
 
 	val esrSessionMessages = MutableLiveData<MutableList<ESRSessionMessage>>(mutableListOf())
+	private fun esrSessionMessageExists(message: String): Boolean {
+		return esrSessionMessages.value?.find { it.message == message } != null
+	}
 	private fun addESRSessionMessage(esrSessionMessage: ESRSessionMessage) {
-		esrSessionMessages.value?.add(esrSessionMessage)
-		esrSessionMessages.postValue(esrSessionMessages.value)
+		if (!esrSessionMessageExists(esrSessionMessage.message)) {
+			val list = esrSessionMessages.value
+			list?.apply {
+				add(esrSessionMessage)
+				esrSessionMessages.postValue(this)
+			}
+		}
 	}
 	private fun removeESRSessionMessage(esrSessionMessage: ESRSessionMessage) {
-		esrSessionMessages.value?.remove(esrSessionMessage)
-		esrSessionMessages.postValue(esrSessionMessages.value)
+		val list = esrSessionMessages.value
+		list?.apply {
+			remove(esrSessionMessage)
+			esrSessionMessages.postValue(this)
+		}
+	}
+	private fun removeESRSessionMessages(esrSessionId: String) {
+		esrSessionMessages.value?.forEach {
+			if (it.esrSession.id == esrSessionId) {
+				removeESRSessionMessage(it)
+			}
+		}
+	}
+	private fun removeAllESRSessionMessages() {
+		esrSessionMessages.value?.forEach {
+			removeESRSessionMessage(it)
+		}
 	}
 
 	fun initESRSessions(/*activeAccount*/) = protonCoroutineScope.launch {
@@ -757,9 +795,13 @@ class Proton private constructor(context: Context) {
 
 			emit(Resource.success(accountModule.decodeESRSessionMessage(activeAccount, tokenContractMap, esrSession, message)))
 		} catch (e: ProtonException) {
+			removeESRSessionMessage(esrSessionMessage)
+
 			val error: Resource<ProtonESR> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
+			removeESRSessionMessage(esrSessionMessage)
+
 			val error: Resource<ProtonESR> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
@@ -775,9 +817,13 @@ class Proton private constructor(context: Context) {
 
 			emit(response)
 		} catch (e: ProtonException) {
+			removeESRSessionMessage(esrSessionMessage)
+
 			val error: Resource<String> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
+			removeESRSessionMessage(esrSessionMessage)
+
 			val error: Resource<String> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
@@ -793,9 +839,13 @@ class Proton private constructor(context: Context) {
 
 			emit(response)
 		} catch (e: ProtonException) {
+			removeESRSessionMessage(esrSessionMessage)
+
 			val error: Resource<String> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
+			removeESRSessionMessage(esrSessionMessage)
+
 			val error: Resource<String> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
@@ -827,7 +877,10 @@ class Proton private constructor(context: Context) {
 			@Suppress("UNUSED_VARIABLE")
 			val activeAccount = getActiveAccountAsync()
 
-			removeOpenESRSession(esrSession.id)
+			val esrSessionId = esrSession.id
+
+			removeOpenESRSession(esrSessionId)
+			removeESRSessionMessages(esrSessionId)
 
 			accountModule.removeESRSession(esrSession)
 
@@ -849,6 +902,7 @@ class Proton private constructor(context: Context) {
 			val activeAccount = getActiveAccountAsync()
 
 			removeAllOpenESRSessions()
+			removeAllESRSessionMessages()
 
 			accountModule.removeAllESRSessions()
 

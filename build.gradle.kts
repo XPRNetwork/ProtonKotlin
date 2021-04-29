@@ -3,7 +3,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 buildscript {
 	repositories {
 		google()
-		jcenter()
+		mavenCentral()
 	}
 
 	dependencies {
@@ -22,7 +22,18 @@ plugins {
 allprojects {
 	repositories {
 		google()
+		mavenCentral()
 		jcenter()
+
+		mavenLocal()
+		maven {
+			name = "eosio-signing-request-java"
+			url = uri("https://maven.pkg.github.com/ProtonProtocol/eosio-signing-request-java")
+			credentials {
+				username = gradleLocalProperties(rootDir).getProperty("github.username")
+				password = gradleLocalProperties(rootDir).getProperty("github.token")
+			}
+		}
 	}
 }
 
