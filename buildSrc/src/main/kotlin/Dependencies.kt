@@ -23,15 +23,14 @@ const val kotlinVersion = "1.4.32"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 39
-	const val versionName = "0.9.6"
+	const val versionCode = 40
+	const val versionName = "1.0.0"
 }
 
 object BuildPlugins {
 	object Versions {
 		const val gradle = "4.1.3"
 		const val dokka = "0.10.1" // TODO: 1.4.0
-		const val bintray = "1.8.5"
 	}
 
 	const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.gradle}"
@@ -41,7 +40,6 @@ object BuildPlugins {
 	const val mavenPublish = "maven-publish"
 	const val dokka = "org.jetbrains.dokka"
 	const val orchid = "com.eden.orchidPlugin"
-	const val bintray = "com.jfrog.bintray"
 }
 
 object Android {
@@ -113,26 +111,7 @@ object TestLibraries {
 }
 
 object Publishing {
-	object Publications {
-		const val debug = "ProtonSDKDebug"
-		const val release = "ProtonSDKRelease"
-	}
-	const val bintrayRepo = "ProtonKotlin"
-	const val bintrayName = "com.metallicus.protonsdk"
-	const val userOrganization = "protonprotocol"
-
-	const val libraryName = "protonsdk"
-	const val libraryVersion = ProtonSdk.versionName
-
-	const val publishedGroupId = "com.metallicus"
-
-	const val libraryDescription = "Kotlin library for handling Proton Chain operations"
-	const val siteUrl = "https://github.com/ProtonProtocol/ProtonKotlin"
-	const val gitUrl = "https://github.com/ProtonProtocol/ProtonKotlin.git"
-	const val developerId = "joey-harward"
-	const val developerName = "Metallicus Inc."
-	const val developerEmail = "joey@metalpay.co"
-	const val licenseName = "MIT License"
-	const val licenseUrl = "https://opensource.org/licenses/MIT"
-	const val allLicenses = "MIT"
+	const val groupId = "com.metallicus"
+	const val artifactId = "protonsdk"
+	const val version = ProtonSdk.versionName
 }
