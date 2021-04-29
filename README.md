@@ -15,17 +15,26 @@ over time.*
 
 # Installation
 
-First make sure you include jcenter() in your root build.gradle
+This library is hosted by Github Packages so you will need to provide your Github
+credentials for access.
 
 ```gradle
 allprojects {
     repositories {
         ...
-        jcenter()
+		maven {
+			name = "ProtonKotlinSdk"
+			url = uri("https://maven.pkg.github.com/ProtonProtocol/ProtonKotlin")
+			credentials {
+                ...
+                username = properties.getProperty('github.username')
+                password = properties.getProperty('github.token')
+			}
+		}
 
         // this is needed for ESR library access
         maven {
-            name = "eosio-signing-request-java"
+            name = "ESRSdk"
             url = uri("https://maven.pkg.github.com/ProtonProtocol/eosio-signing-request-java")
             credentials {
                 ...
@@ -42,7 +51,7 @@ Then add the following dependency to your module's build.gradle
 ```gradle
 dependencies {
     ...
-    implementation "com.metallicus:protonsdk:0.9.6"
+    implementation "com.metallicus:protonsdk:1.0.0"
 }
 ```
 
