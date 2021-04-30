@@ -3,7 +3,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 buildscript {
 	repositories {
 		google()
-		jcenter()
+		mavenCentral()
 	}
 
 	dependencies {
@@ -16,13 +16,24 @@ plugins {
 	id(BuildPlugins.dokka) version BuildPlugins.Versions.dokka
 	id(BuildPlugins.orchid) version orchidVersion
 	`maven-publish`
-	id(BuildPlugins.bintray) version BuildPlugins.Versions.bintray
 }
 
 allprojects {
 	repositories {
+		mavenLocal()
+
 		google()
-		jcenter()
+		mavenCentral()
+		jcenter() // for orchid
+
+		maven {
+			name = "ProtonKotlinSdk"
+			url = uri("https://maven.pkg.github.com/ProtonProtocol/ProtonKotlin")
+			credentials {
+				username = gradleLocalProperties(rootDir).getProperty("github.username")
+				password = gradleLocalProperties(rootDir).getProperty("github.token")
+			}
+		}
 	}
 }
 
