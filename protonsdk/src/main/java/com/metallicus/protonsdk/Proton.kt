@@ -933,7 +933,8 @@ class Proton private constructor(context: Context) {
 				currencyBalancesModule.getTokenCurrencyBalances(
 					activeAccount.chainProvider.hyperionHistoryUrl,
 					activeAccount.account.accountName,
-					tokenContractsMap)
+					tokenContractsMap,
+					true)
 
 			when (tokenBalancesResource.status) {
 				Status.SUCCESS -> {
