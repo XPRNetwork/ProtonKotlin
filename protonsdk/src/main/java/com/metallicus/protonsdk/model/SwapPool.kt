@@ -27,21 +27,13 @@ data class SwapPool(
 	@SerializedName("lt_symbol") val symbol: String,
 	@SerializedName("creator") val creator: String,
 	@SerializedName("memo") val memo: String,
-	@SerializedName("pool1") val pool1: SwapPoolAsset,
-	@SerializedName("pool2") val pool2: SwapPoolAsset,
+	@SerializedName("pool1") var pool1: SwapPoolAsset,
+	@SerializedName("pool2") var pool2: SwapPoolAsset,
 	@SerializedName("hash") val hash: String,
 	@SerializedName("fee") val fee: SwapPoolFee,
 	@SerializedName("active") val active: Int,
 	@SerializedName("reserved") val reserved: Int
 ) {
-	fun getPool1Symbol(): String {
-		return memo.split("<>")[0]
-	}
-
-	fun getPool2Symbol(): String {
-		return memo.split("<>")[1]
-	}
-
 	fun getPool1Amount(): Double {
 		return pool1.quantity.substringBefore(" ").toDouble()
 	}
@@ -50,12 +42,38 @@ data class SwapPool(
 		return pool2.quantity.substringBefore(" ").toDouble()
 	}
 
-	fun getPool1Rate(): Double {
-		return getPool1Amount() / getPool2Amount()
+	fun getPool1Symbol(): String {
+		return pool1.quantity.substringAfter(" ")
+	}
+
+	fun getPool2Symbol(): String {
+		return pool2.quantity.substringAfter(" ")
 	}
 
 	fun getPool1Contract(): String {
 		return pool1.contract
+	}
+
+	fun getPool2Contract(): String {
+		return pool2.contract
+	}
+
+	fun getFee(): Int {
+		return fee.exchangeFee.toInt()
+	}
+
+	fun deepCopy(): SwapPool {
+		return SwapPool(
+			symbol,
+			creator,
+			memo,
+			SwapPoolAsset(pool1.quantity, pool1.contract),
+			SwapPoolAsset(pool2.quantity, pool2.contract),
+			hash,
+			SwapPoolFee(fee.exchangeFee, fee.addLiquidityFee, fee.removeLiquidityFee),
+			active,
+			reserved
+		)
 	}
 }
 
@@ -70,7 +88,7 @@ data class SwapPoolFee(
 	@SerializedName("remove_liquidity_fee") val removeLiquidityFee: Long
 )
 
-data class SwapPoolMapEntry(
-	val rate: Double,
-	val tokenCurrencyBalance: TokenCurrencyBalance
+data class SwapPoolData(
+	val swapPools: List<SwapPool>,
+	val swapPoolTokens: List<TokenCurrencyBalance>
 )

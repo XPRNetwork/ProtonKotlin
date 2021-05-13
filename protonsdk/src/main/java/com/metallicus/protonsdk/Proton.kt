@@ -918,7 +918,7 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getSwapPoolMap(): LiveData<Resource<Map<String, SwapPoolMapEntry>>> = liveData {
+	fun getSwapPools(): LiveData<Resource<SwapPoolData>> = liveData {
 		emit(Resource.loading())
 
 		try {
@@ -954,7 +954,8 @@ class Proton private constructor(context: Context) {
 						)
 						when (tableRowsResource.status) {
 							Status.SUCCESS -> {
-								val poolMap = mutableMapOf<String, SwapPool>()
+								val swapPools = mutableListOf<SwapPool>()
+								val swapPoolTokens = mutableListOf<TokenCurrencyBalance>()
 
 								val gson = Gson()
 
@@ -965,26 +966,26 @@ class Proton private constructor(context: Context) {
 
 										val swapPool = gson.fromJson(swapPoolJsonObject, SwapPool::class.java)
 
-										poolMap[swapPool.getPool1Symbol()] = swapPool
+										val pool1 = "${swapPool.getPool1Contract()}:${swapPool.getPool1Symbol()}"
+										val pool2 = "${swapPool.getPool2Contract()}:${swapPool.getPool2Symbol()}"
+
+										tokenCurrencyBalancesMap[pool1]?.let { tokenCurrencyBalance ->
+											swapPoolTokens.add(tokenCurrencyBalance)
+										}
+										tokenCurrencyBalancesMap[pool2]?.let { tokenCurrencyBalance ->
+											swapPoolTokens.add(tokenCurrencyBalance)
+										}
+
+										swapPools.add(swapPool)
 									}
 								}
 
-								val poolGraph = mutableMapOf<String, SwapPoolMapEntry>()
+								val swapPoolData = SwapPoolData(swapPools, swapPoolTokens.distinct())
 
-								poolMap.forEach {
-									val symbol = it.key
-									val rate = it.value.getPool1Rate()
-									val contract = it.value.getPool1Contract()
-
-									tokenCurrencyBalancesMap["$contract:$symbol"]?.let { tokenCurrencyBalance ->
-										poolGraph[symbol] = SwapPoolMapEntry(rate, tokenCurrencyBalance)
-									}
-								}
-
-								emit(Resource.success(poolGraph))
+								emit(Resource.success(swapPoolData))
 							}
 							Status.ERROR -> {
-								val error: Resource<Map<String, SwapPoolMapEntry>> =
+								val error: Resource<SwapPoolData> =
 									Resource.error(tableRowsResource.message.orEmpty(), tableRowsResource.code ?: -1)
 								emit(error)
 							}
@@ -993,17 +994,17 @@ class Proton private constructor(context: Context) {
 					}
 				}
 				Status.ERROR -> {
-					val error: Resource<Map<String, SwapPoolMapEntry>> =
+					val error: Resource<SwapPoolData> =
 						Resource.error(tokenBalancesResource.message.orEmpty(), tokenBalancesResource.code ?: -1)
 					emit(error)
 				}
 				Status.LOADING -> { }
 			}
 		} catch (e: ProtonException) {
-			val error: Resource<Map<String, SwapPoolMapEntry>> = Resource.error(e)
+			val error: Resource<SwapPoolData> = Resource.error(e)
 			emit(error)
 		} catch (e: Exception) {
-			val error: Resource<Map<String, SwapPoolMapEntry>> = Resource.error(e.localizedMessage.orEmpty())
+			val error: Resource<SwapPoolData> = Resource.error(e.localizedMessage.orEmpty())
 			emit(error)
 		}
 	}
