@@ -965,18 +965,19 @@ class Proton private constructor(context: Context) {
 										val swapPoolJsonObject = it.asJsonObject
 
 										val swapPool = gson.fromJson(swapPoolJsonObject, SwapPool::class.java)
+										if (swapPool.active == 1) {
+											val pool1 = "${swapPool.getPool1Contract()}:${swapPool.getPool1Symbol()}"
+											val pool2 = "${swapPool.getPool2Contract()}:${swapPool.getPool2Symbol()}"
 
-										val pool1 = "${swapPool.getPool1Contract()}:${swapPool.getPool1Symbol()}"
-										val pool2 = "${swapPool.getPool2Contract()}:${swapPool.getPool2Symbol()}"
+											tokenCurrencyBalancesMap[pool1]?.let { tokenCurrencyBalance ->
+												swapPoolTokens.add(tokenCurrencyBalance)
+											}
+											tokenCurrencyBalancesMap[pool2]?.let { tokenCurrencyBalance ->
+												swapPoolTokens.add(tokenCurrencyBalance)
+											}
 
-										tokenCurrencyBalancesMap[pool1]?.let { tokenCurrencyBalance ->
-											swapPoolTokens.add(tokenCurrencyBalance)
+											swapPools.add(swapPool)
 										}
-										tokenCurrencyBalancesMap[pool2]?.let { tokenCurrencyBalance ->
-											swapPoolTokens.add(tokenCurrencyBalance)
-										}
-
-										swapPools.add(swapPool)
 									}
 								}
 

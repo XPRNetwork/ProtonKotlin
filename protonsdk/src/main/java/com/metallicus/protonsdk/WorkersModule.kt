@@ -94,13 +94,6 @@ class WorkersModule {
 				.then(initTokenContracts)
 				.enqueue()
 		}
-
-		// start periodic worker to update exchange rates
-		/*val updateTokenContractRates = PeriodicWorkRequest.Builder(UpdateTokenContractRatesWorker::class.java, 15L, TimeUnit.MINUTES)
-			.setConstraints(constraints)
-			.setInitialDelay(1L, TimeUnit.MINUTES)
-			.build()
-		workManager.enqueueUniquePeriodicWork(UPDATE_RATES, ExistingPeriodicWorkPolicy.REPLACE, updateTokenContractRates)*/
 	}
 
 	fun onInitChainProvider(callback: (Boolean, Data?) -> Unit) {
