@@ -19,31 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.metallicus.protonsdk.db
+package com.metallicus.protonsdk.api
 
-import androidx.room.*
-import com.metallicus.protonsdk.model.CurrencyBalance
-import com.metallicus.protonsdk.model.TokenCurrencyBalance
+import com.google.gson.JsonObject
+import com.metallicus.protonsdk.model.*
+import retrofit2.Response
+import retrofit2.http.*
 
-/**
- * Interface for database access for [CurrencyBalance] related operations
- */
-@Dao
-interface CurrencyBalanceDao {
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insert(currencyBalance: CurrencyBalance)
+interface ProtonChainStatsService {
+	@POST//("/v1/chain/get_info")
+	suspend fun getChainInfo(@Url url: String): Response<ChainInfo>
 
-	@Query("UPDATE currencyBalance SET amount = :amount WHERE accountName = :accountName AND contract = :contract AND symbol = :symbol")
-	suspend fun updateAmount(accountName: String, contract: String, symbol: String, amount: String)
-
-	@Transaction
-	@Query("SELECT * FROM currencyBalance WHERE accountName = :accountName AND tokenContractId = :tokenContractId")
-	suspend fun findByTokenContract(accountName: String, tokenContractId: String): TokenCurrencyBalance
-
-	@Transaction
-	@Query("SELECT * FROM currencyBalance WHERE accountName = :accountName")
-	suspend fun findByAccountName(accountName: String): List<TokenCurrencyBalance>
-
-	@Query("DELETE FROM currencyBalance")
-	suspend fun removeAll()
+	@GET//("/v2/health")
+	suspend fun getHealth(@Url url: String): Response<JsonObject>
 }

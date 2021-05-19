@@ -27,6 +27,7 @@ import com.google.gson.GsonBuilder
 import com.metallicus.protonsdk.R
 import com.metallicus.protonsdk.api.ESRCallbackService
 import com.metallicus.protonsdk.api.ProtonChainService
+import com.metallicus.protonsdk.api.ProtonChainStatsService
 import com.metallicus.protonsdk.common.SecureKeys
 import com.metallicus.protonsdk.common.Prefs
 import com.metallicus.protonsdk.db.*
@@ -75,11 +76,11 @@ class ProtonModule {
 //		return db.accountContactDao()
 //	}
 
-	@Singleton
-	@Provides
-	fun provideCurrencyBalanceDao(db: ProtonDb): CurrencyBalanceDao {
-		return db.currencyBalanceDao()
-	}
+//	@Singleton
+//	@Provides
+//	fun provideCurrencyBalanceDao(db: ProtonDb): CurrencyBalanceDao {
+//		return db.currencyBalanceDao()
+//	}
 
 	@Singleton
 	@Provides
@@ -91,6 +92,33 @@ class ProtonModule {
 	@Provides
 	fun provideESRSessionDao(db: ProtonDb): ESRSessionDao {
 		return db.esrSessionDao()
+	}
+
+	@Singleton
+	@Provides
+	fun provideProtonChainStatsService(context: Context): ProtonChainStatsService {
+		val logging = HttpLoggingInterceptor()
+		logging.level = HttpLoggingInterceptor.Level.BODY
+
+		val httpClient = OkHttpClient.Builder()
+			.callTimeout(10, TimeUnit.SECONDS)
+			.connectTimeout(10, TimeUnit.SECONDS)
+			.readTimeout(10, TimeUnit.SECONDS)
+			.writeTimeout(10, TimeUnit.SECONDS)
+			.addInterceptor(logging)
+
+		val gson = GsonBuilder()
+			.registerTypeAdapterFactory(GsonEosTypeAdapterFactory())
+			.serializeNulls()
+//			.excludeFieldsWithoutExposeAnnotation()
+			.create()
+
+		return Retrofit.Builder()
+			.baseUrl(context.getString(R.string.defaultProtonChainUrl))
+			.addConverterFactory(GsonConverterFactory.create(gson))
+			.client(httpClient.build())
+			.build()
+			.create(ProtonChainStatsService::class.java)
 	}
 
 	@Singleton

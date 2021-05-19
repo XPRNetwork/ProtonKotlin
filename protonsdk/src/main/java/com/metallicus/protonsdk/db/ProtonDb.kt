@@ -32,10 +32,10 @@ import com.metallicus.protonsdk.model.*
 		TokenContract::class,
 		Account::class,
 		//AccountContact::class,
-		CurrencyBalance::class,
+		//CurrencyBalance::class,
 		Action::class,
 		ESRSession::class],
-	version = 31,
+	version = 32,
 	exportSchema = false
 )
 @TypeConverters(DefaultTypeConverters::class, EOSTypeConverters::class, ProtonTypeConverters::class)
@@ -43,7 +43,7 @@ abstract class ProtonDb : RoomDatabase() {
 	abstract fun chainProviderDao(): ChainProviderDao
 	abstract fun tokenContractDao(): TokenContractDao
 	abstract fun accountDao(): AccountDao
-	abstract fun currencyBalanceDao(): CurrencyBalanceDao
+//	abstract fun currencyBalanceDao(): CurrencyBalanceDao
 //	abstract fun accountContactDao(): AccountContactDao
 	abstract fun actionDao(): ActionDao
 	abstract fun esrSessionDao(): ESRSessionDao

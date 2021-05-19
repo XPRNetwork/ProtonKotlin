@@ -309,12 +309,18 @@ class ActionsModule {
 	suspend fun signAndPushTransaction(chainUrl: String, pin: String, actions: List<Action>): Resource<JsonObject> {
 		return try {
 			val signedTransactionResource = signTransaction(chainUrl, pin, actions)
-			if (signedTransactionResource.status == Status.SUCCESS) {
-				signedTransactionResource.data?.let {
-					pushTransaction(chainUrl, it)
-				} ?: Resource.error("No SignedTransaction")
-			} else {
-				Resource.error(signedTransactionResource.message.orEmpty(), signedTransactionResource.code ?: -1)
+			when (signedTransactionResource.status) {
+				Status.SUCCESS -> {
+					signedTransactionResource.data?.let {
+						pushTransaction(chainUrl, it)
+					} ?: Resource.error("No SignedTransaction")
+				}
+				Status.ERROR -> {
+					Resource.error(signedTransactionResource.message.orEmpty(), signedTransactionResource.code ?: -1)
+				}
+				Status.LOADING -> {
+					Resource.loading()
+				}
 			}
 		} catch (e: Exception) {
 			Resource.error(e.localizedMessage.orEmpty())

@@ -22,6 +22,10 @@
 	<string name="kycProvidersTableCode" translatable="false">eosio.proton</string>
 	<string name="kycProvidersTableName" translatable="false">kycproviders</string>
 
+	<string name="protonSwapPoolsTableScope" translatable="false">proton.swaps</string>
+	<string name="protonSwapPoolsTableCode" translatable="false">proton.swaps</string>
+	<string name="protonSwapPoolsTableName" translatable="false">pools</string>
+
 	<string name="secureStorageKeyPairAlreadyExists">KeyPair already exists!</string>
 	<string name="secureStorageKeyPairDoesNotExist">KeyPair does not exist in Keystore</string>
 	<string name="secureStorageEncryptionError">Problem during encryption</string>

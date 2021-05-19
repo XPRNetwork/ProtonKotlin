@@ -61,23 +61,17 @@ class CurrencyBalancesModule {
 					tokenContract.getSymbol() == it.asJsonObject.get("symbol").asString
 				}?.asJsonObject
 
-				val tokenContractId = tokenContract.id
+				val currencyBalance = CurrencyBalance(tokenContract.contract, tokenContract.getSymbol())
 
 				tokenJsonObject?.let { token ->
-					val code = token.get("contract").asString
-					val symbol = token.get("symbol").asString
 					val amount = token.get("amount").asString
 
-					val currencyBalance = CurrencyBalance(code, symbol, amount)
-					currencyBalance.tokenContractId = tokenContractId
-					currencyBalance.accountName = accountName
-
-					currencyBalanceRepository.addCurrencyBalance(currencyBalance)
+					currencyBalance.amount = amount
 				}
 
-				val tokenCurrencyBalances = currencyBalanceRepository.getTokenCurrencyBalance(accountName, tokenContractId)
+				val tokenCurrencyBalance = TokenCurrencyBalance(tokenContract, currencyBalance)
 
-				Resource.success(tokenCurrencyBalances)
+				Resource.success(tokenCurrencyBalance)
 			} else {
 				val msg = balancesResponse.errorBody()?.string()
 				val errorMsg = if (msg.isNullOrEmpty()) {
@@ -93,55 +87,82 @@ class CurrencyBalancesModule {
 		}
 	}
 
+	private fun isValidEmptyToken(contract: String): Boolean {
+		return (contract == "eosio.token" || contract == "xtokens")
+	}
+
 	suspend fun getTokenCurrencyBalances(
 		hyperionHistoryUrl: String,
 		accountName: String,
-		tokenContractsMap: Map<String, TokenContract>): Resource<List<TokenCurrencyBalance>> {
+		tokenContractsMap: Map<String, TokenContract>,
+		addEmptyTokens: Boolean = false
+	): Resource<List<TokenCurrencyBalance>> {
 		return try {
 			val balancesResponse = currencyBalanceRepository.fetchCurrencyBalances(hyperionHistoryUrl, accountName)
 			if (balancesResponse.isSuccessful) {
-				val jsonObject = balancesResponse.body()
-				val tokenArray = jsonObject?.getAsJsonArray("tokens")
+				val tokenCurrencyBalances = mutableListOf<TokenCurrencyBalance>()
 
-				tokenArray?.forEach {
-					val token = it.asJsonObject
-					val code = token.get("contract").asString
-					val symbol = token.get("symbol").asString
-					val amount = token.get("amount").asString
-
-					val tokenContractId = "$code:$symbol"
-
-					if (tokenContractsMap.containsKey("$code:$symbol")) {
-						val currencyBalance = CurrencyBalance(code, symbol, amount)
-						currencyBalance.tokenContractId = tokenContractId
-						currencyBalance.accountName = accountName
-
-						currencyBalanceRepository.addCurrencyBalance(currencyBalance)
-					} else {
-						val precision = token.get("precision").asInt
-						val precisionSymbol = "$precision,$symbol"
-						val tokenContract = TokenContract(
-							id = tokenContractId,
-							contract = code,
-							name = symbol,
-							url = "",
-							description = "",
-							iconUrl = "",
-							precisionSymbol = precisionSymbol,
-							blacklisted = 0)
-						tokenContract.rates = mapOf(Pair("USD", TokenContractRate()))
-
-						tokenContractRepository.addTokenContract(tokenContract)
-
-						val currencyBalance = CurrencyBalance(code, symbol, amount)
-						currencyBalance.tokenContractId = tokenContractId
-						currencyBalance.accountName = accountName
-
-						currencyBalanceRepository.addCurrencyBalance(currencyBalance)
+				balancesResponse.body()?.getAsJsonArray("tokens")?.let { tokensArray ->
+					val currencyBalancesMap = tokensArray.associateBy {
+						val token = it.asJsonObject
+						val contract = token.get("contract").asString
+						val symbol = token.get("symbol").asString
+						"$contract:$symbol"
 					}
-				}
 
-				val tokenCurrencyBalances = currencyBalanceRepository.getTokenCurrencyBalances(accountName)
+					tokenContractsMap.forEach { tokenContractMapEntry ->
+						val tokenContract = tokenContractMapEntry.value
+						val contract = tokenContract.contract
+						val symbol = tokenContract.getSymbol()
+
+						val currencyBalanceKey = "$contract:$symbol"
+
+						val currencyBalance = CurrencyBalance(contract, symbol)
+
+						if (currencyBalancesMap.containsKey(currencyBalanceKey)) {
+							val token = currencyBalancesMap[currencyBalanceKey]?.asJsonObject
+							currencyBalance.amount = token?.get("amount")?.asString.orEmpty()
+
+							val tokenCurrencyBalance = TokenCurrencyBalance(tokenContract, currencyBalance)
+							tokenCurrencyBalances.add(tokenCurrencyBalance)
+						} else if (addEmptyTokens && isValidEmptyToken(contract)) { // only add valid empty tokens
+							val tokenCurrencyBalance = TokenCurrencyBalance(tokenContract, currencyBalance)
+							tokenCurrencyBalances.add(tokenCurrencyBalance)
+						}
+					}
+
+					// add custom tokens
+					/*currencyBalancesMap.forEach { currencyBalancesMapEntry ->
+						val token = currencyBalancesMapEntry.value.asJsonObject
+						val contract = token.get("contract").asString
+						val symbol = token.get("symbol").asString
+
+						val currencyBalanceKey = "$contract:$symbol"
+
+						if (!tokenContractsMap.containsKey(currencyBalanceKey)) {
+							val amount = token.get("amount").asString
+							val precision = token.get("precision").asInt
+							val precisionSymbol = "$precision,$symbol"
+							val tokenContract = TokenContract(
+								id = currencyBalanceKey,
+								contract = contract,
+								name = symbol,
+								url = "",
+								description = "",
+								iconUrl = "",
+								precisionSymbol = precisionSymbol,
+								blacklisted = 0)
+							tokenContract.rates = mapOf(Pair("USD", TokenContractRate()))
+
+							tokenContractRepository.addTokenContract(tokenContract)
+
+							val currencyBalance = CurrencyBalance(contract, symbol, amount)
+
+							val tokenCurrencyBalance = TokenCurrencyBalance(tokenContract, currencyBalance)
+							tokenCurrencyBalances.add(tokenCurrencyBalance)
+						}
+					}*/
+				}
 
 				Resource.success(tokenCurrencyBalances)
 			} else {

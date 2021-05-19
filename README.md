@@ -39,7 +39,7 @@ Then add the following dependency to your module's build.gradle
 ```gradle
 dependencies {
     ...
-    implementation "com.metallicus:protonsdk:1.0.2"
+    implementation "com.metallicus:protonsdk:{latest_version}"
 }
 ```
 
