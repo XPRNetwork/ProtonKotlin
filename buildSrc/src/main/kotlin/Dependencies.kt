@@ -19,17 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const val kotlinVersion = "1.4.32"
+const val kotlinVersion = "1.5.0"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 41
-	const val versionName = "1.0.3"
+	const val versionCode = 42
+	const val versionName = "1.0.4"
 }
 
 object BuildPlugins {
 	object Versions {
-		const val gradle = "4.1.3"
+		const val gradle = "4.2.1" // TODO: 4.2.1
 		const val dokka = "0.10.1" // TODO: 1.4.0
 	}
 
@@ -46,7 +46,7 @@ object Android {
 	const val minSdk = 21
 	const val compileSdk = 30
 	const val targetSdk = compileSdk
-	const val buildTools = "31.0.0-rc02"
+	const val buildTools = "31.0.0-rc4"
 
 	object Progaurd {
 		const val consumeFile = "consumer-rules.pro"
@@ -57,15 +57,15 @@ object Android {
 
 object Libraries {
 	private object Versions {
-		const val ktx = "1.5.0-beta03"
+		const val ktx = "1.6.0-beta01"
 		const val lifecycleLiveData = "2.3.1"
 		const val room = "2.3.0-rc01"
 		const val workManager = "2.5.0"
 		const val okhttp3 = "5.0.0-alpha.2"
 		const val retrofit = "2.9.0"
-		const val dagger = "2.29.1"
+		const val dagger = "2.35.1"
 		const val daggerAssistedInject = "0.6.0"
-		const val coroutines = "1.4.3"
+		const val coroutines = "1.4.0-M1"
 		const val timber = "4.7.1"
 		const val gson = "2.8.6"
 		const val guava = "30.1.1-jre"
@@ -100,7 +100,7 @@ object Libraries {
 
 object TestLibraries {
 	private object Versions {
-		const val junit = "4.13.1"
+		const val junit = "4.13.2"
 		const val testExt = "1.1.2"
 		const val espresso = "3.3.0"
 	}
