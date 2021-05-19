@@ -87,6 +87,10 @@ class CurrencyBalancesModule {
 		}
 	}
 
+	private fun isValidEmptyToken(contract: String): Boolean {
+		return (contract == "eosio.token" || contract == "xtokens")
+	}
+
 	suspend fun getTokenCurrencyBalances(
 		hyperionHistoryUrl: String,
 		accountName: String,
@@ -121,14 +125,14 @@ class CurrencyBalancesModule {
 
 							val tokenCurrencyBalance = TokenCurrencyBalance(tokenContract, currencyBalance)
 							tokenCurrencyBalances.add(tokenCurrencyBalance)
-						} else if (addEmptyTokens) {
+						} else if (addEmptyTokens && isValidEmptyToken(contract)) { // only add valid empty tokens
 							val tokenCurrencyBalance = TokenCurrencyBalance(tokenContract, currencyBalance)
 							tokenCurrencyBalances.add(tokenCurrencyBalance)
 						}
 					}
 
 					// add custom tokens
-					currencyBalancesMap.forEach { currencyBalancesMapEntry ->
+					/*currencyBalancesMap.forEach { currencyBalancesMapEntry ->
 						val token = currencyBalancesMapEntry.value.asJsonObject
 						val contract = token.get("contract").asString
 						val symbol = token.get("symbol").asString
@@ -157,7 +161,7 @@ class CurrencyBalancesModule {
 							val tokenCurrencyBalance = TokenCurrencyBalance(tokenContract, currencyBalance)
 							tokenCurrencyBalances.add(tokenCurrencyBalance)
 						}
-					}
+					}*/
 				}
 
 				Resource.success(tokenCurrencyBalances)

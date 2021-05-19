@@ -22,10 +22,7 @@
 package com.metallicus.protonsdk.repository
 
 import com.google.gson.JsonObject
-import com.metallicus.protonsdk.api.AccountBody
-import com.metallicus.protonsdk.api.ProtonChainService
-import com.metallicus.protonsdk.api.TableRowsBody
-import com.metallicus.protonsdk.api.TableRowsIndexPosition
+import com.metallicus.protonsdk.api.*
 import com.metallicus.protonsdk.db.ChainProviderDao
 import com.metallicus.protonsdk.model.ChainInfo
 import com.metallicus.protonsdk.model.ChainProvider
@@ -36,7 +33,8 @@ import javax.inject.Singleton
 @Singleton
 class ChainProviderRepository @Inject constructor(
 	private val chainProviderDao: ChainProviderDao,
-	private val protonChainService: ProtonChainService
+	private val protonChainService: ProtonChainService,
+	private val protonChainStatsService: ProtonChainStatsService
 ) {
 	suspend fun removeAll() {
 		chainProviderDao.removeAll()
@@ -67,11 +65,11 @@ class ChainProviderRepository @Inject constructor(
 	}
 
 	suspend fun getChainInfo(chainUrl: String): Response<ChainInfo> {
-		return protonChainService.getChainInfo("$chainUrl/v1/chain/get_info")
+		return protonChainStatsService.getChainInfo("$chainUrl/v1/chain/get_info")
 	}
 
 	suspend fun getHealth(chainUrl: String): Response<JsonObject> {
-		return protonChainService.getHealth("$chainUrl/v2/health")
+		return protonChainStatsService.getHealth("$chainUrl/v2/health")
 	}
 
 	suspend fun getAbi(chainUrl: String, accountName: String): Response<JsonObject> {

@@ -221,6 +221,37 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
+	fun getMarketContracts(updateExchangeRates: Boolean = false): LiveData<Resource<List<TokenContract>>> = liveData {
+		emit(Resource.loading())
+
+		try {
+			val tokenContracts = getTokenContractsAsync()
+
+			val marketContracts = tokenContracts.filter {
+				it.contract == "eosio.token" || it.contract == "xtokens"
+			}
+
+			if (updateExchangeRates) {
+				val activeAccount = getActiveAccountAsync()
+
+				val tokenContractsMap = marketContracts.associateBy { "${it.contract}:${it.getSymbol()}" }
+
+				val exchangeRateUrl =
+					activeAccount.chainProvider.protonChainUrl + activeAccount.chainProvider.exchangeRatePath
+
+				tokenContractsModule.updateExchangeRates(exchangeRateUrl, tokenContractsMap)
+			}
+
+			emit(Resource.success(marketContracts))
+		} catch (e: ProtonException) {
+			val error: Resource<List<TokenContract>> = Resource.error(e)
+			emit(error)
+		} catch (e: Exception) {
+			val error: Resource<List<TokenContract>> = Resource.error(e.localizedMessage.orEmpty())
+			emit(error)
+		}
+	}
+
 	fun generatePrivateKey(): Pair<String, String> {
 		val privateKey = EosPrivateKey()
 		val publicKeyStr = privateKey.publicKey.toString()
