@@ -21,24 +21,13 @@
  */
 package com.metallicus.protonsdk.model
 
-import androidx.annotation.NonNull
-import androidx.room.*
 import com.google.gson.annotations.SerializedName
 
-@Entity(
-	indices = [(Index("tokenContractId", "accountName", "contract", "symbol"))],
-	primaryKeys = ["tokenContractId", "accountName"])
 data class CurrencyBalance(
 	@SerializedName("contract") val contract: String,
 	@SerializedName("symbol") val symbol: String,
-	@SerializedName("amount") val amount: String
+	@SerializedName("amount") var amount: String = "0.0"
 ) {
-	@NonNull
-	lateinit var tokenContractId: String
-
-	@NonNull
-	lateinit var accountName: String
-
 	fun getAmountDouble(): Double {
 		return amount.toDouble()
 	}

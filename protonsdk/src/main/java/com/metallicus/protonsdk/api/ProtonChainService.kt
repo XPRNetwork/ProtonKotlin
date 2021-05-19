@@ -123,12 +123,6 @@ interface ProtonChainService {
 		@Url url: String,
 		@Body body: JsonToBinBody): Response<JsonToBinResponse>
 
-	@POST//("/v1/chain/get_info")
-	suspend fun getChainInfo(@Url url: String): Response<ChainInfo>
-
-	@GET//("/v2/health")
-	suspend fun getHealth(@Url url: String): Response<JsonObject>
-
 	@POST//("/v1/chain/get_required_keys")
 	suspend fun getRequiredKeys(
 		@Url url: String,

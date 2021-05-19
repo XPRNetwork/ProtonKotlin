@@ -38,16 +38,14 @@ class ProtonWorkerFactory @Inject constructor(
 		workerParameters: WorkerParameters
 	): ListenableWorker? {
 		return try {
-			val factoryEntry =
-				workerFactory.entries.find { Class.forName(workerClassName).isAssignableFrom(it.key) }
+			val factoryEntry = workerFactory.entries.find { Class.forName(workerClassName).isAssignableFrom(it.key) }
 
 			if (factoryEntry != null) {
 				val factoryProvider = factoryEntry.value
 				factoryProvider.get().create(context, workerParameters)
 			} else { // fallback if no factory was found
 				val workerClass = Class.forName(workerClassName).asSubclass(ListenableWorker::class.java)
-				val constructor =
-					workerClass.getDeclaredConstructor(Context::class.java, WorkerParameters::class.java)
+				val constructor = workerClass.getDeclaredConstructor(Context::class.java, WorkerParameters::class.java)
 				constructor.newInstance(context, workerParameters)
 			}
 		} catch (e: ClassNotFoundException) {
