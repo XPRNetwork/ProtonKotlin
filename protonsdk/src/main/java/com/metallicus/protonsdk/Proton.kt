@@ -221,7 +221,7 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getMarketContracts(updateExchangeRates: Boolean = false): LiveData<Resource<List<TokenContract>>> = liveData {
+	fun getMarketTokenContracts(updateExchangeRates: Boolean = false): LiveData<Resource<List<TokenContract>>> = liveData {
 		emit(Resource.loading())
 
 		try {

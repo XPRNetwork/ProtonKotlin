@@ -808,7 +808,7 @@ class AccountModule {
 	}
 
 	private fun String.hexStringToByteArray(): ByteArray {
-		val s = toUpperCase(Locale.ROOT)
+		val s = uppercase(Locale.ROOT)
 		val len = s.length
 		val data = ByteArray(len / 2)
 		var i = 0
