@@ -24,6 +24,7 @@ allprojects {
 
 		google()
 		mavenCentral()
+		jcenter() // for orchid
 
 		maven {
 			name = "ProtonKotlinSdk"
