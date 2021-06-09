@@ -44,6 +44,10 @@ class ChainProviderRepository @Inject constructor(
 		chainProviderDao.insert(chainProvider)
 	}
 
+	suspend fun updateChainProvider(chainProvider: ChainProvider) {
+		chainProviderDao.update(chainProvider)
+	}
+
 	suspend fun updateChainUrl(chainId: String, chainUrl: String) {
 		chainProviderDao.updateChainUrl(chainId, chainUrl)
 	}

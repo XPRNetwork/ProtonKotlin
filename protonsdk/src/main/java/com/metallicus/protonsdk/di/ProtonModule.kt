@@ -101,10 +101,10 @@ class ProtonModule {
 		logging.level = HttpLoggingInterceptor.Level.BODY
 
 		val httpClient = OkHttpClient.Builder()
-			.callTimeout(10, TimeUnit.SECONDS)
-			.connectTimeout(10, TimeUnit.SECONDS)
-			.readTimeout(10, TimeUnit.SECONDS)
-			.writeTimeout(10, TimeUnit.SECONDS)
+			.callTimeout(5, TimeUnit.SECONDS)
+			.connectTimeout(5, TimeUnit.SECONDS)
+			.readTimeout(5, TimeUnit.SECONDS)
+			.writeTimeout(5, TimeUnit.SECONDS)
 			.addInterceptor(logging)
 
 		val gson = GsonBuilder()

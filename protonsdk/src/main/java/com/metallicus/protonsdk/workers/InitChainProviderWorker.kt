@@ -64,80 +64,8 @@ class InitChainProviderWorker
 				val chainProvider = Gson().fromJson(response.body(), ChainProvider::class.java)
 				chainProvider.protonChainUrl = protonChainUrl
 
-				val acceptableChainBlockDiff = ChainUrlInfo.ACCEPTABLE_CHAIN_BLOCK_DIFF
-				val acceptableHyperionHistoryBlockDiff = ChainUrlInfo.ACCEPTABLE_HYPERION_HISTORY_BLOCK_DIFF
-
-				val chainUrlStats = mutableListOf<ChainUrlInfo>()
-				chainProvider.chainUrls.forEach { chainUrl ->
-					try {
-						val chainUrlResponse = chainProviderRepository.getChainInfo(chainUrl)
-						if (chainUrlResponse.isSuccessful) {
-							chainUrlResponse.body()?.let { chainInfo ->
-								val blockDiff = chainInfo.headBlockNum.toLong() - chainInfo.lastIrreversibleBlockNum.toLong()
-								val responseTimeMillis = chainUrlResponse.raw().receivedResponseAtMillis - chainUrlResponse.raw().sentRequestAtMillis
-								val inSync = blockDiff < acceptableChainBlockDiff
-
-								val chainUrlInfo = ChainUrlInfo(chainUrl, responseTimeMillis, blockDiff, inSync)
-								chainUrlStats.add(chainUrlInfo)
-							}
-						}
-					} catch (e: Exception) {
-						Timber.d(e)
-					}
-				}
-				chainProvider.chainUrlStats = chainUrlStats
-
-				val hyperionHistoryUrlStats = mutableListOf<ChainUrlInfo>()
-				chainProvider.hyperionHistoryUrls.forEach { hyperionHistoryUrl ->
-					try {
-						val healthResponse = chainProviderRepository.getHealth(hyperionHistoryUrl)
-						if (healthResponse.isSuccessful) {
-							var blockDiff: Long? = null
-
-							healthResponse.body()?.let { body ->
-								var headBlockNum = 0L
-								var lastIndexedBlock = 0L
-								val health = body.get("health").asJsonArray
-								health.forEach { healthElement ->
-									val serviceObj = healthElement.asJsonObject
-									if (serviceObj.get("service").asString == "NodeosRPC") {
-										val serviceDataObj = serviceObj.get("service_data").asJsonObject
-										headBlockNum = serviceDataObj.get("head_block_num").asLong
-									}
-									if (serviceObj.get("service").asString == "Elasticsearch") {
-										val serviceDataObj = serviceObj.get("service_data").asJsonObject
-										lastIndexedBlock = serviceDataObj.get("last_indexed_block").asLong
-									}
-								}
-
-								if (headBlockNum != 0L && lastIndexedBlock != 0L) {
-									blockDiff = headBlockNum - lastIndexedBlock
-								}
-							}
-
-							blockDiff?.let { blkDiff ->
-								val responseTimeMillis = healthResponse.raw().receivedResponseAtMillis - healthResponse.raw().sentRequestAtMillis
-								val inSync = blkDiff < acceptableHyperionHistoryBlockDiff
-
-								val chainUrlInfo = ChainUrlInfo(hyperionHistoryUrl, responseTimeMillis, blkDiff, inSync)
-								hyperionHistoryUrlStats.add(chainUrlInfo)
-							}
-						}
-					} catch (e: Exception) {
-						Timber.d(e)
-					}
-				}
-				chainProvider.hyperionHistoryUrlStats = hyperionHistoryUrlStats
-
-				val fastestChainUrl = chainUrlStats.filter { it.inSync }.minByOrNull { it.responseTimeMillis }
-				fastestChainUrl?.apply {
-					chainProvider.chainUrl = url
-				}
-
-				val fastestHyperionUrl = hyperionHistoryUrlStats.filter { it.inSync }.minByOrNull { it.responseTimeMillis }
-				fastestHyperionUrl?.apply {
-					chainProvider.hyperionHistoryUrl = url
-				}
+				chainProvider.chainUrlStats = mutableListOf()
+				chainProvider.hyperionHistoryUrlStats = mutableListOf()
 
 				val kycProviders = mutableListOf<KYCProvider>()
 
@@ -154,8 +82,7 @@ class InitChainProviderWorker
 					rows?.forEach {
 						val kycProvidersJsonObject = it.asJsonObject
 
-						val kycProvider =
-							gson.fromJson(kycProvidersJsonObject, KYCProvider::class.java)
+						val kycProvider = gson.fromJson(kycProvidersJsonObject, KYCProvider::class.java)
 
 						if (kycProvider.blackListed == 0) {
 							kycProviders.add(kycProvider)

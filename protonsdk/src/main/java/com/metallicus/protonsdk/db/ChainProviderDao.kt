@@ -21,10 +21,7 @@
  */
 package com.metallicus.protonsdk.db
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.metallicus.protonsdk.model.ChainProvider
 
 /**
@@ -34,6 +31,9 @@ import com.metallicus.protonsdk.model.ChainProvider
 interface ChainProviderDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(chainProvider: ChainProvider)
+
+	@Update
+	suspend fun update(chainProvider: ChainProvider)
 
 	@Query("SELECT * FROM chainProvider WHERE chainId = :id")
 	suspend fun findById(id: String): ChainProvider

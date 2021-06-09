@@ -30,21 +30,26 @@ import dagger.multibindings.IntoMap
 @Suppress("unused")
 @Module
 abstract class WorkerModule {
-    @Binds
-    @IntoMap
-    @WorkerKey(InitChainProviderWorker::class)
-    abstract fun bindInitChainProvidersWorker(factory: InitChainProviderWorker.Factory): ChildWorkerFactory
+	@Binds
+	@IntoMap
+	@WorkerKey(InitChainProviderWorker::class)
+	abstract fun bindInitChainProvidersWorker(factory: InitChainProviderWorker.Factory): ChildWorkerFactory
 
-    @Binds
-    @IntoMap
-    @WorkerKey(InitTokenContractsWorker::class)
-    abstract fun bindInitTokenContractsWorker(factory: InitTokenContractsWorker.Factory): ChildWorkerFactory
+	@Binds
+	@IntoMap
+	@WorkerKey(InitTokenContractsWorker::class)
+	abstract fun bindInitTokenContractsWorker(factory: InitTokenContractsWorker.Factory): ChildWorkerFactory
 
-    @Binds
-    @IntoMap
-    @WorkerKey(InitActiveAccountWorker::class)
-    abstract fun bindInitActiveAccountWorker(factory: InitActiveAccountWorker.Factory): ChildWorkerFactory
+	@Binds
+	@IntoMap
+	@WorkerKey(InitActiveAccountWorker::class)
+	abstract fun bindInitActiveAccountWorker(factory: InitActiveAccountWorker.Factory): ChildWorkerFactory
 
-    @Binds
-    abstract fun bindWorkerFactory(factory: ProtonWorkerFactory): WorkerFactory
+	@Binds
+	@IntoMap
+	@WorkerKey(InitChainUrlStatsWorker::class)
+	abstract fun bindInitChainUrlStatsWorker(factory: InitChainUrlStatsWorker.Factory): ChildWorkerFactory
+
+	@Binds
+	abstract fun bindWorkerFactory(factory: ProtonWorkerFactory): WorkerFactory
 }

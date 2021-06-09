@@ -53,6 +53,10 @@ class ChainProviderModule {
 		return chainProviderRepository.getChainProvider(chainId)
 	}
 
+	suspend fun updateChainProvider(chainProvider: ChainProvider) {
+		chainProviderRepository.updateChainProvider(chainProvider)
+	}
+
 	suspend fun updateChainUrl(chainId: String, chainUrl: String) {
 		chainProviderRepository.updateChainUrl(chainId, chainUrl)
 	}
