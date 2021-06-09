@@ -94,6 +94,18 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
+	private suspend fun getChainProviderWithUrlStatsAsync() = suspendCoroutine<ChainProvider> { continuation ->
+		workersModule.onInitChainUrlStats { success, data ->
+			if (success) {
+				protonCoroutineScope.launch {
+					continuation.resume(chainProviderModule.getActiveChainProvider())
+				}
+			} else {
+				continuation.resumeWithException(ProtonException(data))
+			}
+		}
+	}
+
 	/**
 	 * Get the [ChainProvider] info
 	 *
@@ -101,11 +113,15 @@ class Proton private constructor(context: Context) {
 	 *
 	 * @return	LiveData<Resource<[ChainProvider]>>
 	 */
-	fun getChainProvider(): LiveData<Resource<ChainProvider>> = liveData {
+	fun getChainProvider(includeUrlStats: Boolean=false): LiveData<Resource<ChainProvider>> = liveData {
 		emit(Resource.loading())
 
 		try {
-			val chainProvider = getChainProviderAsync()
+			val chainProvider =
+				if (includeUrlStats)
+					getChainProviderWithUrlStatsAsync()
+				else
+					getChainProviderAsync()
 			emit(Resource.success(chainProvider))
 		} catch (e: ProtonException) {
 			val error: Resource<ChainProvider> = Resource.error(e)

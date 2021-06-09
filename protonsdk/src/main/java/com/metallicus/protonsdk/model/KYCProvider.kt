@@ -21,13 +21,9 @@
  */
 package com.metallicus.protonsdk.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity
 data class KYCProvider(
-	@PrimaryKey
 	@SerializedName("kyc_provider") val kycProvider: String,
 
 	@SerializedName("desc") val description: String,

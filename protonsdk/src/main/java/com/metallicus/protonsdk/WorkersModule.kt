@@ -33,6 +33,10 @@ import javax.inject.Inject
  * Helper class used to facilitate WorkManager operations
  */
 class WorkersModule {
+	companion object {
+		const val INIT = "WORKER_INIT"
+	}
+
 	@Inject
 	lateinit var context: Context
 
@@ -53,11 +57,6 @@ class WorkersModule {
 		WorkManager.initialize(context, workManagerConfig)
 
 		workManager = WorkManager.getInstance(context)
-	}
-
-	companion object {
-		const val INIT = "WORKER_INIT"
-		const val UPDATE_RATES = "WORKER_UPDATE_RATES"
 	}
 
 	fun init(protonChainUrl: String) {
@@ -82,16 +81,21 @@ class WorkersModule {
 		val initActiveAccount = OneTimeWorkRequest.Builder(InitActiveAccountWorker::class.java)
 			.setConstraints(constraints).build()
 
+		val initChainUrlsStats = OneTimeWorkRequest.Builder(InitChainUrlStatsWorker::class.java)
+			.setConstraints(constraints).build()
+
 		if (prefs.getActiveAccountName().isNotEmpty()) {
 			workManager
 				.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
 				.then(initTokenContracts)
 				.then(initActiveAccount)
+				.then(initChainUrlsStats)
 				.enqueue()
 		} else {
 			workManager
 				.beginUniqueWork(INIT, ExistingWorkPolicy.REPLACE, initChainProvider)
 				.then(initTokenContracts)
+				.then(initChainUrlsStats)
 				.enqueue()
 		}
 	}
@@ -162,6 +166,31 @@ class WorkersModule {
 						workInfoLiveData.removeObserver(this)
 					} else if (activeAccountWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
 						prefs.hasActiveAccount = true
+						callback(true, null)
+						workInfoLiveData.removeObserver(this)
+					}
+				}
+			}
+			workInfoLiveData.observeForever(workInfoObserver)
+		}
+	}
+
+	fun onInitChainUrlStats(callback: (Boolean, Data?) -> Unit) {
+		if (prefs.hasChainUrlStats) {
+			callback(true, null)
+		} else {
+			val workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(INIT)
+			val workInfoObserver = object : Observer<List<WorkInfo>> {
+				override fun onChanged(workInfos: List<WorkInfo>) {
+					val chainUrlStatsWorkInfos =
+						workInfos.filter { it.tags.contains(InitChainUrlStatsWorker::class.java.name) }
+					if (chainUrlStatsWorkInfos.isEmpty() ||
+						chainUrlStatsWorkInfos.any { it.state == WorkInfo.State.FAILED || it.state == WorkInfo.State.CANCELLED }) {
+						val data = chainUrlStatsWorkInfos.find { it.state == WorkInfo.State.FAILED }?.outputData
+						callback(false, data)
+						workInfoLiveData.removeObserver(this)
+					} else if (chainUrlStatsWorkInfos.all { it.state == WorkInfo.State.SUCCEEDED }) {
+						prefs.hasChainUrlStats = true
 						callback(true, null)
 						workInfoLiveData.removeObserver(this)
 					}

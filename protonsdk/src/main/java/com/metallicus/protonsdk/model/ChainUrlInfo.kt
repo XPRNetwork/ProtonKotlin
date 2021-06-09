@@ -21,12 +21,7 @@
  */
 package com.metallicus.protonsdk.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity
 data class ChainUrlInfo(
-	@PrimaryKey
 	val url: String,
 
 	val responseTimeMillis: Long,

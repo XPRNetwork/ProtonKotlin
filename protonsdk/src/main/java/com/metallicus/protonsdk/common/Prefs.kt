@@ -31,6 +31,7 @@ class Prefs(context: Context) {
 
 		const val HAS_CHAIN_PROVIDER = "has_chain_provider"
 		const val HAS_TOKEN_CONTRACTS = "has_token_contracts"
+		const val HAS_CHAIN_URL_STATS = "has_chain_url_stats"
 
 		const val ACTIVE_CHAIN_ID = "active_chain_id"
 		const val ACTIVE_ACCOUNT_NAME = "active_account_name"
@@ -54,6 +55,14 @@ class Prefs(context: Context) {
 		set(value) {
 			value.let {
 				prefs.edit { putBoolean(HAS_TOKEN_CONTRACTS, it) }
+			}
+		}
+
+	var hasChainUrlStats: Boolean
+		get() = prefs.getBoolean(HAS_CHAIN_URL_STATS, false)
+		set(value) {
+			value.let {
+				prefs.edit { putBoolean(HAS_CHAIN_URL_STATS, it) }
 			}
 		}
 
@@ -94,6 +103,7 @@ class Prefs(context: Context) {
 			remove(HAS_CHAIN_PROVIDER)
 			remove(HAS_TOKEN_CONTRACTS)
 			remove(HAS_ACTIVE_ACCOUNT)
+			remove(HAS_CHAIN_URL_STATS)
 		}
 	}
 
