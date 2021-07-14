@@ -482,8 +482,7 @@ class AccountModule {
 		"linkauth",
 		"unlinkauth",
 		"setabi",
-		"setcode",
-		"newaccount"
+		"setcode"
 	)
 
 	suspend fun decodeESR(chainAccount: ChainAccount, tokenContractMap: Map<String, TokenContract>, originalESRUrl: String, esrSession: ESRSession?=null): ProtonESR {
