@@ -797,6 +797,7 @@ class Proton private constructor(context: Context) {
 						.connectTimeout(30, TimeUnit.SECONDS)
 						.readTimeout(30, TimeUnit.SECONDS)
 						.writeTimeout(30, TimeUnit.SECONDS)
+						.pingInterval(5, TimeUnit.SECONDS)
 						.addInterceptor(logging)
 						.build()
 
