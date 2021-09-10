@@ -121,6 +121,11 @@ EOS APIs inspired by
 Key Storage inspired by
 [Secure Device Storage](https://github.com/adorsys/secure-storage-android)
 
+# Developer Chat
+
+We have a telegram channel dedicated to Proton development here:
+[https://t.me/protondev](https://t.me/protondev)
+
 # MIT License
 
 Copyright (c) 2021 Proton Chain LLC, Delaware

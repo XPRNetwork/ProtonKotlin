@@ -244,7 +244,7 @@ class Proton private constructor(context: Context) {
 			val tokenContracts = getTokenContractsAsync()
 
 			val marketContracts = tokenContracts.filter {
-				it.contract == "eosio.token" || it.contract == "xtokens"
+				it.contract == "eosio.token" || it.contract == "xtokens" || it.contract=="loan.token"
 			}
 
 			if (updateExchangeRates) {
@@ -797,6 +797,7 @@ class Proton private constructor(context: Context) {
 						.connectTimeout(30, TimeUnit.SECONDS)
 						.readTimeout(30, TimeUnit.SECONDS)
 						.writeTimeout(30, TimeUnit.SECONDS)
+						.pingInterval(5, TimeUnit.SECONDS)
 						.addInterceptor(logging)
 						.build()
 
