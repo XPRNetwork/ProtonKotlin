@@ -19,12 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-const val kotlinVersion = "1.5.21"
+const val kotlinVersion = "1.5.31"
 const val orchidVersion = "0.21.1"
 
 object ProtonSdk {
-	const val versionCode = 46
-	const val versionName = "1.0.8"
+	const val versionCode = 47
+	const val versionName = "1.1.0"
 }
 
 object BuildPlugins {
@@ -44,7 +44,7 @@ object BuildPlugins {
 
 object Android {
 	const val minSdk = 21
-	const val compileSdk = 30
+	const val compileSdk = 31
 	const val targetSdk = compileSdk
 	const val buildTools = "30.0.3"
 
@@ -57,17 +57,17 @@ object Android {
 
 object Libraries {
 	private object Versions {
-		const val ktx = "1.6.0-beta01"
+		const val ktx = "1.6.0-rc01"
 		const val lifecycleLiveData = "2.3.1"
-		const val room = "2.3.0-rc01"
-		const val workManager = "2.5.0"
+		const val room = "2.4.0-alpha04"
+		const val workManager = "2.6.0"
 		const val okhttp3 = "5.0.0-alpha.2"
 		const val retrofit = "2.9.0"
-		const val dagger = "2.35.1"
+		const val dagger = "2.38.1"
 		const val daggerAssistedInject = "0.6.0"
-		const val coroutines = "1.4.0-M1"
+		const val coroutines = "1.5.2"
 		const val timber = "4.7.1"
-		const val gson = "2.8.6"
+		const val gson = "2.8.8"
 		const val guava = "30.1.1-jre"
 		const val esr = "1.0.1"
 	}
