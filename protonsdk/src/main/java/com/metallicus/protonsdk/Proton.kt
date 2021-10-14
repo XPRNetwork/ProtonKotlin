@@ -492,7 +492,7 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	suspend fun getActiveAccountActions(contract: String, symbol: String, limit: Int, skip: Int): Resource<List<Action>> {
+	suspend fun getActiveAccountActions(contract: String, symbol: String, skip: Int, limit: Int): Resource<List<Action>> {
 		return try {
 			val activeAccount = getActiveAccountAsync()
 
@@ -502,8 +502,8 @@ class Proton private constructor(context: Context) {
 				activeAccount.account.accountName,
 				contract,
 				symbol,
-				limit,
-				skip)
+				skip,
+				limit)
 		} catch (e: ProtonException) {
 			Resource.error(e)
 		} catch (e: Exception) {
@@ -511,10 +511,10 @@ class Proton private constructor(context: Context) {
 		}
 	}
 
-	fun getActiveAccountActionsLiveData(contract: String, symbol: String, limit: Int, skip: Int): LiveData<Resource<List<Action>>> = liveData {
+	fun getActiveAccountActionsLiveData(contract: String, symbol: String, skip: Int, limit: Int): LiveData<Resource<List<Action>>> = liveData {
 		emit(Resource.loading())
 
-		emit(getActiveAccountActions(contract, symbol, limit, skip))
+		emit(getActiveAccountActions(contract, symbol, skip, limit))
 	}
 
 	fun updateAccountName(pin: String, name: String): LiveData<Resource<ChainAccount>> = liveData {
@@ -786,7 +786,7 @@ class Proton private constructor(context: Context) {
 			val esrSessionList = accountModule.getESRSessions(/*activeAccount*/)
 			esrSessionList.forEach { esrSession ->
 				val esrSessionId = esrSession.id
-				if (!isESRSessionOpen(esrSessionId)) {
+				//if (!isESRSessionOpen(esrSessionId)) {
 					val request = Request.Builder().url(esrSession.receiveChannelUrl).build()
 
 					val logging = HttpLoggingInterceptor()
@@ -824,7 +824,7 @@ class Proton private constructor(context: Context) {
 							Timber.d("ESR Listener onFailure - $message")
 						}
 					))
-				}
+				//}
 			}
 		} catch (e: Exception) {
 			Timber.e(e)

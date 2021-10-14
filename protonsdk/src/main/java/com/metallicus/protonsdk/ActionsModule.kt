@@ -71,9 +71,9 @@ class ActionsModule {
 	}
 
 	@Suppress("unused", "UNUSED_PARAMETER")
-	suspend fun getActions(chainUrl: String, hyperionHistoryUrl: String, accountName: String, contract: String, symbol: String, limit: Int=250, skip: Int=0): Resource<List<AccountAction>> {
+	suspend fun getActions(chainUrl: String, hyperionHistoryUrl: String, accountName: String, contract: String, symbol: String, skip: Int=0, limit: Int=250): Resource<List<AccountAction>> {
 		return try {
-			val response = actionRepository.fetchAccountTokenActions(hyperionHistoryUrl, accountName, symbol, limit, skip)
+			val response = actionRepository.fetchAccountTokenActions(hyperionHistoryUrl, accountName, symbol, skip, limit)
 			if (response.isSuccessful) {
 				val jsonObject = response.body()
 
